@@ -1,0 +1,67 @@
+basePath: /api/v1
+definitions:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.Product:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:3001
+info:
+  contact:
+    email: faalsaru@gmail.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the awesome API for the Hotel Trivoli project.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Hotel Trivoli API
+  version: "1.0"
+paths:
+  /product:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable products in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+      summary: List products
+      tags:
+      - product
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

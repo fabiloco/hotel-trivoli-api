@@ -6,6 +6,14 @@ Hotel Trivoli project API
 
 Create a .env file in the root folder and filled the variables with your owns or ask for them.
 
+##### Generate swagger documentation
+
+```
+swag init --parseDependency --parseInternal
+```
+
+Once the app is running, the swagger docs will be avaliable at /docs
+
 #### Setup database
 
 Make sure you have docker and docker-compose installed on your system. Run the following command on the root folder to setup the mariadb database.
