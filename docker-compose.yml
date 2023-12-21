@@ -1,0 +1,18 @@
+version: '3'
+
+volumes:
+  data:
+
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hotel_trivoli
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    volumes:
+      - data:/var/lib/mysql
+    ports:
+      - '3306:3306'

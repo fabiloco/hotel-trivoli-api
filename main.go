@@ -1,7 +1,8 @@
-
 package main
 
 import (
+	"fabiloco/hotel-trivoli-api/database"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -14,7 +15,7 @@ func main() {
   // Serve static assets
   app.Static("/public", "./public")
 
-  // database.ConnectDB()
+  database.ConnectDB()
 
   app.Get("/", func(c *fiber.Ctx) error {
     return c.SendString("hello world")
