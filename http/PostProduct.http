@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/v1/product
+Content-Type: application/json
+
+{
+  "name": "lol",
+  "price": 123,
+  "stock": 123,
+  "type": "123"
+}
