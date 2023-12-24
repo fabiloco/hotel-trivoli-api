@@ -9,6 +9,7 @@ definitions:
         type: boolean
     type: object
   model.Product:
+    description: Products information in stock
     properties:
       createdAt:
         type: string
@@ -17,12 +18,16 @@ definitions:
       id:
         type: integer
       name:
+        description: product name
         type: string
       price:
+        description: product price
         type: number
       stock:
+        description: product stock avaliable
         type: integer
       type:
+        description: product type
         type: string
       updatedAt:
         type: string
@@ -59,6 +64,31 @@ paths:
               $ref: '#/definitions/model.Product'
             type: array
       summary: List products
+      tags:
+      - product
+    post:
+      consumes:
+      - application/json
+      description: Create new products
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: "{\n\r\"name\": \"test product\",\n\"price\": 2000,\n\"stock\":
+            100,\n\"type\": \"test type\"\n}"
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+      summary: Create products
       tags:
       - product
 securityDefinitions:

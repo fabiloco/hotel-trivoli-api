@@ -2,17 +2,19 @@ package main
 
 import (
 	"fabiloco/hotel-trivoli-api/database"
+	"fabiloco/hotel-trivoli-api/middleware"
 	"fabiloco/hotel-trivoli-api/router"
+
+	_ "fabiloco/hotel-trivoli-api/docs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-  "github.com/gofiber/swagger" // swagger handler
-  _ "fabiloco/hotel-trivoli-api/docs"
+	"github.com/gofiber/swagger" // swagger handler
 )
 
 // @title           Hotel Trivoli API
 // @version         1.0
-// @description     This is the awesome API for the Hotel Trivoli project. 
+// @description     This is the awesome API for the Hotel Trivoli project.
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   API Support
@@ -29,6 +31,13 @@ import (
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
+
+
+type  GlobalErrorHandlerResp struct {
+  Success bool   `json:"success"`
+  Message string `json:"message"`
+}
+
 func main() {
   app := fiber.New()
 
@@ -55,6 +64,7 @@ func main() {
 		OAuth2RedirectUrl: "http://localhost:3001/swagger/oauth2-redirect.html",
 	}))
 
+  app.Use(middleware.FormatResponse())
   router.SetupRoutes(app)
 
   app.Listen(":3001")

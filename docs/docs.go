@@ -48,6 +48,42 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Create new products",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Create products",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\r\"name\": \"test product\",\n\"price\": 2000,\n\"stock\": 100,\n\"type\": \"test type\"\n}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Product"
+                            }
+                        }
+                    }
+                }
             }
         }
     },
@@ -65,6 +101,7 @@ const docTemplate = `{
             }
         },
         "model.Product": {
+            "description": "Products information in stock",
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -77,15 +114,19 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+                    "description": "product name",
                     "type": "string"
                 },
                 "price": {
+                    "description": "product price",
                     "type": "number"
                 },
                 "stock": {
+                    "description": "product stock avaliable",
                     "type": "integer"
                 },
                 "type": {
+                    "description": "product type",
                     "type": "string"
                 },
                 "updatedAt": {
