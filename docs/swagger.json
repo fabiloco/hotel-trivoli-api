@@ -63,8 +63,121 @@
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "example": "{\n\r\"name\": \"test product\",\n\"price\": 2000,\n\"stock\": 100,\n\"type\": \"test type\"\n}"
+                            "example": "{\n\"name\": \"test product\",\n\"price\": 2000,\n\"stock\": 100,\n\"type\": \"test type\"\n}"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Product"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product/:id": {
+            "put": {
+                "description": "Edit existing product",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Update products",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\",\n\"price\": 2000,\n\"stock\": 100,\n\"type\": \"test type\"\n}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the product to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Product"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing product",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Delete products",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the product to delete",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Product"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/product/{id}": {
+            "get": {
+                "description": "Get a single product by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Get a product",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the product to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
