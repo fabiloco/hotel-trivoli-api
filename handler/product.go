@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"fabiloco/hotel-trivoli-api/database"
 	"fabiloco/hotel-trivoli-api/model"
 	"fabiloco/hotel-trivoli-api/utils"
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,21 +14,52 @@ import (
 // @Produce       json
 // @Success       200  {array}   model.Product
 // @Router        /product [get]
-func GetProducts(ctx *fiber.Ctx) error {
-  var products []model.Product
-  
-  result := database.DB.Find(&products)
+func (h *Handler) ListProducts(ctx *fiber.Ctx) error {
+  products, error := h.productStore.List()
 
-  if result.Error != nil {
-
+  if error != nil {
     ctx.Locals("data", fiber.Map{
-			"errors": result.Error.Error(),
+			"errors": error.Error(),
 		})
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
   ctx.Locals("data", fiber.Map{
     "products": products,
+  })
+
+  return ctx.SendStatus(fiber.StatusOK)
+}
+
+// ListProducts   godoc
+// @Summary       Get a product
+// @Description   Get a single product by its id
+// @Tags          product
+// @Accept        json
+// @Param			    id  path  number  true  "id of the product to retrieve" 
+// @Produce       json
+// @Success       200  {array}   model.Product
+// @Router        /product/{id} [get]
+func (h *Handler) GetProductById(ctx *fiber.Ctx) error {
+  id, err := ctx.ParamsInt("id")
+  if err != nil {
+    ctx.Locals("data", fiber.Map{
+			"errors": err.Error(),
+		})
+    return ctx.SendStatus(fiber.StatusBadRequest)
+  }
+
+  product, error := h.productStore.FindById(id)
+
+  if error != nil {
+    ctx.Locals("data", fiber.Map{
+			"errors": error.Error(),
+		})
+    return ctx.SendStatus(fiber.StatusNotFound)
+  }
+
+  ctx.Locals("data", fiber.Map{
+    "product": product,
   })
 
   return ctx.SendStatus(fiber.StatusOK)
@@ -46,7 +74,7 @@ func GetProducts(ctx *fiber.Ctx) error {
 // @Produce       json
 // @Success       200  {array}   model.Product
 // @Router        /product [post]
-func PostProducts(ctx *fiber.Ctx) error {
+func (h *Handler) PostProducts(ctx *fiber.Ctx) error {
   var body model.CreateProduct
   
   if err := ctx.BodyParser(&body); err != nil {
@@ -65,17 +93,17 @@ func PostProducts(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  product := model.Product {
-    Name: body.Name,
-    Stock: body.Stock,
-    Price: body.Price,
-    Type: body.Type,
+  product, error := h.productStore.Create(&body)
+
+  if error != nil {
+    ctx.Locals("data", fiber.Map{
+			"errors": error.Error(),
+		})
+    return ctx.SendStatus(fiber.StatusNotFound)
   }
 
-  database.DB.Create(&product)
-
   ctx.Locals("data", fiber.Map{
-    "product": body,
+    "product": product,
   })
 
   return ctx.SendStatus(fiber.StatusCreated)
@@ -92,7 +120,7 @@ func PostProducts(ctx *fiber.Ctx) error {
 // @Produce       json
 // @Success       200  {array}   model.Product
 // @Router        /product/{id} [put]
-func PutProduct(ctx *fiber.Ctx) error {
+func (h *Handler) PutProduct(ctx *fiber.Ctx) error {
   var body model.CreateProduct
 
   if err := ctx.BodyParser(&body); err != nil {
@@ -118,28 +146,16 @@ func PutProduct(ctx *fiber.Ctx) error {
 			"errors": err.Error(),
 		})
     return ctx.SendStatus(fiber.StatusBadRequest)
-
   }
 
-  product := model.Product {}
+  product, error := h.productStore.Update(id, &body)
 
-  result := database.DB.First(&product, id)
-
-  if result.Error != nil {
+  if error != nil {
     ctx.Locals("data", fiber.Map{
-			"errors": result.Error.Error(),
+			"errors": error.Error(),
 		})
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
-
-  fmt.Println(body.Name)
-
-  product.Name = body.Name
-  product.Price = body.Price
-  product.Type = body.Type
-  product.Stock = body.Stock
-
-  database.DB.Save(&product)
 
   ctx.Locals("data", fiber.Map{
     "product": product,
@@ -149,42 +165,6 @@ func PutProduct(ctx *fiber.Ctx) error {
 }
 
 
-// ListProducts   godoc
-// @Summary       Get a product
-// @Description   Get a single product by its id
-// @Tags          product
-// @Accept        json
-// @Param			    id  path  number  true  "id of the product to retrieve" 
-// @Produce       json
-// @Success       200  {array}   model.Product
-// @Router        /product/{id} [get]
-func GetProductById(ctx *fiber.Ctx) error {
-  var products []model.Product
-
-  id, err := ctx.ParamsInt("id")
-
-  if err != nil {
-    ctx.Locals("data", fiber.Map{
-			"errors": err.Error(),
-		})
-    return ctx.SendStatus(fiber.StatusBadRequest)
-  }
-  
-  result := database.DB.Find(&products, id)
-
-  if result.Error != nil {
-    ctx.Locals("data", fiber.Map{
-			"errors": result.Error.Error(),
-		})
-    return ctx.SendStatus(fiber.StatusBadRequest)
-  }
-
-  ctx.Locals("data", fiber.Map{
-    "products": products,
-  })
-
-  return ctx.SendStatus(fiber.StatusOK)
-}
 
 
 // ListProducts   godoc
@@ -196,9 +176,7 @@ func GetProductById(ctx *fiber.Ctx) error {
 // @Produce       json
 // @Success       200  {array}   model.Product
 // @Router        /product/{id} [delete]
-func DeleteProductById(ctx *fiber.Ctx) error {
-  var product model.Product
-
+func (h *Handler) DeleteProductById(ctx *fiber.Ctx) error {
   id, err := ctx.ParamsInt("id")
 
   if err != nil {
@@ -208,17 +186,17 @@ func DeleteProductById(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
   
-  result := database.DB.Delete(&product, id)
+  product, error := h.productStore.Delete(id)
 
-  if result.Error != nil {
+  if error != nil {
     ctx.Locals("data", fiber.Map{
-			"errors": result.Error.Error(),
+			"errors": error.Error(),
 		})
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
   ctx.Locals("data", fiber.Map{
-    "products": product,
+    "product": product,
   })
 
   return ctx.SendStatus(fiber.StatusOK)

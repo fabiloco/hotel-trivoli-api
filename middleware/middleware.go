@@ -16,8 +16,8 @@ func FormatResponse() fiber.Handler {
     response := c.Response()
 
     formattedResponse := fiber.Map{
-      "success": response.StatusCode() >= 200 && response.StatusCode() < 400,
       // "message": response.Status(),
+      "success": response.StatusCode() >= 200 && response.StatusCode() < 400,
       "data": data,
     }
 

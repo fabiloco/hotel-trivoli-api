@@ -30,7 +30,7 @@ You can run the app in dev mode using the following command:
 go run main.go
 ```
 
-You can also install [air](https://github.com/cosmtrek/air) to live-reload the app during dev time.
+You can also install [air](https://github.com/cosmtrek/air) to live-reload the app during developing.
 
 ```
 air

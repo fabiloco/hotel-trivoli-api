@@ -2,8 +2,9 @@ package main
 
 import (
 	"fabiloco/hotel-trivoli-api/database"
+	"fabiloco/hotel-trivoli-api/handler"
 	"fabiloco/hotel-trivoli-api/middleware"
-	"fabiloco/hotel-trivoli-api/router"
+	"fabiloco/hotel-trivoli-api/store"
 
 	_ "fabiloco/hotel-trivoli-api/docs"
 
@@ -65,7 +66,11 @@ func main() {
 	}))
 
   app.Use(middleware.FormatResponse())
-  router.SetupRoutes(app)
+
+  productStore := store.NewProductStore(database.DB)
+
+  handler := handler.NewHandler(productStore)
+  handler.Register(app)
 
   app.Listen(":3001")
 }
