@@ -6,19 +6,28 @@ import (
 )
 
 func (h *Handler) Register(app *fiber.App) {
-  // middleware
-  api := app.Group("/api/v1", logger.New())
-  // api.Get("/", handler.Hello)
+	// middleware
+	api := app.Group("/api/v1", logger.New())
+	// api.Get("/", handler.Hello)
 
-  // Product
-  product := api.Group("/product")
-  product.Get("/", h.ListProducts)
-  product.Get("/:id", h.GetProductById)
-  product.Post("/", h.PostProducts)
-  product.Put("/:id", h.PutProduct)
-  product.Delete("/:id", h.DeleteProductById)
+	// Product
+	product := api.Group("/product")
+	product.Get("/", h.ListProducts)
+	product.Get("/:id", h.GetProductById)
+	product.Post("/", h.PostProducts)
+	product.Put("/:id", h.PutProduct)
+	product.Delete("/:id", h.DeleteProductById)
 
-  // Auth
+	// User
+	user := api.Group("/user")
+	user.Get("/", h.ListUsers)
+	user.Get("/:id", h.GetUserById)
+	user.Post("/", h.CreateUser)
+	user.Put("/:id", h.UpdateUser)
+	user.Delete("/:id", h.DeleteUserById)
+
+	// Auth
 	// auth := api.Group("/auth")
 	// auth.Post("/login", handler.Login)
+
 }

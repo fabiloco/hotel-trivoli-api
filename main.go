@@ -2,75 +2,61 @@ package main
 
 import (
 	"fabiloco/hotel-trivoli-api/database"
+	_ "fabiloco/hotel-trivoli-api/docs"
 	"fabiloco/hotel-trivoli-api/handler"
 	"fabiloco/hotel-trivoli-api/middleware"
+	"fabiloco/hotel-trivoli-api/model"
 	"fabiloco/hotel-trivoli-api/store"
-
-	_ "fabiloco/hotel-trivoli-api/docs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/swagger" // swagger handler
+	"github.com/gofiber/swagger"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-// @title           Hotel Trivoli API
-// @version         1.0
-// @description     This is the awesome API for the Hotel Trivoli project.
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  faalsaru@gmail.com
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:3001
-// @BasePath  /api/v1
-
-// @securityDefinitions.basic  BasicAuth
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
-
-
-type  GlobalErrorHandlerResp struct {
-  Success bool   `json:"success"`
-  Message string `json:"message"`
-}
-
 func main() {
-  app := fiber.New()
+	app := fiber.New()
 
-  app.Use(cors.New())
+	app.Use(cors.New())
 
-  // Serve static assets
-  app.Static("/public", "./public")
+	// Serve static assets
+	app.Static("/public", "./public")
 
-  database.ConnectDB()
+	database.ConnectDB()
 
-  app.Get("/docs/*", swagger.HandlerDefault) // default
+	app.Get("/docs/*", swagger.HandlerDefault)
 
-	app.Get("/docs/*", swagger.New(swagger.Config{ // custom
-		URL: "http://example.com/swagger.json",
-		DeepLinking: false,
-		// Expand ("list") or Collapse ("none") tag groups by default
+	app.Get("/docs/*", swagger.New(swagger.Config{
+		URL:          "http://example.com/swagger.json",
+		DeepLinking:  false,
 		DocExpansion: "none",
-		// Prefill OAuth ClientId on Authorize popup
 		OAuth: &swagger.OAuthConfig{
 			AppName:  "OAuth Provider",
 			ClientId: "21bb4edc-05a7-4afc-86f1-2e151e4ba6e2",
 		},
-		// Ability to change OAuth2 redirect uri location
 		OAuth2RedirectUrl: "http://localhost:3001/swagger/oauth2-redirect.html",
 	}))
 
-  app.Use(middleware.FormatResponse())
+	app.Use(middleware.FormatResponse())
 
-  productStore := store.NewProductStore(database.DB)
+	// Configurar la base de datos
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("No se pudo conectar a la base de datos")
+	}
 
-  handler := handler.NewHandler(productStore)
-  handler.Register(app)
+	// Migrar modelos
+	db.AutoMigrate(&model.User{}) // Asegúrate de tener otros modelos aquí si es necesario
 
-  app.Listen(":3001")
+	// Crear instancias de los stores
+	productStore := store.NewProductStore(database.DB)
+	userStore := store.NewUserStore(database.DB)
+
+	// Crear instancias de los handlers
+	StoreHandler := handler.NewHandler(productStore, userStore)
+
+	// Registrar las rutas
+	StoreHandler.Register(app)
+	app.Listen(":3001")
 }
