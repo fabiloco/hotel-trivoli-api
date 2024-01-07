@@ -18,6 +18,14 @@ func (h *Handler) Register(app *fiber.App) {
 	product.Put("/:id", h.PutProduct)
 	product.Delete("/:id", h.DeleteProductById)
 
+	// Product type
+	productType := api.Group("/product-type")
+	productType.Get("/", h.ListProductTypes)
+	productType.Get("/:id", h.GetProductTypeById)
+	productType.Post("/", h.PostProductType)
+	productType.Put("/:id", h.PutProductType)
+	productType.Delete("/:id", h.DeleteProductTypeById)
+
 	// User
 	user := api.Group("/user")
 	user.Get("/", h.ListUsers)

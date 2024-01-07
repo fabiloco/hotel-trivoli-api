@@ -51,10 +51,11 @@ func main() {
 
 	// Crear instancias de los stores
 	productStore := store.NewProductStore(database.DB)
+	productTypeStore := store.NewProductTypeStore(database.DB)
 	userStore := store.NewUserStore(database.DB)
 
 	// Crear instancias de los handlers
-	StoreHandler := handler.NewHandler(productStore, userStore)
+	StoreHandler := handler.NewHandler(productStore, userStore, productTypeStore)
 
 	// Registrar las rutas
 	StoreHandler.Register(app)
