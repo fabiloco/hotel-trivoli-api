@@ -4,7 +4,6 @@ import (
 	"fabiloco/hotel-trivoli-api/api/routes"
 	"fabiloco/hotel-trivoli-api/api/database"
 	_ "fabiloco/hotel-trivoli-api/docs"
-	"fabiloco/hotel-trivoli-api/api/middleware"
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	producttype "fabiloco/hotel-trivoli-api/pkg/product_type"
 	"fabiloco/hotel-trivoli-api/pkg/user"
@@ -38,13 +37,13 @@ func main() {
 		OAuth2RedirectUrl: "http://localhost:3001/swagger/oauth2-redirect.html",
 	}))
 
-	app.Use(middleware.FormatResponse())
+	// app.Use(middleware.FormatResponse())
 
   productRepo := product.NewRepository(database.DB)
   productTypeRepo := producttype.NewRepository(database.DB)
   userRepo := user.NewRepository(database.DB)
 
-  productService := product.NewService(productRepo)
+  productService := product.NewService(productRepo, productTypeRepo)
   productTypeService := producttype.NewService(productTypeRepo)
   userService := user.NewService(userRepo)
 

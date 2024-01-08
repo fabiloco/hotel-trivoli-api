@@ -35,7 +35,7 @@ func (r *repository) Read() (*[]entities.Product, error) {
 func (r *repository) ReadById(id uint) (*entities.Product, error) {
 	var product entities.Product
 
-	result := r.db.Preload("Type").Find(&product, id)
+	result := r.db.Preload("Type").First(&product, id)
 
 	if result.Error != nil {
 		return nil, result.Error

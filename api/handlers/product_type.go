@@ -1,7 +1,14 @@
 package handlers
 
 import (
+	"errors"
+	"fabiloco/hotel-trivoli-api/api/presenter"
+	"fabiloco/hotel-trivoli-api/api/utils"
+	"fabiloco/hotel-trivoli-api/pkg/entities"
 	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
+	"net/http"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,20 +22,14 @@ import (
 // @Router        /product-type [get]
 func GetProductTypes(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-    products, error := service.FetchProductTypes()
+    productTypes, error := service.FetchProductTypes()
 
     if error != nil {
-      ctx.Locals("data", fiber.Map{
-        "errors": error.Error(),
-      })
-      return ctx.SendStatus(fiber.StatusBadRequest)
+      ctx.Status(http.StatusInternalServerError)
+      return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    ctx.Locals("data", fiber.Map{
-      "products": products,
-    })
-
-    return ctx.SendStatus(fiber.StatusOK)
+    return ctx.JSON(presenter.SuccessResponse(productTypes))
   }
 }
 
@@ -45,26 +46,18 @@ func GetProductTypeById(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
     if err != nil {
-      ctx.Locals("data", fiber.Map{
-        "errors": err.Error(),
-      })
-      return ctx.SendStatus(fiber.StatusBadRequest)
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
     }
 
     product, error := service.FetchProductTypeById(uint(id))
 
     if error != nil {
-      ctx.Locals("data", fiber.Map{
-        "errors": error.Error(),
-      })
-      return ctx.SendStatus(fiber.StatusNotFound)
+      ctx.Status(http.StatusInternalServerError)
+      return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    ctx.Locals("data", fiber.Map{
-      "product": product,
-    })
-
-    return ctx.SendStatus(fiber.StatusOK)
+    return ctx.JSON(presenter.SuccessResponse(product))
   }
 }
 
@@ -79,60 +72,27 @@ func GetProductTypeById(service productType.Service) fiber.Handler {
 // @Router        /product-type [post]
 func PostProductTypes(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-  //
-  // var body entities.CreateProductType
-  // 
-  // if err := ctx.BodyParser(&body); err != nil {
-  //   ctx.Locals("data", fiber.Map{
-		// 	"errors": err.Error(),
-		// })
-  //   return ctx.SendStatus(fiber.StatusBadRequest)
-  // }
-  //
-  // validationErrors := utils.ValidateInput(ctx, body)
-  //
-  // if validationErrors != nil {
-  //   ctx.Locals("data", fiber.Map{
-		// 	"errors": validationErrors,
-		// })
-  //   return ctx.SendStatus(fiber.StatusBadRequest)
-  // }
-  //
-  // var productTypesSlice []entities.ProductTypeType
-  //
-  // for i := 0; i < len(body.Type); i++{
-  //   productType, error := h.productTypeStore.FindById(body.Type[i])
-  //
-  //   if error != nil {
-  //     ctx.Locals("data", fiber.Map{
-  //       "errors": error.Error() + fmt.Sprintf(": product type with id: %d", body.Type[i]),
-  //     })
-  //     return ctx.SendStatus(fiber.StatusNotFound)
-  //   }
-  //
-  //   productTypesSlice = append(productTypesSlice, *productType)
-  // }
-  //
-  // newProductType := model.ProductType {
-  //   Name: body.Name,
-  //   Price: body.Price,
-  //   Stock: body.Stock,
-  //   Type: productTypesSlice,
-  // }
-  //
-  // product, error := h.productStore.Create(&newProductType)
-  //
-  // if error != nil {
-  //   ctx.Locals("data", fiber.Map{
-		// 	"errors": error.Error(),
-		// })
-  //   return ctx.SendStatus(fiber.StatusNotFound)
-  // }
-  //
-  // ctx.Locals("data", fiber.Map{
-  //   "product": product,
-  // })
-  return ctx.SendStatus(fiber.StatusCreated)
+    var body entities.CreateProductType
+
+    if err := ctx.BodyParser(&body); err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(err))
+    }
+    validationErrors := utils.ValidateInput(ctx, body)
+
+    if validationErrors != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+    }
+
+    product, error := service.InsertProductType(&body)
+
+    if error != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+    return ctx.JSON(presenter.SuccessResponse(product))
   }
 }
 
@@ -149,70 +109,33 @@ func PostProductTypes(service productType.Service) fiber.Handler {
 // @Router        /product-type/{id} [put]
 func PutProductType(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-    // var body entities.CreateProductType
-    //
-    // if err := ctx.BodyParser(&body); err != nil {
-    //   ctx.Locals("data", fiber.Map{
-    //     "errors": err.Error(),
-    //   })
-    //   return ctx.SendStatus(fiber.StatusBadRequest)
-    // }
-    //
-    // validationErrors := utils.ValidateInput(ctx, body)
-    //
-    // if validationErrors != nil {
-    //   ctx.Locals("data", fiber.Map{
-    //     "errors": validationErrors,
-    //   })
-    //   return ctx.SendStatus(fiber.StatusBadRequest)
-    // }
-    // 
-    // id, err := ctx.ParamsInt("id")
-    //
-    // if err != nil {
-    //   ctx.Locals("data", fiber.Map{
-    //     "errors": err.Error(),
-    //   })
-    //   return ctx.SendStatus(fiber.StatusBadRequest)
-    // }
-    //
-    // var productTypesSlice []model.ProductTypeType
-    //
-    // for i := 0; i < len(body.Type); i++{
-    //   productType, error := h.productTypeStore.FindById(body.Type[i])
-    //
-    //   if error != nil {
-    //     ctx.Locals("data", fiber.Map{
-    //       "errors": error.Error() + fmt.Sprintf(": product type with id: %d", body.Type[i]),
-    //     })
-    //     return ctx.SendStatus(fiber.StatusNotFound)
-    //   }
-    //
-    //   productTypesSlice = append(productTypesSlice, *productType)
-    // }
-    //
-    // newProductType := model.ProductType {
-    //   Name: body.Name,
-    //   Price: body.Price,
-    //   Stock: body.Stock,
-    //   Type: productTypesSlice,
-    // }
-    //
-    //
-    // product, error := h.productStore.Update(uint(id), &newProductType)
-    //
-    // if error != nil {
-    //   ctx.Locals("data", fiber.Map{
-    //     "errors": error.Error(),
-    //   })
-    //   return ctx.SendStatus(fiber.StatusBadRequest)
-    // }
-    //
-    // ctx.Locals("data", fiber.Map{
-    //   "product": product,
-    // })
-    //
-    return ctx.SendStatus(fiber.StatusCreated)
+    var body entities.CreateProductType
+
+    if err := ctx.BodyParser(&body); err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(err))
+    }
+    validationErrors := utils.ValidateInput(ctx, body)
+
+    if validationErrors != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+    }
+
+    id, err := ctx.ParamsInt("id")
+    if err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+    }
+
+    product, error := service.UpdateProductType(uint(id), &body)
+
+    if error != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+    return ctx.JSON(presenter.SuccessResponse(product))
   }
 }
 
@@ -231,28 +154,19 @@ func PutProductType(service productType.Service) fiber.Handler {
 func DeleteProductTypeById(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
-
     if err != nil {
-      ctx.Locals("data", fiber.Map{
-        "errors": err.Error(),
-      })
-      return ctx.SendStatus(fiber.StatusBadRequest)
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
     }
     
     product, error := service.RemoveProductType(uint(id))
 
     if error != nil {
-      ctx.Locals("data", fiber.Map{
-        "errors": error.Error(),
-      })
-      return ctx.SendStatus(fiber.StatusBadRequest)
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    ctx.Locals("data", fiber.Map{
-      "product": product,
-    })
-
-    return ctx.SendStatus(fiber.StatusOK)
+    return ctx.JSON(presenter.SuccessResponse(product))
   }
 }
 

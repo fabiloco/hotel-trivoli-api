@@ -2,5 +2,5 @@ POST http://localhost:3001/api/v1/product-type
 Content-Type: application/json
 
 {
-  "name": "gasiosia"
+  "name": "verduras"
 }
