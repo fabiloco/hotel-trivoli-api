@@ -1,18 +1,16 @@
 package main
 
 import (
+	"fabiloco/hotel-trivoli-api/api/routes"
 	"fabiloco/hotel-trivoli-api/database"
 	_ "fabiloco/hotel-trivoli-api/docs"
-	"fabiloco/hotel-trivoli-api/handler"
 	"fabiloco/hotel-trivoli-api/middleware"
-	"fabiloco/hotel-trivoli-api/model"
-	"fabiloco/hotel-trivoli-api/store"
+	"fabiloco/hotel-trivoli-api/pkg/product"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 func main() {
@@ -40,24 +38,16 @@ func main() {
 
 	app.Use(middleware.FormatResponse())
 
-	// Configurar la base de datos
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	if err != nil {
-		panic("No se pudo conectar a la base de datos")
-	}
-
-	// Migrar modelos
-	db.AutoMigrate(&model.User{}) // Asegúrate de tener otros modelos aquí si es necesario
-
 	// Crear instancias de los stores
-	productStore := store.NewProductStore(database.DB)
-	productTypeStore := store.NewProductTypeStore(database.DB)
-	userStore := store.NewUserStore(database.DB)
+	// productStore := store.NewProductStore(database.DB)
 
-	// Crear instancias de los handlers
-	StoreHandler := handler.NewHandler(productStore, userStore, productTypeStore)
+  productRepo := product.NewRepository(database.DB)
+  productService := product.NewService(productRepo)
 
-	// Registrar las rutas
-	StoreHandler.Register(app)
+	api := app.Group("/api/v1", logger.New())
+
+  routes.ProductRouter(api, productService)
+
+	// StoreHandler.Register(app)
 	app.Listen(":3001")
 }

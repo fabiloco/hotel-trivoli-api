@@ -2,10 +2,9 @@ package database
 
 import (
 	"fabiloco/hotel-trivoli-api/config"
-	"fabiloco/hotel-trivoli-api/model"
+	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fmt"
 	"strconv"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -42,6 +41,6 @@ func ConnectDB() {
   // }
 
 	fmt.Println("Connection Opened to Database")
-	DB.AutoMigrate(&model.User{}, &model.Product{}, &model.ProductType{})
+	DB.AutoMigrate(&entities.User{}, &entities.Product{}, &entities.ProductType{})
 	fmt.Println("Database Migrated")
 }
