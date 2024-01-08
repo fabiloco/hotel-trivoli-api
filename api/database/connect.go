@@ -1,7 +1,7 @@
 package database
 
 import (
-	"fabiloco/hotel-trivoli-api/config"
+	"fabiloco/hotel-trivoli-api/api/config"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fmt"
 	"strconv"

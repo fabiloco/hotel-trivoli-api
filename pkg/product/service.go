@@ -4,7 +4,7 @@ import "fabiloco/hotel-trivoli-api/pkg/entities"
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	InsertProduct (book *entities.Product) (*entities.Product, error)
+	InsertProduct (productType *entities.Product) (*entities.Product, error)
 	FetchProducts () (*[]entities.Product, error)
   FetchProductById (id uint) (*entities.Product, error)
 	UpdateProduct (id uint, product *entities.Product) (*entities.Product, error)
