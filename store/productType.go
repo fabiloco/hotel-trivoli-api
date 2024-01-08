@@ -24,7 +24,7 @@ func (store *ProductTypeStore) List() ([]model.ProductType, error) {
 	return productType, nil
 }
 
-func (store *ProductTypeStore) FindById(id int) (*model.ProductType, error) {
+func (store *ProductTypeStore) FindById(id uint) (*model.ProductType, error) {
 	var productType model.ProductType
 
 	result := store.db.First(&productType, id)
@@ -52,7 +52,7 @@ func (store *ProductTypeStore) Create(data *model.CreateProductType) (*model.Pro
 	return &productType, nil
 }
 
-func (store *ProductTypeStore) Update(id int, data *model.CreateProductType) (*model.ProductType, error) {
+func (store *ProductTypeStore) Update(id uint, data *model.CreateProductType) (*model.ProductType, error) {
 	product, error := store.FindById(id)
 
 	if error != nil {
@@ -70,7 +70,7 @@ func (store *ProductTypeStore) Update(id int, data *model.CreateProductType) (*m
 	return product, nil
 }
 
-func (store *ProductTypeStore) Delete(id int) (*model.ProductType, error) {
+func (store *ProductTypeStore) Delete(id uint) (*model.ProductType, error) {
 	productType, error := store.FindById(id)
 
 	if error != nil {

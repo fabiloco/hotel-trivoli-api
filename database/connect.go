@@ -35,6 +35,12 @@ func ConnectDB() {
 		panic("failed to connect database")
 	}
 
+  // err = DB.Migrator().DropColumn(&model.Product{}, "type")
+  // if err != nil {
+  //     // Do whatever you want to do!
+  //     fmt.Print("ERROR: We expect the description column to be drop-able")
+  // }
+
 	fmt.Println("Connection Opened to Database")
 	DB.AutoMigrate(&model.User{}, &model.Product{}, &model.ProductType{})
 	fmt.Println("Database Migrated")

@@ -3,6 +3,7 @@ Content-Type: application/json
 
 {
   "name": "Quiero cafe dame cafe",
-  "price": "1000",
-  "stock": 10
+  "price": 1000,
+  "stock": 10,
+  "type": [3]
 }

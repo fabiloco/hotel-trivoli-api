@@ -49,7 +49,7 @@ func (h *Handler) GetProductTypeById(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  productType, error := h.productTypeStore.FindById(id)
+  productType, error := h.productTypeStore.FindById(uint(id))
 
   if error != nil {
     ctx.Locals("data", fiber.Map{
@@ -148,7 +148,7 @@ func (h *Handler) PutProductType(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  productType, error := h.productTypeStore.Update(id, &body)
+  productType, error := h.productTypeStore.Update(uint(id), &body)
 
   if error != nil {
     ctx.Locals("data", fiber.Map{
@@ -186,7 +186,7 @@ func (h *Handler) DeleteProductTypeById(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
   
-  productType, error := h.productTypeStore.Delete(id)
+  productType, error := h.productTypeStore.Delete(uint(id))
 
   if error != nil {
     ctx.Locals("data", fiber.Map{

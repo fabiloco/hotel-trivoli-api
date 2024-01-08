@@ -2,7 +2,6 @@ package store
 
 import (
 	"fabiloco/hotel-trivoli-api/model"
-
 	"gorm.io/gorm"
 )
 
@@ -19,12 +18,12 @@ func NewProductStore(db *gorm.DB) *ProductStore {
 func (store *ProductStore) List() ([]model.Product, error) {
 	var products []model.Product
 
-	store.db.Find(&products)
+	store.db.Preload("Type").Find(&products)
 
 	return products, nil
 }
 
-func (store *ProductStore) FindById(id int) (*model.Product, error) {
+func (store *ProductStore) FindById(id uint) (*model.Product, error) {
 	var product model.Product
 
 	result := store.db.First(&product, id)
@@ -36,7 +35,7 @@ func (store *ProductStore) FindById(id int) (*model.Product, error) {
 	return &product, nil
 }
 
-func (store *ProductStore) Create(data *model.CreateProduct) (*model.Product, error) {
+func (store *ProductStore) Create(data *model.Product) (*model.Product, error) {
 	var product model.Product
 
 	product = model.Product{
@@ -55,7 +54,7 @@ func (store *ProductStore) Create(data *model.CreateProduct) (*model.Product, er
 	return &product, nil
 }
 
-func (store *ProductStore) Update(id int, data *model.CreateProduct) (*model.Product, error) {
+func (store *ProductStore) Update(id uint, data *model.Product) (*model.Product, error) {
 	product, error := store.FindById(id)
 
 	if error != nil {
@@ -69,6 +68,8 @@ func (store *ProductStore) Update(id int, data *model.CreateProduct) (*model.Pro
 
 	result := store.db.Save(&product)
 
+  store.db.Model(&product).Association("Type").Replace(data.Type)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -76,7 +77,7 @@ func (store *ProductStore) Update(id int, data *model.CreateProduct) (*model.Pro
 	return product, nil
 }
 
-func (store *ProductStore) Delete(id int) (*model.Product, error) {
+func (store *ProductStore) Delete(id uint) (*model.Product, error) {
 	product, error := store.FindById(id)
 
 	if error != nil {

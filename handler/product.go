@@ -3,6 +3,8 @@ package handler
 import (
 	"fabiloco/hotel-trivoli-api/model"
 	"fabiloco/hotel-trivoli-api/utils"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -49,7 +51,7 @@ func (h *Handler) GetProductById(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  product, error := h.productStore.FindById(id)
+  product, error := h.productStore.FindById(uint(id))
 
   if error != nil {
     ctx.Locals("data", fiber.Map{
@@ -93,7 +95,29 @@ func (h *Handler) PostProducts(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  product, error := h.productStore.Create(&body)
+  var productTypesSlice []model.ProductType
+
+  for i := 0; i < len(body.Type); i++{
+    productType, error := h.productTypeStore.FindById(body.Type[i])
+
+    if error != nil {
+      ctx.Locals("data", fiber.Map{
+        "errors": error.Error() + fmt.Sprintf(": product type with id: %d", body.Type[i]),
+      })
+      return ctx.SendStatus(fiber.StatusNotFound)
+    }
+
+    productTypesSlice = append(productTypesSlice, *productType)
+  }
+
+  newProduct := model.Product {
+    Name: body.Name,
+    Price: body.Price,
+    Stock: body.Stock,
+    Type: productTypesSlice,
+  }
+
+  product, error := h.productStore.Create(&newProduct)
 
   if error != nil {
     ctx.Locals("data", fiber.Map{
@@ -148,7 +172,30 @@ func (h *Handler) PutProduct(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
 
-  product, error := h.productStore.Update(id, &body)
+  var productTypesSlice []model.ProductType
+
+  for i := 0; i < len(body.Type); i++{
+    productType, error := h.productTypeStore.FindById(body.Type[i])
+
+    if error != nil {
+      ctx.Locals("data", fiber.Map{
+        "errors": error.Error() + fmt.Sprintf(": product type with id: %d", body.Type[i]),
+      })
+      return ctx.SendStatus(fiber.StatusNotFound)
+    }
+
+    productTypesSlice = append(productTypesSlice, *productType)
+  }
+
+  newProduct := model.Product {
+    Name: body.Name,
+    Price: body.Price,
+    Stock: body.Stock,
+    Type: productTypesSlice,
+  }
+
+
+  product, error := h.productStore.Update(uint(id), &newProduct)
 
   if error != nil {
     ctx.Locals("data", fiber.Map{
@@ -186,7 +233,7 @@ func (h *Handler) DeleteProductById(ctx *fiber.Ctx) error {
     return ctx.SendStatus(fiber.StatusBadRequest)
   }
   
-  product, error := h.productStore.Delete(id)
+  product, error := h.productStore.Delete(uint(id))
 
   if error != nil {
     ctx.Locals("data", fiber.Map{

@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   gorm.DeletedAt:
     properties:
@@ -28,26 +27,29 @@ definitions:
         type: integer
       type:
         description: product type
+        items:
+          $ref: '#/definitions/model.ProductType'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  model.ProductType:
+    description: Product type information
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        description: type name
         type: string
       updatedAt:
         type: string
     type: object
-externalDocs:
-  description: OpenAPI
-  url: https://swagger.io/resources/open-api/
-host: localhost:3001
 info:
-  contact:
-    email: faalsaru@gmail.com
-    name: API Support
-    url: http://www.swagger.io/support
-  description: This is the awesome API for the Hotel Trivoli project.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
-  title: Hotel Trivoli API
-  version: "1.0"
+  contact: {}
 paths:
   /product:
     get:
@@ -96,7 +98,126 @@ paths:
       summary: Create products
       tags:
       - product
-  /product/:id:
+  /product-type:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable product types in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ProductType'
+            type: array
+      summary: List product types
+      tags:
+      - product type
+    post:
+      consumes:
+      - application/json
+      description: Create new product types
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product type"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ProductType'
+            type: array
+      summary: Create a product type
+      tags:
+      - product type
+  /product-type/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing product type
+      parameters:
+      - description: id of the product type to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ProductType'
+            type: array
+      summary: Delete product type
+      tags:
+      - product type
+    get:
+      consumes:
+      - application/json
+      description: Get a single product type by its id
+      parameters:
+      - description: id of the product type to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ProductType'
+            type: array
+      summary: Get a product type
+      tags:
+      - product type
+    put:
+      consumes:
+      - application/json
+      description: Edit existing product type
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the product type to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ProductType'
+            type: array
+      summary: Update product type
+      tags:
+      - product type
+  /product/{id}:
     delete:
       consumes:
       - application/json
@@ -104,7 +225,7 @@ paths:
       parameters:
       - description: id of the product to delete
         in: path
-        name: path
+        name: id
         required: true
         type: number
       produces:
@@ -117,6 +238,28 @@ paths:
               $ref: '#/definitions/model.Product'
             type: array
       summary: Delete products
+      tags:
+      - product
+    get:
+      consumes:
+      - application/json
+      description: Get a single product by its id
+      parameters:
+      - description: id of the product to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+      summary: Get a product
       tags:
       - product
     put:
@@ -154,30 +297,4 @@ paths:
       summary: Update products
       tags:
       - product
-  /product/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a single product by its id
-      parameters:
-      - description: id of the product to retrieve
-        in: path
-        name: id
-        required: true
-        type: number
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.Product'
-            type: array
-      summary: Get a product
-      tags:
-      - product
-securityDefinitions:
-  BasicAuth:
-    type: basic
 swagger: "2.0"
