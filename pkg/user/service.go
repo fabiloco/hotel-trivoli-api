@@ -22,13 +22,13 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) InsertUser(user *entities.CreateUser) (*entities.User, error) {
-  newUser := entities.User {
-    Username: user.Username,
-    Firstname: user.Firstname,
-    Lastname: user.Lastname,
-    Identification: user.Identification,
-    Password: user.Password,
-  }
+	newUser := entities.User{
+		Username:       user.Username,
+		Firstname:      user.Firstname,
+		Lastname:       user.Lastname,
+		Identification: user.Identification,
+		Password:       user.Password,
+	}
 
 	return s.repository.Create(&newUser)
 }
