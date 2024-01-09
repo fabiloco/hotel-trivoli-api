@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fabiloco/hotel-trivoli-api/api/routes"
 	"fabiloco/hotel-trivoli-api/api/database"
+	"fabiloco/hotel-trivoli-api/api/routes"
 	_ "fabiloco/hotel-trivoli-api/docs"
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	producttype "fabiloco/hotel-trivoli-api/pkg/product_type"
+	"fabiloco/hotel-trivoli-api/pkg/service"
 	"fabiloco/hotel-trivoli-api/pkg/user"
 
 	"github.com/gofiber/fiber/v2"
@@ -42,16 +43,19 @@ func main() {
   productRepo := product.NewRepository(database.DB)
   productTypeRepo := producttype.NewRepository(database.DB)
   userRepo := user.NewRepository(database.DB)
+  serviceRepo := service.NewRepository(database.DB)
 
   productService := product.NewService(productRepo, productTypeRepo)
   productTypeService := producttype.NewService(productTypeRepo)
   userService := user.NewService(userRepo)
+  serviceService := service.NewService(serviceRepo)
 
 	api := app.Group("/api/v1", logger.New())
 
   routes.ProductRouter(api, productService)
   routes.ProductTypeRouter(api, productTypeService)
   routes.UserRouter(api, userService)
+  routes.ServiceRouter(api, serviceService)
 
 	// StoreHandler.Register(app)
 	app.Listen(":3001")

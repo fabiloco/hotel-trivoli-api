@@ -41,6 +41,13 @@ func ConnectDB() {
   // }
 
 	fmt.Println("Connection Opened to Database")
-	DB.AutoMigrate(&entities.User{}, &entities.Product{}, &entities.ProductType{})
+
+	DB.AutoMigrate(
+    &entities.User{}, 
+    &entities.Product{}, 
+    &entities.ProductType{}, 
+    &entities.Service{},
+  )
+
 	fmt.Println("Database Migrated")
 }
