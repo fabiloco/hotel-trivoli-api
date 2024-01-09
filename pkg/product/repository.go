@@ -70,14 +70,13 @@ func (r *repository) Update(id uint, data *entities.Product) (*entities.Product,
 		return nil, error
 	}
 
-	product.Name = data.Name
-	product.Price = data.Price
-	product.Stock = data.Stock
-	product.Type = data.Type
+	result := r.db.Model(&product).Updates(
+    entities.Product{Name: data.Name, Price: data.Price, Stock: data.Stock, Type: data.Type},
+  )
 
-	result := r.db.Save(&product)
-
-  r.db.Model(&product).Association("Type").Replace(data.Type)
+  if len(data.Type) != 0 {
+    r.db.Model(&product).Association("Type").Replace(data.Type)
+  }
 
 	if result.Error != nil {
 		return nil, result.Error

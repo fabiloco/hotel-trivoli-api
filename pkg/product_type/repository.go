@@ -67,9 +67,9 @@ func (r *repository) Update(id uint, data *entities.ProductType) (*entities.Prod
 		return nil, error
 	}
 
-	productType.Name = data.Name
-
-	result := r.db.Save(&productType)
+	result := r.db.Model(&productType).Updates(
+    entities.ProductType{Name: data.Name},
+  )
 
 	if result.Error != nil {
 		return nil, result.Error

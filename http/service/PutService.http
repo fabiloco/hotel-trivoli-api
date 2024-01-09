@@ -1,7 +1,6 @@
-PUT http://localhost:3001/api/v1/service/1
+PUT http://localhost:3001/api/v1/service/2
 Content-Type: application/json
 
 {
-  "name": "frutas",
-  "price": 123
+  "price": 222
 }

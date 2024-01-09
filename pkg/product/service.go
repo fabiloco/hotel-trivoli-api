@@ -12,7 +12,7 @@ type Service interface {
 	InsertProduct (productType *entities.CreateProduct) (*entities.Product, error)
 	FetchProducts () (*[]entities.Product, error)
   FetchProductById (id uint) (*entities.Product, error)
-	UpdateProduct (id uint, product *entities.CreateProduct) (*entities.Product, error)
+	UpdateProduct (id uint, product *entities.UpdateProduct) (*entities.Product, error)
 	RemoveProduct (id uint) (*entities.Product, error)
 }
 
@@ -56,7 +56,7 @@ func (s *service) FetchProducts() (*[]entities.Product, error) {
 	return s.productRepository.Read()
 }
 
-func (s *service) UpdateProduct(id uint, product *entities.CreateProduct) (*entities.Product, error) {
+func (s *service) UpdateProduct(id uint, product *entities.UpdateProduct) (*entities.Product, error) {
   var productTypesSlice []entities.ProductType
 
   for i := 0; i < len(product.Type); i++{
@@ -71,9 +71,8 @@ func (s *service) UpdateProduct(id uint, product *entities.CreateProduct) (*enti
 
   newProduct := entities.Product {
     Name: product.Name,
-    Price: product.Price,
     Stock: product.Stock,
-    Type: productTypesSlice,
+    Price: product.Price,
   }
 
 	return s.productRepository.Update(id, &newProduct)

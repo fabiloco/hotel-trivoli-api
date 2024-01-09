@@ -1,9 +1,6 @@
-PUT http://localhost:3001/api/v1/product/15
+PUT http://localhost:3001/api/v1/product/26
 Content-Type: application/json
 
 {
-  "name": "pan",
-  "stock": 11,
-  "type": [7],
-  "price": 3000
+  "type": [2]
 }

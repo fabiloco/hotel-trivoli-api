@@ -18,3 +18,10 @@ type CreateProduct struct {
   Type  []uint   `valid:"required"`
 	Price float32 `valid:"required,numeric"`
 }
+
+type UpdateProduct struct {
+	Name  string  `valid:"stringlength(3|100),optional"`
+	Stock uint8   `valid:"numeric,optional"`
+  Type  []uint  `valid:"optional"`
+	Price float32 `valid:"numeric,optional"`
+}

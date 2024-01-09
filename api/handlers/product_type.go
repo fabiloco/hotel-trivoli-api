@@ -109,7 +109,7 @@ func PostProductTypes(service productType.Service) fiber.Handler {
 // @Router        /product-type/{id} [put]
 func PutProductType(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-    var body entities.CreateProductType
+    var body entities.UpdateProductType
 
     if err := ctx.BodyParser(&body); err != nil {
       ctx.Status(http.StatusBadRequest)

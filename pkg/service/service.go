@@ -9,7 +9,7 @@ type Service interface {
 	InsertService (productType *entities.CreateService) (*entities.Service, error)
 	FetchServices () (*[]entities.Service, error)
   FetchServiceById (id uint) (*entities.Service, error)
-	UpdateService (id uint, product *entities.CreateService) (*entities.Service, error)
+	UpdateService (id uint, product *entities.UpdateService) (*entities.Service, error)
 	RemoveService (id uint) (*entities.Service, error)
 }
 
@@ -36,7 +36,7 @@ func (s *service) FetchServices() (*[]entities.Service, error) {
 	return s.repository.Read()
 }
 
-func (s *service) UpdateService(id uint, service *entities.CreateService) (*entities.Service, error) {
+func (s *service) UpdateService(id uint, service *entities.UpdateService) (*entities.Service, error) {
   newService := entities.Service {
     Name: service.Name,
     Price: service.Price,

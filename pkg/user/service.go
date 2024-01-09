@@ -7,7 +7,7 @@ type Service interface {
 	InsertUser (user *entities.CreateUser) (*entities.User, error)
 	FetchUsers () (*[]entities.User, error)
   FetchUserById (id uint) (*entities.User, error)
-	UpdateUser (id uint, user *entities.CreateUser) (*entities.User, error)
+	UpdateUser (id uint, user *entities.UpdateUser) (*entities.User, error)
 	RemoveUser (id uint) (*entities.User, error)
 }
 
@@ -37,7 +37,7 @@ func (s *service) FetchUsers() (*[]entities.User, error) {
 	return s.repository.Read()
 }
 
-func (s *service) UpdateUser(id uint, user *entities.CreateUser) (*entities.User, error) {
+func (s *service) UpdateUser(id uint, user *entities.UpdateUser) (*entities.User, error) {
   newUser := entities.User {
     Username: user.Username,
     Firstname: user.Firstname,

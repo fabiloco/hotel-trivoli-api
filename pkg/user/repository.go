@@ -71,13 +71,15 @@ func (r *repository) Update(id uint, data *entities.User) (*entities.User, error
 		return nil, error
 	}
 
-  user.Username = data.Username
-  user.Firstname = data.Firstname
-  user.Lastname = data.Lastname
-  user.Password = data.Password
-  user.Identification = data.Identification
-
-	result := r.db.Save(&user)
+	result := r.db.Model(&user).Updates(
+    entities.User{
+      Password: data.Password,
+      Identification: data.Identification, 
+      Lastname: data.Lastname,
+      Firstname: data.Firstname,
+      Username: data.Username,
+    },
+  )
 
 	if result.Error != nil {
 		return nil, result.Error

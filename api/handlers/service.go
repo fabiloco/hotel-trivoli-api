@@ -109,7 +109,7 @@ func PostServices(service service.Service) fiber.Handler {
 // @Router        /product-type/{id} [put]
 func PutService(service service.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-    var body entities.CreateService
+    var body entities.UpdateService
 
     if err := ctx.BodyParser(&body); err != nil {
       ctx.Status(http.StatusBadRequest)

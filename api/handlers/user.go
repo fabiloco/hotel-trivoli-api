@@ -71,7 +71,7 @@ func PostUsers(service user.Service) fiber.Handler {
 
 func PutUser(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
-    var body entities.CreateUser
+    var body entities.UpdateUser
 
     if err := ctx.BodyParser(&body); err != nil {
       ctx.Status(http.StatusBadRequest)

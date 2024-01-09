@@ -12,3 +12,7 @@ type ProductType struct {
 type CreateProductType struct {
 	Name  string  `valid:"required,stringlength(3|100)"`
 }
+
+type UpdateProductType struct {
+	Name  string  `valid:"optional,stringlength(3|100)"`
+}

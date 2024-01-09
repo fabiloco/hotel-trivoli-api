@@ -25,73 +25,75 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 func (r *repository) Read() (*[]entities.Service, error) {
-	var products []entities.Service
+	var services []entities.Service
 
-	r.db.Find(&products)
+	r.db.Find(&services)
 
-	return &products, nil
+	return &services, nil
 }
 
 func (r *repository) ReadById(id uint) (*entities.Service, error) {
-	var product entities.Service
+	var service entities.Service
 
-	result := r.db.First(&product, id)
+	result := r.db.First(&service, id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &product, nil
+	return &service, nil
 }
 
 func (r *repository) Create(data *entities.Service) (*entities.Service, error) {
-	var product entities.Service
+	var service entities.Service
 
-	product = entities.Service{
+	service = entities.Service{
 		Name:  data.Name,
 		Price: data.Price,
 	}
 
-	result := r.db.Create(&product)
+	result := r.db.Create(&service)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &product, nil
+	return &service, nil
 }
 
 func (r *repository) Update(id uint, data *entities.Service) (*entities.Service, error) {
-	product, error := r.ReadById(id)
+	service, error := r.ReadById(id)
 
 	if error != nil {
 		return nil, error
 	}
 
-	product.Name = data.Name
-	product.Price = data.Price
-
-	result := r.db.Save(&product)
+	result := r.db.Model(&service).Updates(
+    entities.Service{
+      Name: data.Name,
+      Price: data.Price,
+    },
+  )
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return product, nil
+	return service, nil
 }
 
 func (r *repository) Delete(id uint) (*entities.Service, error) {
-	product, error := r.ReadById(id)
+	service, error := r.ReadById(id)
 
 	if error != nil {
 		return nil, error
 	}
 
-	result := r.db.Delete(&product, id)
+	result := r.db.Delete(&service, id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return product, nil
+	return service, nil
 }
