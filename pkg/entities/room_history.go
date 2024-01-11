@@ -19,14 +19,14 @@ type RoomHistory struct {
 
 type CreateRoomHistory struct {
   StartDate   string   `valid:"required,rfc3339"`
-  EndDate     string   `valid:"required,rfc3339"`
-  Room        uint        `valid:"required,numeric"`
-  Service     uint        `valid:"required,numeric"`
+  EndDate     string   `valid:"optional,rfc3339"`
+  Room        uint     `valid:"required,numeric"`
+  Service     uint     `valid:"required,numeric"`
 }
 
 type UpdateRoomHistory struct {
   StartDate   string   `valid:"optional,rfc3339"`
   EndDate     string   `valid:"optional,rfc3339"`
-  Room        uint        `valid:"optional,numeric"`
-  Service     uint        `valid:"optional,numeric"`
+  Room        uint     `valid:"optional,numeric"`
+  Service     uint     `valid:"optional,numeric"`
 }

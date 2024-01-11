@@ -43,18 +43,17 @@ func (s *service) InsertRoomHistory(roomHistory *entities.CreateRoomHistory) (*e
   service, error := s.serviceRepository.ReadById(roomHistory.Service)
 
   if error != nil {
-    fmt.Println("service not find")
-    return nil, errors.New(fmt.Sprintf("no room with id %d", roomHistory.Room))
+    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Room))
   }
 
   sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
   if error != nil {
-    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.StartDate))
+    return nil, errors.New(fmt.Sprintf("error parsing StartDate %s", roomHistory.StartDate))
   }
 
   ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
   if error != nil {
-    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.EndDate))
+    return nil, errors.New(fmt.Sprintf("error parsing EndDate %s", roomHistory.EndDate))
   }
 
   newRoomHistory := entities.RoomHistory {
@@ -63,7 +62,6 @@ func (s *service) InsertRoomHistory(roomHistory *entities.CreateRoomHistory) (*e
     Room: *room,
     Service: *service,
   }
-
 
 	return s.repository.Create(&newRoomHistory)
 }
@@ -82,7 +80,7 @@ func (s *service) UpdateRoomHistory(id uint, roomHistory *entities.UpdateRoomHis
   service, error := s.serviceRepository.ReadById(roomHistory.Service)
 
   if error != nil {
-    return nil, errors.New(fmt.Sprintf("no room with id %d", roomHistory.Room))
+    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Room))
   }
 
   sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
