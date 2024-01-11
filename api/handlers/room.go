@@ -71,7 +71,7 @@ func PostRooms(service room.Service) fiber.Handler {
 
 func PutRoom(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var body entities.CreateRoom
+		var body entities.UpdateRoom
 
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)

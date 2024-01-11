@@ -6,10 +6,10 @@ import (
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	InsertRoom(productType *entities.CreateRoom) (*entities.Room, error)
+	InsertRoom(room *entities.CreateRoom) (*entities.Room, error)
 	FetchRooms() (*[]entities.Room, error)
 	FetchRoomById(id uint) (*entities.Room, error)
-	UpdateRoom(id uint, product *entities.CreateRoom) (*entities.Room, error)
+	UpdateRoom(id uint, room *entities.UpdateRoom) (*entities.Room, error)
 	RemoveRoom(id uint) (*entities.Room, error)
 }
 
@@ -25,7 +25,7 @@ func NewService(r Repository) Service {
 
 func (s *service) InsertRoom(room *entities.CreateRoom) (*entities.Room, error) {
 	newRoom := entities.Room{
-		Number_room: room.Number_room,
+		Number: room.Number,
 	}
 
 	return s.repository.Create(&newRoom)
@@ -35,9 +35,9 @@ func (s *service) FetchRooms() (*[]entities.Room, error) {
 	return s.repository.Read()
 }
 
-func (s *service) UpdateRoom(id uint, room *entities.CreateRoom) (*entities.Room, error) {
+func (s *service) UpdateRoom(id uint, room *entities.UpdateRoom) (*entities.Room, error) {
 	newRoom := entities.Room{
-		Number_room: room.Number_room,
+		Number: room.Number,
 	}
 
 	return s.repository.Update(id, &newRoom)

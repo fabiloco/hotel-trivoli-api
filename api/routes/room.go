@@ -8,7 +8,7 @@ import (
 )
 
 func RoomRouter(app fiber.Router, service room.Service) {
-	productGroup := app.Group("/user")
+	productGroup := app.Group("/room")
 	productGroup.Get("/", handlers.GetRooms(service))
 	productGroup.Get("/:id", handlers.GetRoomById(service))
 	productGroup.Post("/", handlers.PostRooms(service))

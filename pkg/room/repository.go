@@ -48,7 +48,7 @@ func (r *repository) Create(data *entities.Room) (*entities.Room, error) {
 	var room entities.Room
 
 	room = entities.Room{
-		Number_room: data.Number_room,
+		Number: data.Number,
 	}
 
 	result := r.db.Create(&room)
@@ -67,11 +67,11 @@ func (r *repository) Update(id uint, data *entities.Room) (*entities.Room, error
 		return nil, error
 	}
 
-	room.Number_room = data.Number_room
+	room.Number = data.Number
 
 	result := r.db.Save(&room)
 
-	r.db.Model(&room).Association("Type").Replace(data.Number_room)
+	r.db.Model(&room).Association("Type").Replace(data.Number)
 
 	if result.Error != nil {
 		return nil, result.Error

@@ -12,19 +12,21 @@ type RoomHistory struct {
   StartDate   time.Time   `gorm:"not null" json:"start_date"`
   EndDate     time.Time   `gorm:"optional" json:"end_date"`
   Room        Room        `gorm:"not null" json:"room"`
+  RoomID      uint        `gorm:"not null"`
   Service     Service     `gorm:"not null" json:"service"`
+  ServiceID   uint        `gorm:"not null"`
 }
 
 type CreateRoomHistory struct {
-  StartDate   time.Time   `valid:"required,rfc3339"`
-  EndDate     time.Time   `valid:"required,rfc3339"`
+  StartDate   string   `valid:"required,rfc3339"`
+  EndDate     string   `valid:"required,rfc3339"`
   Room        uint        `valid:"required,numeric"`
   Service     uint        `valid:"required,numeric"`
 }
 
 type UpdateRoomHistory struct {
-  StartDate   time.Time   `valid:"optional,rfc3339"`
-  EndDate     time.Time   `valid:"optional,rfc3339"`
+  StartDate   string   `valid:"optional,rfc3339"`
+  EndDate     string   `valid:"optional,rfc3339"`
   Room        uint        `valid:"optional,numeric"`
   Service     uint        `valid:"optional,numeric"`
 }

@@ -55,7 +55,7 @@ func main() {
   userService := user.NewService(userRepo)
   serviceService := service.NewService(serviceRepo)
   roomService := room.NewService(roomRepo)
-  roomHistoryService := roomHistory.NewService(roomHistoryRepo)
+  roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
 
 	api := app.Group("/api/v1", logger.New())
 

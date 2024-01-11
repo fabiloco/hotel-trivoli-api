@@ -1,6 +1,8 @@
 package presenter
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,7 +18,7 @@ func SuccessResponse(data interface{}) *fiber.Map {
 func ErrorResponse(error error) *fiber.Map {
   return &fiber.Map {
     "status": false,
-    "error": error.Error(),
+    "error": strings.Split(error.Error(), ", "),
     "data": "",
   }
 }

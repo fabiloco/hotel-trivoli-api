@@ -6,6 +6,7 @@ import (
 	"fabiloco/hotel-trivoli-api/pkg/room"
 	serviceModule "fabiloco/hotel-trivoli-api/pkg/service"
 	"fmt"
+	"time"
 )
 
 // Service is an interface from which our api module can access our repository of all our models
@@ -23,9 +24,11 @@ type service struct {
 	serviceRepository serviceModule.Repository
 }
 
-func NewService(r Repository) Service {
+func NewService(r Repository, rr room.Repository, sr serviceModule.Repository) Service {
 	return &service{
 		repository: r,
+    roomRepository: rr,
+    serviceRepository: sr,
 	}
 }
 
@@ -40,12 +43,23 @@ func (s *service) InsertRoomHistory(roomHistory *entities.CreateRoomHistory) (*e
   service, error := s.serviceRepository.ReadById(roomHistory.Service)
 
   if error != nil {
+    fmt.Println("service not find")
     return nil, errors.New(fmt.Sprintf("no room with id %d", roomHistory.Room))
   }
 
+  sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.StartDate))
+  }
+
+  ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.EndDate))
+  }
+
   newRoomHistory := entities.RoomHistory {
-    StartDate: roomHistory.StartDate,
-    EndDate: roomHistory.EndDate,
+    StartDate: sd,
+    EndDate: ed,
     Room: *room,
     Service: *service,
   }
@@ -71,9 +85,19 @@ func (s *service) UpdateRoomHistory(id uint, roomHistory *entities.UpdateRoomHis
     return nil, errors.New(fmt.Sprintf("no room with id %d", roomHistory.Room))
   }
 
+  sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.StartDate))
+  }
+
+  ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.EndDate))
+  }
+
   newRoomHistory := entities.RoomHistory {
-    StartDate: roomHistory.StartDate,
-    EndDate: roomHistory.EndDate,
+    StartDate: sd,
+    EndDate: ed,
     Room: *room,
     Service: *service,
   }

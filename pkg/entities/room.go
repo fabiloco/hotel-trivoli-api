@@ -6,10 +6,14 @@ import "gorm.io/gorm"
 // @Description Rooms information in stock
 type Room struct {
 	gorm.Model
-	Number_room int `gorm:"not null" json:"Numer_room"` // room name
+	Number int `gorm:"not null" json:"number"` // room name
 
 }
 
 type CreateRoom struct {
-	Number_room int `valid:"required"`
+	Number int `valid:"required"`
+}
+
+type UpdateRoom struct {
+	Number int `valid:"optional"`
 }

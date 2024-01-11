@@ -82,7 +82,7 @@ func PostRoomHistorys(service roomHistory.Service) fiber.Handler {
 
     if validationErrors != nil {
       ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", ") )))
     }
 
     product, error := service.InsertRoomHistory(&body)

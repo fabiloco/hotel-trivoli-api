@@ -1,7 +1,9 @@
-POST http://localhost:3001/api/v1/service
+POST http://localhost:3001/api/v1/room-history
 Content-Type: application/json
 
 {
-  "name": "Carro",
-  "price": 1000
+  "startDate": "2024-01-11T10:42:55-05:00",
+  "endDate": "2024-01-11T10:42:55-05:00",
+  "room": 2,
+  "service": 1
 }
