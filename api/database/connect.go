@@ -47,6 +47,8 @@ func ConnectDB() {
     &entities.Product{}, 
     &entities.ProductType{}, 
     &entities.Service{},
+    &entities.Room{},
+    &entities.RoomHistory{},
   )
 
 	fmt.Println("Database Migrated")

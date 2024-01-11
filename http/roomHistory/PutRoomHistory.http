@@ -1,0 +1,6 @@
+PUT http://localhost:3001/api/v1/service/2
+Content-Type: application/json
+
+{
+  "price": 222
+}
