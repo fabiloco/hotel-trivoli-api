@@ -49,6 +49,7 @@ func ConnectDB() {
     &entities.Service{},
     &entities.Room{},
     &entities.RoomHistory{},
+    &entities.Receipt{},
   )
 
 	fmt.Println("Database Migrated")

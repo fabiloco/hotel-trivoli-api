@@ -6,11 +6,12 @@ import (
 	_ "fabiloco/hotel-trivoli-api/docs"
 
 	"fabiloco/hotel-trivoli-api/pkg/product"
+	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
+	"fabiloco/hotel-trivoli-api/pkg/receipt"
 	"fabiloco/hotel-trivoli-api/pkg/room"
+	roomHistory "fabiloco/hotel-trivoli-api/pkg/room_history"
 	"fabiloco/hotel-trivoli-api/pkg/service"
 	"fabiloco/hotel-trivoli-api/pkg/user"
-	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
-	roomHistory "fabiloco/hotel-trivoli-api/pkg/room_history"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -49,6 +50,7 @@ func main() {
   serviceRepo := service.NewRepository(database.DB)
   roomRepo := room.NewRepository(database.DB)
   roomHistoryRepo := roomHistory.NewRepository(database.DB)
+  receiptRepo := receipt.NewRepository(database.DB)
 
   productService := product.NewService(productRepo, productTypeRepo)
   productTypeService := productType.NewService(productTypeRepo)
@@ -56,6 +58,7 @@ func main() {
   serviceService := service.NewService(serviceRepo)
   roomService := room.NewService(roomRepo)
   roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
+  receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo)
 
 	api := app.Group("/api/v1", logger.New())
 
@@ -65,6 +68,7 @@ func main() {
   routes.ServiceRouter(api, serviceService)
   routes.RoomRouter(api, roomService)
   routes.RoomHistoryRouter(api, roomHistoryService)
+  routes.ReceiptRouter(api, receptService)
 
 	// StoreHandler.Register(app)
 	app.Listen(":3001")
