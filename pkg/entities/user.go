@@ -5,11 +5,11 @@ import "gorm.io/gorm"
 // User struct
 type User struct {
 	gorm.Model
-	Username       string `gorm:"uniqueIndex;not null" json:"username"`
+	Username       string `gorm:"not null" json:"username"`
 	Password       string `gorm:"not null" json:"password"`
 	Firstname      string `gorm:"not null" json:"firstname"`
 	Lastname       string `gorm:"not null" json:"lastname"`
-	Identification string `gorm:"uniqueIndex;not null" json:"identification"`
+	Identification string `gorm:"not null" json:"identification"`
 }
 
 type CreateUser struct {

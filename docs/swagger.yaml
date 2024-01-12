@@ -1,13 +1,5 @@
 definitions:
-  gorm.DeletedAt:
-    properties:
-      time:
-        type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
-    type: object
-  model.Product:
+  entities.Product:
     description: Products information in stock
     properties:
       createdAt:
@@ -28,12 +20,12 @@ definitions:
       type:
         description: product type
         items:
-          $ref: '#/definitions/model.ProductType'
+          $ref: '#/definitions/entities.ProductType'
         type: array
       updatedAt:
         type: string
     type: object
-  model.ProductType:
+  entities.ProductType:
     description: Product type information
     properties:
       createdAt:
@@ -48,10 +40,144 @@ definitions:
       updatedAt:
         type: string
     type: object
+  entities.Receipt:
+    description: Receipt information in stock
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      products:
+        items:
+          $ref: '#/definitions/entities.Product'
+        type: array
+      room:
+        $ref: '#/definitions/entities.Room'
+      roomID:
+        type: integer
+      service:
+        $ref: '#/definitions/entities.Service'
+      serviceID:
+        type: integer
+      total_price:
+        type: number
+      total_time:
+        $ref: '#/definitions/time.Duration'
+      updatedAt:
+        type: string
+    type: object
+  entities.Room:
+    description: Rooms information in stock
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      number:
+        description: room name
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  entities.RoomHistory:
+    description: Rooms information in stock
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      end_date:
+        type: string
+      id:
+        type: integer
+      room:
+        $ref: '#/definitions/entities.Room'
+      roomID:
+        type: integer
+      service:
+        $ref: '#/definitions/entities.Service'
+      serviceID:
+        type: integer
+      start_date:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  entities.Service:
+    description: Services information in stock
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      name:
+        description: service name
+        type: string
+      price:
+        description: service price
+        type: number
+      updatedAt:
+        type: string
+    type: object
+  entities.User:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      firstname:
+        type: string
+      id:
+        type: integer
+      identification:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
 info:
   contact: {}
 paths:
-  /product:
+  /api/v1/product:
     get:
       consumes:
       - application/json
@@ -63,7 +189,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Product'
+              $ref: '#/definitions/entities.Product'
             type: array
       summary: List products
       tags:
@@ -93,12 +219,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Product'
+              $ref: '#/definitions/entities.Product'
             type: array
       summary: Create products
       tags:
       - product
-  /product-type:
+  /api/v1/product-type:
     get:
       consumes:
       - application/json
@@ -110,7 +236,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.ProductType'
+              $ref: '#/definitions/entities.ProductType'
             type: array
       summary: List product types
       tags:
@@ -136,12 +262,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.ProductType'
+              $ref: '#/definitions/entities.ProductType'
             type: array
       summary: Create a product type
       tags:
       - product type
-  /product-type/{id}:
+  /api/v1/product-type/{id}:
     delete:
       consumes:
       - application/json
@@ -159,7 +285,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.ProductType'
+              $ref: '#/definitions/entities.ProductType'
             type: array
       summary: Delete product type
       tags:
@@ -181,7 +307,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.ProductType'
+              $ref: '#/definitions/entities.ProductType'
             type: array
       summary: Get a product type
       tags:
@@ -212,12 +338,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.ProductType'
+              $ref: '#/definitions/entities.ProductType'
             type: array
       summary: Update product type
       tags:
       - product type
-  /product/{id}:
+  /api/v1/product/{id}:
     delete:
       consumes:
       - application/json
@@ -235,7 +361,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Product'
+              $ref: '#/definitions/entities.Product'
             type: array
       summary: Delete products
       tags:
@@ -257,7 +383,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Product'
+              $ref: '#/definitions/entities.Product'
             type: array
       summary: Get a product
       tags:
@@ -292,9 +418,604 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.Product'
+              $ref: '#/definitions/entities.Product'
             type: array
       summary: Update products
       tags:
       - product
+  /api/v1/receipt:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable receipts in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Receipt'
+            type: array
+      summary: List receipts
+      tags:
+      - receipt
+    post:
+      consumes:
+      - application/json
+      description: Create new receipts
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test receipt"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Receipt'
+            type: array
+      summary: Create a receipt
+      tags:
+      - receipt
+  /api/v1/receipt/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing receipt
+      parameters:
+      - description: id of the receipt to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Receipt'
+            type: array
+      summary: Delete receipt
+      tags:
+      - receipt
+    get:
+      consumes:
+      - application/json
+      description: Get a single receipt by its id
+      parameters:
+      - description: id of the receipt to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Receipt'
+            type: array
+      summary: Get a receipt
+      tags:
+      - receipt
+    put:
+      consumes:
+      - application/json
+      description: Edit existing receipt
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the receipt to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Receipt'
+            type: array
+      summary: Update receipt
+      tags:
+      - receipt
+  /api/v1/room:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable rooms in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Room'
+            type: array
+      summary: List rooms
+      tags:
+      - room
+    post:
+      consumes:
+      - application/json
+      description: Create new rooms
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test room"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Room'
+            type: array
+      summary: Create a room
+      tags:
+      - room
+  /api/v1/room-history:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable room historys in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.RoomHistory'
+            type: array
+      summary: List room historys
+      tags:
+      - room history
+    post:
+      consumes:
+      - application/json
+      description: Create new room historys
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test room history"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.RoomHistory'
+            type: array
+      summary: Create a room history
+      tags:
+      - room history
+  /api/v1/room-history/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing room history
+      parameters:
+      - description: id of the room history to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.RoomHistory'
+            type: array
+      summary: Delete room history
+      tags:
+      - room history
+    get:
+      consumes:
+      - application/json
+      description: Get a single room history by its id
+      parameters:
+      - description: id of the room history to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.RoomHistory'
+            type: array
+      summary: Get a room history
+      tags:
+      - room history
+    put:
+      consumes:
+      - application/json
+      description: Edit existing room history
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the room history to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.RoomHistory'
+            type: array
+      summary: Update room history
+      tags:
+      - room history
+  /api/v1/room/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing room
+      parameters:
+      - description: id of the room to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Room'
+            type: array
+      summary: Delete room
+      tags:
+      - room
+    get:
+      consumes:
+      - application/json
+      description: Get a single room by its id
+      parameters:
+      - description: id of the room to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Room'
+            type: array
+      summary: Get a room
+      tags:
+      - room
+    put:
+      consumes:
+      - application/json
+      description: Edit existing room
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the room to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Room'
+            type: array
+      summary: Update room
+      tags:
+      - room
+  /api/v1/service:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable services in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Service'
+            type: array
+      summary: List services
+      tags:
+      - service
+    post:
+      consumes:
+      - application/json
+      description: Create new services
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test service"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Service'
+            type: array
+      summary: Create a service
+      tags:
+      - service
+  /api/v1/service/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing service
+      parameters:
+      - description: id of the service to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Service'
+            type: array
+      summary: Delete service
+      tags:
+      - service
+    get:
+      consumes:
+      - application/json
+      description: Get a single service by its id
+      parameters:
+      - description: id of the service to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Service'
+            type: array
+      summary: Get a service
+      tags:
+      - service
+    put:
+      consumes:
+      - application/json
+      description: Edit existing service
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the service to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Service'
+            type: array
+      summary: Update service
+      tags:
+      - service
+  /api/v1/user:
+    get:
+      consumes:
+      - application/json
+      description: list avaliable users in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      summary: List users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create new users
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test user"}
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      summary: Create a user
+      tags:
+      - user
+  /api/v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing user
+      parameters:
+      - description: id of the user to delete
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      summary: Delete user
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get a single user by its id
+      parameters:
+      - description: id of the user to retrieve
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      summary: Get a user
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Edit existing user
+      parameters:
+      - description: Body of the request
+        in: body
+        name: body
+        required: true
+        schema:
+          example: |-
+            {
+            "name": "test product"}
+          type: string
+      - description: id of the user to update
+        in: path
+        name: id
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+      summary: Update user
+      tags:
+      - user
 swagger: "2.0"

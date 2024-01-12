@@ -12,6 +12,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// ListRooms   godoc
+// @Summary       List rooms
+// @Description   list avaliable rooms in the database
+// @Tags          room
+// @Accept        json
+// @Produce       json
+// @Success       200  {array}   entities.Room
+// @Router        /api/v1/room [get]
 func GetRooms(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		rooms, err := service.FetchRooms()
@@ -25,6 +33,15 @@ func GetRooms(service room.Service) fiber.Handler {
 	}
 }
 
+// GetRoomById   godoc
+// @Summary       Get a room
+// @Description   Get a single room by its id
+// @Tags          room
+// @Accept        json
+// @Param			    id  path  number  true  "id of the room to retrieve" 
+// @Produce       json
+// @Success       200  {array}   entities.Room
+// @Router        /api/v1/room/{id} [get]
 func GetRoomById(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		id, err := ctx.ParamsInt("id")
@@ -44,6 +61,15 @@ func GetRoomById(service room.Service) fiber.Handler {
 	}
 }
 
+// PostRoom   godoc
+// @Summary       Create a room
+// @Description   Create new rooms
+// @Tags          room
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test room"})
+// @Produce       json
+// @Success       200  {array}   entities.Room
+// @Router        /api/v1/room [post]
 func PostRooms(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var body entities.CreateRoom
@@ -69,6 +95,16 @@ func PostRooms(service room.Service) fiber.Handler {
 	}
 }
 
+// PutRoom   godoc
+// @Summary       Update room
+// @Description   Edit existing room
+// @Tags          room
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
+// @Param			    id  path  number  true  "id of the room to update" 
+// @Produce       json
+// @Success       200  {array}   entities.Room
+// @Router        /api/v1/room/{id} [put]
 func PutRoom(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var body entities.UpdateRoom
@@ -101,6 +137,15 @@ func PutRoom(service room.Service) fiber.Handler {
 	}
 }
 
+// DeleteRoomById   godoc
+// @Summary       Delete room
+// @Description   Delete existing room
+// @Tags          room
+// @Accept        json
+// @Param			    id  path  number  true  "id of the room to delete" 
+// @Produce       json
+// @Success       200  {array}   entities.Room
+// @Router        /api/v1/room/{id} [delete]
 func DeleteRoomById(service room.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		id, err := ctx.ParamsInt("id")

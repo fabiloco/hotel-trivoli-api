@@ -13,13 +13,13 @@ import (
 )
 
 // ListServices   godoc
-// @Summary       List product types
-// @Description   list avaliable product types in the database
-// @Tags          product type
+// @Summary       List services
+// @Description   list avaliable services in the database
+// @Tags          service
 // @Accept        json
 // @Produce       json
-// @Success       200  {array}   model.Service
-// @Router        /product-type [get]
+// @Success       200  {array}   entities.Service
+// @Router        /api/v1/service [get]
 func GetServices(service service.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		services, error := service.FetchServices()
@@ -34,14 +34,14 @@ func GetServices(service service.Service) fiber.Handler {
 }
 
 // GetServiceById   godoc
-// @Summary       Get a product type
-// @Description   Get a single product type by its id
-// @Tags          product type
+// @Summary       Get a service
+// @Description   Get a single service by its id
+// @Tags          service
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to retrieve"
+// @Param			    id  path  number  true  "id of the service to retrieve"
 // @Produce       json
-// @Success       200  {array}   model.Service
-// @Router        /product-type/{id} [get]
+// @Success       200  {array}   entities.Service
+// @Router        /api/v1/service/{id} [get]
 func GetServiceById(service service.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		id, err := ctx.ParamsInt("id")
@@ -62,14 +62,14 @@ func GetServiceById(service service.Service) fiber.Handler {
 }
 
 // PostService   godoc
-// @Summary       Create a product type
-// @Description   Create new product types
-// @Tags          product type
+// @Summary       Create a service
+// @Description   Create new services
+// @Tags          service
 // @Accept        json
-// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product type"})
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test service"})
 // @Produce       json
-// @Success       200  {array}   model.Service
-// @Router        /product-type [post]
+// @Success       200  {array}   entities.Service
+// @Router        /api/v1/service [post]
 func PostServices(service service.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var body entities.CreateService
@@ -97,15 +97,15 @@ func PostServices(service service.Service) fiber.Handler {
 }
 
 // PutService   godoc
-// @Summary       Update product type
-// @Description   Edit existing product type
-// @Tags          product type
+// @Summary       Update service
+// @Description   Edit existing service
+// @Tags          service
 // @Accept        json
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
-// @Param			    id  path  number  true  "id of the product type to update"
+// @Param			    id  path  number  true  "id of the service to update"
 // @Produce       json
-// @Success       200  {array}   model.Service
-// @Router        /product-type/{id} [put]
+// @Success       200  {array}   entities.Service
+// @Router        /api/v1/service/{id} [put]
 func PutService(service service.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.UpdateService
@@ -139,14 +139,14 @@ func PutService(service service.Service) fiber.Handler {
 }
 
 // DeleteServiceById   godoc
-// @Summary       Delete product type
-// @Description   Delete existing product type
-// @Tags          product type
+// @Summary       Delete service
+// @Description   Delete existing service
+// @Tags          service
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to delete"
+// @Param			    id  path  number  true  "id of the service to delete"
 // @Produce       json
-// @Success       200  {array}   model.Service
-// @Router        /product-type/{id} [delete]
+// @Success       200  {array}   entities.Service
+// @Router        /api/v1/service/{id} [delete]
 func DeleteServiceById(service service.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		id, err := ctx.ParamsInt("id")

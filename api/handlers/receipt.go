@@ -13,13 +13,13 @@ import (
 )
 
 // ListReceipts   godoc
-// @Summary       List product types
-// @Description   list avaliable product types in the database
-// @Tags          product type
+// @Summary       List receipts
+// @Description   list avaliable receipts in the database
+// @Tags          receipt
 // @Accept        json
 // @Produce       json
-// @Success       200  {array}   model.Receipt
-// @Router        /product-type [get]
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt [get]
 func GetReceipts(service receipt.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     receipts, error := service.FetchReceipts()
@@ -34,14 +34,14 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 }
 
 // GetReceiptById   godoc
-// @Summary       Get a product type
-// @Description   Get a single product type by its id
-// @Tags          product type
+// @Summary       Get a receipt
+// @Description   Get a single receipt by its id
+// @Tags          receipt
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to retrieve" 
+// @Param			    id  path  number  true  "id of the receipt to retrieve" 
 // @Produce       json
-// @Success       200  {array}   model.Receipt
-// @Router        /product-type/{id} [get]
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt/{id} [get]
 func GetReceiptById(service receipt.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
@@ -62,14 +62,14 @@ func GetReceiptById(service receipt.Service) fiber.Handler {
 }
 
 // PostReceipt   godoc
-// @Summary       Create a product type
-// @Description   Create new product types
-// @Tags          product type
+// @Summary       Create a receipt
+// @Description   Create new receipts
+// @Tags          receipt
 // @Accept        json
-// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product type"})
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test receipt"})
 // @Produce       json
-// @Success       200  {array}   model.Receipt
-// @Router        /product-type [post]
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt [post]
 func PostReceipts(service receipt.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.CreateReceipt
@@ -96,17 +96,16 @@ func PostReceipts(service receipt.Service) fiber.Handler {
   }
 }
 
-
 // PutReceipt   godoc
-// @Summary       Update product type
-// @Description   Edit existing product type
-// @Tags          product type
+// @Summary       Update receipt
+// @Description   Edit existing receipt
+// @Tags          receipt
 // @Accept        json
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
-// @Param			    id  path  number  true  "id of the product type to update" 
+// @Param			    id  path  number  true  "id of the receipt to update" 
 // @Produce       json
-// @Success       200  {array}   model.Receipt
-// @Router        /product-type/{id} [put]
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt/{id} [put]
 func PutReceipt(service receipt.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.UpdateReceipt
@@ -139,18 +138,15 @@ func PutReceipt(service receipt.Service) fiber.Handler {
   }
 }
 
-
-
-
 // DeleteReceiptById   godoc
-// @Summary       Delete product type
-// @Description   Delete existing product type
-// @Tags          product type
+// @Summary       Delete receipt
+// @Description   Delete existing receipt
+// @Tags          receipt
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to delete" 
+// @Param			    id  path  number  true  "id of the receipt to delete" 
 // @Produce       json
-// @Success       200  {array}   model.Receipt
-// @Router        /product-type/{id} [delete]
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt/{id} [delete]
 func DeleteReceiptById(service receipt.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")

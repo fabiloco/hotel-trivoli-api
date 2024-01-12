@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fabiloco/hotel-trivoli-api/api/config"
 	"fabiloco/hotel-trivoli-api/api/database"
 	"fabiloco/hotel-trivoli-api/api/routes"
 	_ "fabiloco/hotel-trivoli-api/docs"
-
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
@@ -71,5 +71,16 @@ func main() {
   routes.ReceiptRouter(api, receptService)
 
 	// StoreHandler.Register(app)
-	app.Listen(":3001")
+	app.Listen(getPort())
+}
+
+func getPort() string {
+	port := config.Config("PORT")
+	if port == "" {
+		port = ":3001"
+	} else {
+		port = ":" + port
+	}
+
+	return port
 }

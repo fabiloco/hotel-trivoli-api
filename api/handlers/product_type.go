@@ -18,8 +18,8 @@ import (
 // @Tags          product type
 // @Accept        json
 // @Produce       json
-// @Success       200  {array}   model.ProductType
-// @Router        /product-type [get]
+// @Success       200  {array}   entities.ProductType
+// @Router        /api/v1/product-type [get]
 func GetProductTypes(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     productTypes, error := service.FetchProductTypes()
@@ -40,8 +40,8 @@ func GetProductTypes(service productType.Service) fiber.Handler {
 // @Accept        json
 // @Param			    id  path  number  true  "id of the product type to retrieve" 
 // @Produce       json
-// @Success       200  {array}   model.ProductType
-// @Router        /product-type/{id} [get]
+// @Success       200  {array}   entities.ProductType
+// @Router        /api/v1/product-type/{id} [get]
 func GetProductTypeById(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
@@ -68,8 +68,8 @@ func GetProductTypeById(service productType.Service) fiber.Handler {
 // @Accept        json
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product type"})
 // @Produce       json
-// @Success       200  {array}   model.ProductType
-// @Router        /product-type [post]
+// @Success       200  {array}   entities.ProductType
+// @Router        /api/v1/product-type [post]
 func PostProductTypes(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.CreateProductType
@@ -105,8 +105,8 @@ func PostProductTypes(service productType.Service) fiber.Handler {
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
 // @Param			    id  path  number  true  "id of the product type to update" 
 // @Produce       json
-// @Success       200  {array}   model.ProductType
-// @Router        /product-type/{id} [put]
+// @Success       200  {array}   entities.ProductType
+// @Router        /api/v1/product-type/{id} [put]
 func PutProductType(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.UpdateProductType
@@ -149,8 +149,8 @@ func PutProductType(service productType.Service) fiber.Handler {
 // @Accept        json
 // @Param			    id  path  number  true  "id of the product type to delete" 
 // @Produce       json
-// @Success       200  {array}   model.ProductType
-// @Router        /product-type/{id} [delete]
+// @Success       200  {array}   entities.ProductType
+// @Router        /api/v1/product-type/{id} [delete]
 func DeleteProductTypeById(service productType.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")

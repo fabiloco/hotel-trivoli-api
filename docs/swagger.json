@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/product": {
+        "/api/v1/product": {
             "get": {
                 "description": "list avaliable products in the database",
                 "consumes": [
@@ -23,7 +23,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Product"
+                                "$ref": "#/definitions/entities.Product"
                             }
                         }
                     }
@@ -59,14 +59,14 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Product"
+                                "$ref": "#/definitions/entities.Product"
                             }
                         }
                     }
                 }
             }
         },
-        "/product-type": {
+        "/api/v1/product-type": {
             "get": {
                 "description": "list avaliable product types in the database",
                 "consumes": [
@@ -85,7 +85,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.ProductType"
+                                "$ref": "#/definitions/entities.ProductType"
                             }
                         }
                     }
@@ -121,14 +121,14 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.ProductType"
+                                "$ref": "#/definitions/entities.ProductType"
                             }
                         }
                     }
                 }
             }
         },
-        "/product-type/{id}": {
+        "/api/v1/product-type/{id}": {
             "get": {
                 "description": "Get a single product type by its id",
                 "consumes": [
@@ -156,7 +156,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.ProductType"
+                                "$ref": "#/definitions/entities.ProductType"
                             }
                         }
                     }
@@ -199,7 +199,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.ProductType"
+                                "$ref": "#/definitions/entities.ProductType"
                             }
                         }
                     }
@@ -232,14 +232,14 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.ProductType"
+                                "$ref": "#/definitions/entities.ProductType"
                             }
                         }
                     }
                 }
             }
         },
-        "/product/{id}": {
+        "/api/v1/product/{id}": {
             "get": {
                 "description": "Get a single product by its id",
                 "consumes": [
@@ -267,7 +267,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Product"
+                                "$ref": "#/definitions/entities.Product"
                             }
                         }
                     }
@@ -310,7 +310,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Product"
+                                "$ref": "#/definitions/entities.Product"
                             }
                         }
                     }
@@ -343,7 +343,872 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Product"
+                                "$ref": "#/definitions/entities.Product"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/receipt": {
+            "get": {
+                "description": "list avaliable receipts in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "List receipts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Receipt"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new receipts",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Create a receipt",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test receipt\"}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Receipt"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/receipt/{id}": {
+            "get": {
+                "description": "Get a single receipt by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Get a receipt",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the receipt to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Receipt"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit existing receipt",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Update receipt",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\"}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the receipt to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Receipt"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing receipt",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Delete receipt",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the receipt to delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Receipt"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/room": {
+            "get": {
+                "description": "list avaliable rooms in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room"
+                ],
+                "summary": "List rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Room"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new rooms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room"
+                ],
+                "summary": "Create a room",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test room\"}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Room"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/room-history": {
+            "get": {
+                "description": "list avaliable room historys in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room history"
+                ],
+                "summary": "List room historys",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.RoomHistory"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new room historys",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room history"
+                ],
+                "summary": "Create a room history",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test room history\"}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.RoomHistory"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/room-history/{id}": {
+            "get": {
+                "description": "Get a single room history by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room history"
+                ],
+                "summary": "Get a room history",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the room history to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.RoomHistory"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit existing room history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room history"
+                ],
+                "summary": "Update room history",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\"}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the room history to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.RoomHistory"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing room history",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room history"
+                ],
+                "summary": "Delete room history",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the room history to delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.RoomHistory"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/room/{id}": {
+            "get": {
+                "description": "Get a single room by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room"
+                ],
+                "summary": "Get a room",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the room to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Room"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit existing room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room"
+                ],
+                "summary": "Update room",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\"}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the room to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Room"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "room"
+                ],
+                "summary": "Delete room",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the room to delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Room"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/service": {
+            "get": {
+                "description": "list avaliable services in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "service"
+                ],
+                "summary": "List services",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Service"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new services",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "service"
+                ],
+                "summary": "Create a service",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test service\"}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Service"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/service/{id}": {
+            "get": {
+                "description": "Get a single service by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "service"
+                ],
+                "summary": "Get a service",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the service to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Service"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit existing service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "service"
+                ],
+                "summary": "Update service",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\"}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the service to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Service"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "service"
+                ],
+                "summary": "Delete service",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the service to delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Service"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user": {
+            "get": {
+                "description": "list avaliable users in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "List users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create a user",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test user\"}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/{id}": {
+            "get": {
+                "description": "Get a single user by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get a user",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the user to retrieve",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit existing user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "description": "Body of the request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "{\n\"name\": \"test product\"}"
+                        }
+                    },
+                    {
+                        "type": "number",
+                        "description": "id of the user to update",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "id of the user to delete",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
                             }
                         }
                     }
@@ -352,19 +1217,7 @@
         }
     },
     "definitions": {
-        "gorm.DeletedAt": {
-            "type": "object",
-            "properties": {
-                "time": {
-                    "type": "string"
-                },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
-                }
-            }
-        },
-        "model.Product": {
+        "entities.Product": {
             "description": "Products information in stock",
             "type": "object",
             "properties": {
@@ -393,7 +1246,7 @@
                     "description": "product type",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.ProductType"
+                        "$ref": "#/definitions/entities.ProductType"
                     }
                 },
                 "updatedAt": {
@@ -401,7 +1254,7 @@
                 }
             }
         },
-        "model.ProductType": {
+        "entities.ProductType": {
             "description": "Product type information",
             "type": "object",
             "properties": {
@@ -422,6 +1275,199 @@
                     "type": "string"
                 }
             }
+        },
+        "entities.Receipt": {
+            "description": "Receipt information in stock",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Product"
+                    }
+                },
+                "room": {
+                    "$ref": "#/definitions/entities.Room"
+                },
+                "roomID": {
+                    "type": "integer"
+                },
+                "service": {
+                    "$ref": "#/definitions/entities.Service"
+                },
+                "serviceID": {
+                    "type": "integer"
+                },
+                "total_price": {
+                    "type": "number"
+                },
+                "total_time": {
+                    "$ref": "#/definitions/time.Duration"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Room": {
+            "description": "Rooms information in stock",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "number": {
+                    "description": "room name",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.RoomHistory": {
+            "description": "Rooms information in stock",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "room": {
+                    "$ref": "#/definitions/entities.Room"
+                },
+                "roomID": {
+                    "type": "integer"
+                },
+                "service": {
+                    "$ref": "#/definitions/entities.Service"
+                },
+                "serviceID": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.Service": {
+            "description": "Services information in stock",
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "service name",
+                    "type": "string"
+                },
+                "price": {
+                    "description": "service price",
+                    "type": "number"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entities.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "identification": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "gorm.DeletedAt": {
+            "type": "object",
+            "properties": {
+                "time": {
+                    "type": "string"
+                },
+                "valid": {
+                    "description": "Valid is true if Time is not NULL",
+                    "type": "boolean"
+                }
+            }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
         }
     }
 }

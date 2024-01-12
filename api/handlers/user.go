@@ -12,6 +12,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// ListUsers   godoc
+// @Summary       List users
+// @Description   list avaliable users in the database
+// @Tags          user
+// @Accept        json
+// @Produce       json
+// @Success       200  {array}   entities.User
+// @Router        /api/v1/user [get]
 func GetUsers(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     users, error := service.FetchUsers()
@@ -25,6 +33,15 @@ func GetUsers(service user.Service) fiber.Handler {
   }
 }
 
+// GetUserById   godoc
+// @Summary       Get a user
+// @Description   Get a single user by its id
+// @Tags          user
+// @Accept        json
+// @Param			    id  path  number  true  "id of the user to retrieve" 
+// @Produce       json
+// @Success       200  {array}   entities.User
+// @Router        /api/v1/user/{id} [get]
 func GetUserById(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
@@ -44,6 +61,15 @@ func GetUserById(service user.Service) fiber.Handler {
   }
 }
 
+// PostUser   godoc
+// @Summary       Create a user
+// @Description   Create new users
+// @Tags          user
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test user"})
+// @Produce       json
+// @Success       200  {array}   entities.User
+// @Router        /api/v1/user [post]
 func PostUsers(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.CreateUser
@@ -69,6 +95,16 @@ func PostUsers(service user.Service) fiber.Handler {
   }
 }
 
+// PutUser   godoc
+// @Summary       Update user
+// @Description   Edit existing user
+// @Tags          user
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
+// @Param			    id  path  number  true  "id of the user to update" 
+// @Produce       json
+// @Success       200  {array}   entities.User
+// @Router        /api/v1/user/{id} [put]
 func PutUser(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.UpdateUser
@@ -101,6 +137,15 @@ func PutUser(service user.Service) fiber.Handler {
   }
 }
 
+// DeleteUserById   godoc
+// @Summary       Delete user
+// @Description   Delete existing user
+// @Tags          user
+// @Accept        json
+// @Param			    id  path  number  true  "id of the user to delete" 
+// @Produce       json
+// @Success       200  {array}   entities.User
+// @Router        /api/v1/user/{id} [delete]
 func DeleteUserById(service user.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")

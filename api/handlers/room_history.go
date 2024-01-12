@@ -13,13 +13,13 @@ import (
 )
 
 // ListRoomHistorys   godoc
-// @Summary       List product types
-// @Description   list avaliable product types in the database
-// @Tags          product type
+// @Summary       List room historys
+// @Description   list avaliable room historys in the database
+// @Tags          room history
 // @Accept        json
 // @Produce       json
-// @Success       200  {array}   model.RoomHistory
-// @Router        /room-history [get]
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history [get]
 func GetRoomHistorys(service roomHistory.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     roomHistorys, error := service.FetchRoomHistorys()
@@ -34,14 +34,14 @@ func GetRoomHistorys(service roomHistory.Service) fiber.Handler {
 }
 
 // GetRoomHistoryById   godoc
-// @Summary       Get a product type
-// @Description   Get a single product type by its id
-// @Tags          product type
+// @Summary       Get a room history
+// @Description   Get a single room history by its id
+// @Tags          room history
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to retrieve" 
+// @Param			    id  path  number  true  "id of the room history to retrieve" 
 // @Produce       json
-// @Success       200  {array}   model.RoomHistory
-// @Router        /room-history/{id} [get]
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history/{id} [get]
 func GetRoomHistoryById(service roomHistory.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
@@ -62,14 +62,14 @@ func GetRoomHistoryById(service roomHistory.Service) fiber.Handler {
 }
 
 // PostRoomHistory   godoc
-// @Summary       Create a product type
-// @Description   Create new product types
-// @Tags          product type
+// @Summary       Create a room history
+// @Description   Create new room historys
+// @Tags          room history
 // @Accept        json
-// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product type"})
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test room history"})
 // @Produce       json
-// @Success       200  {array}   model.RoomHistory
-// @Router        /room-history [post]
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history [post]
 func PostRoomHistorys(service roomHistory.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.CreateRoomHistory
@@ -98,15 +98,15 @@ func PostRoomHistorys(service roomHistory.Service) fiber.Handler {
 
 
 // PutRoomHistory   godoc
-// @Summary       Update product type
-// @Description   Edit existing product type
-// @Tags          product type
+// @Summary       Update room history
+// @Description   Edit existing room history
+// @Tags          room history
 // @Accept        json
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
-// @Param			    id  path  number  true  "id of the product type to update" 
+// @Param			    id  path  number  true  "id of the room history to update" 
 // @Produce       json
-// @Success       200  {array}   model.RoomHistory
-// @Router        /room-history/{id} [put]
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history/{id} [put]
 func PutRoomHistory(service roomHistory.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body entities.UpdateRoomHistory
@@ -143,14 +143,14 @@ func PutRoomHistory(service roomHistory.Service) fiber.Handler {
 
 
 // DeleteRoomHistoryById   godoc
-// @Summary       Delete product type
-// @Description   Delete existing product type
-// @Tags          product type
+// @Summary       Delete room history
+// @Description   Delete existing room history
+// @Tags          room history
 // @Accept        json
-// @Param			    id  path  number  true  "id of the product type to delete" 
+// @Param			    id  path  number  true  "id of the room history to delete" 
 // @Produce       json
-// @Success       200  {array}   model.RoomHistory
-// @Router        /room-history/{id} [delete]
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history/{id} [delete]
 func DeleteRoomHistoryById(service roomHistory.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     id, err := ctx.ParamsInt("id")
