@@ -2,6 +2,7 @@ package user
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
+
 	"gorm.io/gorm"
 )
 
@@ -49,10 +50,9 @@ func (r *repository) Create(data *entities.User) (*entities.User, error) {
 
 	user = entities.User{
     Username: data.Username,
-    Firstname: data.Firstname,
-    Lastname: data.Lastname,
     Password: data.Password,
-    Identification: data.Identification,
+    Role: data.Role,
+    Person: data.Person,
 	}
 
 	result := r.db.Create(&user)
@@ -74,10 +74,9 @@ func (r *repository) Update(id uint, data *entities.User) (*entities.User, error
 	result := r.db.Model(&user).Updates(
     entities.User{
       Password: data.Password,
-      Identification: data.Identification, 
-      Lastname: data.Lastname,
-      Firstname: data.Firstname,
       Username: data.Username,
+      Role: data.Role,
+      Person: data.Person,
     },
   )
 

@@ -49,37 +49,3 @@ func (s *service) ReceiptsBetweenDates(startDate string, endDate string) (*[]ent
    
 	return s.receiptRepository.ReadBetweenDates(sd, ed)
 }
-
-// func (s *service) FetchProducts() (*[]entities.Product, error) {
-// 	return s.productRepository.Read()
-// }
-//
-// func (s *service) UpdateProduct(id uint, product *entities.UpdateProduct) (*entities.Product, error) {
-//   var productTypesSlice []entities.ProductType
-//
-//   for i := 0; i < len(product.Type); i++{
-//     productType, error := s.productTypeRepository.ReadById(product.Type[i])
-//
-//     if error != nil {
-//       return nil, errors.New(fmt.Sprintf("no product type with id %d", product.Type[i]))
-//     }
-//
-//     productTypesSlice = append(productTypesSlice, *productType)
-//   }
-//
-//   newProduct := entities.Product {
-//     Name: product.Name,
-//     Stock: product.Stock,
-//     Price: product.Price,
-//   }
-//
-// 	return s.productRepository.Update(id, &newProduct)
-// }
-//
-// func (s *service) RemoveProduct(ID uint) (*entities.Product, error) {
-// 	return s.productRepository.Delete(ID)
-// }
-//
-// func (s *service) FetchProductById(ID uint) (*entities.Product, error) {
-// 	return s.productRepository.ReadById(ID)
-// }

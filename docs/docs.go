@@ -534,6 +534,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/reports/receipt-between-dates": {
+            "get": {
+                "description": "Report that shows the receipts created between a range of dates",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Receipts between dates",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.ReceiptsBetweenDates"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/reports/receipt-by-date": {
+            "get": {
+                "description": "Report that shows the receipts created at a certain date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Receipts by date",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.ReceiptsByDate"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/room": {
             "get": {
                 "description": "list avaliable rooms in the database",
@@ -1457,6 +1509,25 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.ReceiptsBetweenDates": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ReceiptsByDate": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                }
+            }
+        },
         "time.Duration": {
             "type": "integer",
             "enum": [
@@ -1467,9 +1538,25 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",

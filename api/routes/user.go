@@ -10,7 +10,5 @@ func UserRouter(app fiber.Router, service user.Service) {
   productGroup := app.Group("/user")
 	productGroup.Get("/", handlers.GetUsers(service))
   productGroup.Get("/:id", handlers.GetUserById(service))
-	productGroup.Post("/", handlers.PostUsers(service))
-  productGroup.Put("/:id", handlers.PutUser(service))
   productGroup.Delete("/:id", handlers.DeleteUserById(service))
 }

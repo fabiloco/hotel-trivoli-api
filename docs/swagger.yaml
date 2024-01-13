@@ -154,6 +154,18 @@ definitions:
         description: Valid is true if Time is not NULL
         type: boolean
     type: object
+  handlers.ReceiptsBetweenDates:
+    properties:
+      end_date:
+        type: string
+      start_date:
+        type: string
+    type: object
+  handlers.ReceiptsByDate:
+    properties:
+      date:
+        type: string
+    type: object
   time.Duration:
     enum:
     - -9223372036854775808
@@ -164,8 +176,24 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -540,6 +568,40 @@ paths:
               $ref: '#/definitions/entities.Receipt'
             type: array
       summary: Update receipt
+      tags:
+      - receipt
+  /api/v1/reports/receipt-between-dates:
+    get:
+      consumes:
+      - application/json
+      description: Report that shows the receipts created between a range of dates
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.ReceiptsBetweenDates'
+            type: array
+      summary: Receipts between dates
+      tags:
+      - receipt
+  /api/v1/reports/receipt-by-date:
+    get:
+      consumes:
+      - application/json
+      description: Report that shows the receipts created at a certain date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.ReceiptsByDate'
+            type: array
+      summary: Receipts by date
       tags:
       - receipt
   /api/v1/room:

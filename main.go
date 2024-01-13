@@ -5,10 +5,12 @@ import (
 	"fabiloco/hotel-trivoli-api/api/database"
 	"fabiloco/hotel-trivoli-api/api/routes"
 	_ "fabiloco/hotel-trivoli-api/docs"
+	"fabiloco/hotel-trivoli-api/pkg/auth"
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
 	"fabiloco/hotel-trivoli-api/pkg/reports"
+	"fabiloco/hotel-trivoli-api/pkg/role"
 	"fabiloco/hotel-trivoli-api/pkg/room"
 	roomHistory "fabiloco/hotel-trivoli-api/pkg/room_history"
 	"fabiloco/hotel-trivoli-api/pkg/service"
@@ -53,6 +55,8 @@ func main() {
   roomHistoryRepo := roomHistory.NewRepository(database.DB)
   receiptRepo := receipt.NewRepository(database.DB)
 
+  repositoryRepo := role.NewRepository(database.DB)
+
   productService := product.NewService(productRepo, productTypeRepo)
   productTypeService := productType.NewService(productTypeRepo)
   userService := user.NewService(userRepo)
@@ -62,6 +66,7 @@ func main() {
   receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo)
 
   reportService := reports.NewService(productRepo, receiptRepo)
+  authService := auth.NewService(userRepo, repositoryRepo)
 
 	api := app.Group("/api/v1", logger.New())
 
@@ -74,6 +79,7 @@ func main() {
   routes.ReceiptRouter(api, receptService)
 
   routes.ReportsRouter(api, reportService)
+  routes.AuthRouter(api, authService)
 
 	// StoreHandler.Register(app)
 	app.Listen(getPort())

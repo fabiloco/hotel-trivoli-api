@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "identification": "123123",
+  "firstname": "fabian",
+  "lastname": "sanchez",
+  "birthday": "2024-01-13T10:59:58-05:00",
+  "username": "fabiloco",
+  "password": "12345"
+}
