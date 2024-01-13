@@ -12,6 +12,7 @@ type Repository interface {
 	Update(id uint, data *entities.User) (*entities.User, error)
 	Delete(id uint) (*entities.User, error)
 	ReadById(id uint) (*entities.User, error)
+	ReadByUsername(username string) (*entities.User, error)
 }
 
 
@@ -37,6 +38,18 @@ func (r *repository) ReadById(id uint) (*entities.User, error) {
 	var user entities.User
 
 	result := r.db.Find(&user, id)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
+}
+
+func (r *repository) ReadByUsername(username string) (*entities.User, error) {
+	var user entities.User
+
+	result := r.db.Where("username = ?", username).Preload("Role").First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error

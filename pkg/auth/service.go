@@ -11,6 +11,7 @@ import (
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
 	Register (user *entities.CreateUser, person *entities.CreatePerson) (*entities.User, error)
+	Login (username string) (*entities.User, error)
 }
 
 type service struct {
@@ -52,4 +53,8 @@ func (s *service) Register(user *entities.CreateUser, person *entities.CreatePer
   }
 
   return s.userRepository.Create(&newUser)
+}
+
+func (s *service) Login(username string) (*entities.User, error) {
+  return s.userRepository.ReadByUsername(username)
 }

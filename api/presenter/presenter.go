@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type UserResponse struct {
+type RegisterResponse struct {
 	ID          uint            `gorm:"primarykey"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
@@ -20,6 +20,10 @@ type UserResponse struct {
   PersonID    uint            `gorm:"not null"`
 }
 
+type LoginResponse struct {
+  Token string `json:"token"`
+}
+
 func SuccessResponse(data interface{}) *fiber.Map {
   return &fiber.Map {
     "status": true,
@@ -29,7 +33,7 @@ func SuccessResponse(data interface{}) *fiber.Map {
 }
 
 func SuccessRegisterResponse(data entities.User) *fiber.Map {
-  userResponse := UserResponse{
+  userResponse := RegisterResponse{
     ID: data.ID,
     CreatedAt: data.CreatedAt,
     UpdatedAt: data.UpdatedAt,
@@ -43,6 +47,18 @@ func SuccessRegisterResponse(data entities.User) *fiber.Map {
     "status": true,
     "error": nil,
     "data": userResponse,
+  }
+}
+
+func SuccessLoginResponse(token string) *fiber.Map {
+  loginResponse := LoginResponse{
+    Token: token,
+  }
+
+  return &fiber.Map {
+    "status": true,
+    "error": nil,
+    "data": loginResponse,
   }
 }
 

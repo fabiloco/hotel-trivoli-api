@@ -6,6 +6,6 @@ Content-Type: application/json
   "firstname": "fabian",
   "lastname": "sanchez",
   "birthday": "2024-01-13T10:59:58-05:00",
-  "username": "fabiloco",
+  "username": "fabiloco123",
   "password": "12345"
-}
+} 
