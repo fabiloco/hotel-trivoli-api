@@ -8,6 +8,7 @@ import (
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
+	"fabiloco/hotel-trivoli-api/pkg/reports"
 	"fabiloco/hotel-trivoli-api/pkg/room"
 	roomHistory "fabiloco/hotel-trivoli-api/pkg/room_history"
 	"fabiloco/hotel-trivoli-api/pkg/service"
@@ -60,6 +61,8 @@ func main() {
   roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
   receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo)
 
+  reportService := reports.NewService(productRepo, receiptRepo)
+
 	api := app.Group("/api/v1", logger.New())
 
   routes.ProductRouter(api, productService)
@@ -69,6 +72,8 @@ func main() {
   routes.RoomRouter(api, roomService)
   routes.RoomHistoryRouter(api, roomHistoryService)
   routes.ReceiptRouter(api, receptService)
+
+  routes.ReportsRouter(api, reportService)
 
 	// StoreHandler.Register(app)
 	app.Listen(getPort())

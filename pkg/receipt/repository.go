@@ -2,6 +2,8 @@ package receipt
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -11,6 +13,8 @@ type Repository interface {
 	Update(id uint, data *entities.Receipt) (*entities.Receipt, error)
 	Delete(id uint) (*entities.Receipt, error)
 	ReadById(id uint) (*entities.Receipt, error)
+	ReadByDate(targetDate time.Time) (*[]entities.Receipt, error)
+	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error)
 }
 
 
@@ -27,7 +31,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	r.db.Find(&receipts)
+	r.db.Preload("Products").Find(&receipts)
 
 	return &receipts, nil
 }
@@ -35,13 +39,38 @@ func (r *repository) Read() (*[]entities.Receipt, error) {
 func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 	var receipt entities.Receipt
 
-	result := r.db.First(&receipt, id)
+	result := r.db.Preload("Products").First(&receipt, id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return &receipt, nil
+}
+
+func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, error) {
+	var receipts []entities.Receipt
+
+	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Find(&receipts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &receipts, nil
+}
+
+
+func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error) {
+	var receipts []entities.Receipt
+
+	result := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Products").Find(&receipts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &receipts, nil
 }
 
 func (r *repository) Create(data *entities.Receipt) (*entities.Receipt, error) {

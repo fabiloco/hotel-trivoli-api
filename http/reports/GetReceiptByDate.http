@@ -1,0 +1,7 @@
+GET http://localhost:3001/api/v1/reports/receipt-by-date
+Content-Type: application/json
+
+
+{
+  "date": "2024-01-11T20:00:00-00:00"
+}
