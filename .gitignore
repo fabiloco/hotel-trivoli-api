@@ -29,3 +29,4 @@ go.work
 tmp/
 .env
 .env.prod
+.env.dev
