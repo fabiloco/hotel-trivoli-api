@@ -34,13 +34,13 @@ func seed(db *gorm.DB) {
 
 	// Create Products
 	products := []entities.Product{
-		{Name: "Laptop", Stock: 10, Price: 999.99, Type: []entities.ProductType{productTypes[0]}},
-		{Name: "T-Shirt", Stock: 50, Price: 19.99, Type: []entities.ProductType{productTypes[1]}},
-		{Name: "Book1", Stock: 30, Price: 29.99, Type: []entities.ProductType{productTypes[2]}},
-		{Name: "Smartphone", Stock: 20, Price: 799.99, Type: []entities.ProductType{productTypes[0]}},
-		{Name: "Jeans", Stock: 40, Price: 49.99, Type: []entities.ProductType{productTypes[1]}},
-		{Name: "Book2", Stock: 25, Price: 39.99, Type: []entities.ProductType{productTypes[2]}},
-		{Name: "Headphones", Stock: 15, Price: 129.99, Type: []entities.ProductType{productTypes[0]}},
+		{Name: "Laptop", Stock: 10, Price: 999.99, Type: []entities.ProductType{productTypes[0]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "T-Shirt", Stock: 50, Price: 19.99, Type: []entities.ProductType{productTypes[1]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "Book1", Stock: 30, Price: 29.99, Type: []entities.ProductType{productTypes[2]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "Smartphone", Stock: 20, Price: 799.99, Type: []entities.ProductType{productTypes[0]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "Jeans", Stock: 40, Price: 49.99, Type: []entities.ProductType{productTypes[1]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "Book2", Stock: 25, Price: 39.99, Type: []entities.ProductType{productTypes[2]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
+		{Name: "Headphones", Stock: 15, Price: 129.99, Type: []entities.ProductType{productTypes[0]}, Img: "https://lavaquita.co/cdn/shop/products/supermercados_la_vaquita_supervaquita_doritos_185gr_mega_queso_familiar_pasabocas_700x700.jpg?v=1620489636"},
 		// Add more mock data as needed
 	}
 
