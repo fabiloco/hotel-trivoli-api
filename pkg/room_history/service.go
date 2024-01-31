@@ -16,6 +16,8 @@ type Service interface {
   FetchRoomHistoryById (id uint) (*entities.RoomHistory, error)
 	UpdateRoomHistory (id uint, roomHistory *entities.UpdateRoomHistory) (*entities.RoomHistory, error)
 	RemoveRoomHistory (id uint) (*entities.RoomHistory, error)
+
+	SetEndDate (id uint, roomHistory *entities.SetEndDateRoomHistory) (*entities.RoomHistory, error)
 }
 
 type service struct {
@@ -43,7 +45,7 @@ func (s *service) InsertRoomHistory(roomHistory *entities.CreateRoomHistory) (*e
   service, error := s.serviceRepository.ReadById(roomHistory.Service)
 
   if error != nil {
-    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Room))
+    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Service))
   }
 
   sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
@@ -51,14 +53,13 @@ func (s *service) InsertRoomHistory(roomHistory *entities.CreateRoomHistory) (*e
     return nil, errors.New(fmt.Sprintf("error parsing StartDate %s", roomHistory.StartDate))
   }
 
-  ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
-  if error != nil {
-    return nil, errors.New(fmt.Sprintf("error parsing EndDate %s", roomHistory.EndDate))
-  }
+  // ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
+  // if error != nil {
+  //   return nil, errors.New(fmt.Sprintf("error parsing EndDate %s", roomHistory.EndDate))
+  // }
 
   newRoomHistory := entities.RoomHistory {
     StartDate: sd,
-    EndDate: ed,
     Room: *room,
     Service: *service,
   }
@@ -80,7 +81,7 @@ func (s *service) UpdateRoomHistory(id uint, roomHistory *entities.UpdateRoomHis
   service, error := s.serviceRepository.ReadById(roomHistory.Service)
 
   if error != nil {
-    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Room))
+    return nil, errors.New(fmt.Sprintf("no service with id %d", roomHistory.Service))
   }
 
   sd, error := time.Parse(time.RFC3339, roomHistory.StartDate)
@@ -95,7 +96,7 @@ func (s *service) UpdateRoomHistory(id uint, roomHistory *entities.UpdateRoomHis
 
   newRoomHistory := entities.RoomHistory {
     StartDate: sd,
-    EndDate: ed,
+    EndDate: &ed,
     Room: *room,
     Service: *service,
   }
@@ -109,4 +110,18 @@ func (s *service) RemoveRoomHistory(ID uint) (*entities.RoomHistory, error) {
 
 func (s *service) FetchRoomHistoryById(ID uint) (*entities.RoomHistory, error) {
 	return s.repository.ReadById(ID)
+}
+
+
+func (s *service) SetEndDate(id uint, roomHistory *entities.SetEndDateRoomHistory) (*entities.RoomHistory, error) {
+  ed, error := time.Parse(time.RFC3339, roomHistory.EndDate)
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("error parsing time %s", roomHistory.EndDate))
+  }
+
+  newRoomHistory := entities.RoomHistory {
+    EndDate: &ed,
+  }
+
+	return s.repository.Update(id, &newRoomHistory)
 }

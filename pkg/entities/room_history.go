@@ -10,18 +10,18 @@ import (
 type RoomHistory struct {
 	gorm.Model
   StartDate   time.Time   `gorm:"not null" json:"start_date"`
-  EndDate     time.Time   `gorm:"optional" json:"end_date"`
+  EndDate     *time.Time   `json:"end_date"`
   Room        Room        `gorm:"not null" json:"room"`
   RoomID      uint        `gorm:"not null"`
-  Service     Service     `gorm:"not null" json:"service"`
-  ServiceID   uint        `gorm:"not null"`
+  Service     Service     `json:"service"`
+  ServiceID   uint
 }
 
 type CreateRoomHistory struct {
   StartDate   string   `valid:"required,rfc3339"`
   EndDate     string   `valid:"optional,rfc3339"`
   Room        uint     `valid:"required,numeric"`
-  Service     uint     `valid:"required,numeric"`
+  Service     uint     `valid:"optional,numeric"`
 }
 
 type UpdateRoomHistory struct {
@@ -29,4 +29,8 @@ type UpdateRoomHistory struct {
   EndDate     string   `valid:"optional,rfc3339"`
   Room        uint     `valid:"optional,numeric"`
   Service     uint     `valid:"optional,numeric"`
+}
+
+type SetEndDateRoomHistory struct {
+  EndDate     string   `valid:"required,rfc3339" json:"end_date"`
 }

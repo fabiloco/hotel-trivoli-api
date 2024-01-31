@@ -1,6 +1,6 @@
-PUT http://localhost:3001/api/v1/room-history/2
+PUT http://localhost:3001/api/v1/room-history/3
 Content-Type: application/json
 
 {
-  "price": 222
+  "end_date":"2024-01-11T10:42:55-05:00"
 }

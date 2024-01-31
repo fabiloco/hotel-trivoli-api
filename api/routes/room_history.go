@@ -14,4 +14,6 @@ func RoomHistoryRouter(app fiber.Router, service roomHistory.Service) {
 	productGroup.Post("/", handlers.PostRoomHistorys(service))
   productGroup.Put("/:id", handlers.PutRoomHistory(service))
   productGroup.Delete("/:id", handlers.DeleteRoomHistoryById(service))
+
+  productGroup.Put("/set-end-date/:id", handlers.SetEndDateRoomHistory(service))
 }

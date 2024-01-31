@@ -170,3 +170,43 @@ func DeleteRoomHistoryById(service roomHistory.Service) fiber.Handler {
   }
 }
 
+// SetEndDateRoomHistory   godoc
+// @Summary       Delete room history
+// @Description   Delete existing room history
+// @Tags          room history
+// @Accept        json
+// @Param			    id  path  number  true  "id of the room history to delete" 
+// @Produce       json
+// @Success       200  {array}   entities.RoomHistory
+// @Router        /api/v1/room-history/{id} [delete]
+func SetEndDateRoomHistory(service roomHistory.Service) fiber.Handler {
+  return func(ctx *fiber.Ctx) error {
+    var body entities.SetEndDateRoomHistory
+
+    if err := ctx.BodyParser(&body); err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(err))
+    }
+    validationErrors := utils.ValidateInput(ctx, body)
+
+    if validationErrors != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+    }
+
+    id, err := ctx.ParamsInt("id")
+    if err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+    }
+
+    product, error := service.SetEndDate(uint(id), &body)
+
+    if error != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+    return ctx.JSON(presenter.SuccessResponse(product))
+  }
+}

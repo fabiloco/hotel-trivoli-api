@@ -71,17 +71,19 @@ func seed(db *gorm.DB) {
 		db.Create(&r)
 	}
 
+  var now_date = time.Now()
+  var now_date2 = time.Now()
 	// Create RoomHistories
 	roomHistories := []entities.RoomHistory{
 		{
 			StartDate: time.Now().Add(-24 * time.Hour),
-			EndDate:   time.Now(),
+			EndDate:   &now_date,
 			RoomID:    rooms[0].ID,
 			ServiceID: services[0].ID,
 		},
 		{
 			StartDate: time.Now().Add(-48 * time.Hour),
-			EndDate:   time.Now().Add(-24 * time.Hour),
+			EndDate:   &now_date2,
 			RoomID:    rooms[1].ID,
 			ServiceID: services[1].ID,
 		},

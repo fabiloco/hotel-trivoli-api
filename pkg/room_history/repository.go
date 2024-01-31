@@ -27,7 +27,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.RoomHistory, error) {
 	var roomHistorys []entities.RoomHistory
 
-	r.db.Find(&roomHistorys)
+	r.db.Preload("Room").Find(&roomHistorys)
 
 	return &roomHistorys, nil
 }
@@ -35,7 +35,7 @@ func (r *repository) Read() (*[]entities.RoomHistory, error) {
 func (r *repository) ReadById(id uint) (*entities.RoomHistory, error) {
 	var roomHistory entities.RoomHistory
 
-	result := r.db.First(&roomHistory, id)
+	result := r.db.Preload("Room").First(&roomHistory, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -49,7 +49,7 @@ func (r *repository) Create(data *entities.RoomHistory) (*entities.RoomHistory, 
 
 	roomHistory = entities.RoomHistory{
     StartDate: data.StartDate,
-    EndDate: data.EndDate,
+    EndDate: nil,
     Room: data.Room,
     Service: data.Service,
 	}

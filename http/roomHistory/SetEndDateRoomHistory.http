@@ -1,0 +1,6 @@
+PUT http://localhost:3001/api/v1/room-history/set-end-date/3
+Content-Type: application/json
+
+{
+  "end_date": "2024-01-31T17:43:04-05:00"
+}
