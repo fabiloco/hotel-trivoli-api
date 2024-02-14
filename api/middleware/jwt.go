@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fabiloco/hotel-trivoli-api/api/utils"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,8 +16,13 @@ func JWTMiddleware() fiber.Handler {
 
 		tokenString := authHeader[len("Bearer "):]
 
+
 		// Parse the access token
-		claims := utils.ParseAccessToken(tokenString)
+		claims, error := utils.ParseAccessToken(tokenString)
+    if error != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "invalid token format"})
+    }
+
 		if claims == nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Unauthorized"})
 		}

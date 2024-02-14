@@ -1,0 +1,3 @@
+GET http://localhost:3001/api/v1/auth/verify
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwidXNlcm5hbWUiOiJmYWJpbG9jbzEyMyIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzA3ODU4MDE0LCJpYXQiOjE3MDc4NTcxMTR9.JaLmLQ37WKqrAbi0sBROMT4eePFOEPLid0n1v6Pa3MY
+Content-Type: application/json

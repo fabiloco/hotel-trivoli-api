@@ -2,6 +2,7 @@ POST http://localhost:3001/api/v1/service
 Content-Type: application/json
 
 {
-  "name": "Carro",
-  "price": 1000
+  "name": "Hotel tercer piso pareja",
+  "details": "Servicio de hotel toda la noche",
+  "price": 52000
 }

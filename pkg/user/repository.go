@@ -49,7 +49,7 @@ func (r *repository) ReadById(id uint) (*entities.User, error) {
 func (r *repository) ReadByUsername(username string) (*entities.User, error) {
 	var user entities.User
 
-	result := r.db.Where("username = ?", username).Preload("Role").First(&user)
+	result := r.db.Where("username = ?", username).Preload("Role").Preload("Person").First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error

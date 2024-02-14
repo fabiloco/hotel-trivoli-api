@@ -2,5 +2,5 @@ POST http://localhost:3001/api/v1/room
 Content-Type: application/json
 
 {
-  "number": 99
+  "number": 303
 }

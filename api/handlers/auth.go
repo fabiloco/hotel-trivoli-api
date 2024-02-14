@@ -30,7 +30,7 @@ type RegisterUser struct {
 
 type LoginUser struct {
   Username        string  `valid:"required,stringlength(3|100)" json:"username"`
-	Password        string  `valid:"required,stringlength(5|40)" json:"password"`
+	Password        string  `valid:"required" json:"password"`
 }
 
 // Register   godoc
@@ -116,7 +116,6 @@ func Login(service auth.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(errors.New(fmt.Sprint("Incorrect password"))))
     }
 
-    fmt.Println(user.Role.ID)
 
     userClaims := utils.UserClaims{
       Id: user.ID,
@@ -128,12 +127,46 @@ func Login(service auth.Service) fiber.Handler {
      },
     }
 
+    fmt.Println(userClaims)
+
     signedAccessToken, err := utils.NewAccessToken(userClaims)
     if err != nil {
       log.Fatal("error creating access token")
     }
 
-    return ctx.JSON(presenter.SuccessLoginResponse(signedAccessToken))
+    return ctx.JSON(presenter.SuccessLoginResponse(signedAccessToken, userClaims.StandardClaims, *user))
+  }
+}
+
+func Verify(service auth.Service) fiber.Handler {
+  return func(ctx *fiber.Ctx) error {
+
+    var user = ctx.Locals("userClaims")
+
+    userClaims, ok := user.(*utils.UserClaims)
+
+    if !ok {
+      ctx.Status(http.StatusUnauthorized)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(fmt.Sprint("Incorrect password"))))
+    }
+
+    userClaims.StandardClaims.IssuedAt = time.Now().Unix()
+    userClaims.StandardClaims.ExpiresAt = time.Now().Add(time.Minute * 15).Unix()
+
+    signedAccessToken, err := utils.NewAccessToken(*userClaims)
+    if err != nil {
+      log.Fatal("error creating access token")
+    }
+
+    userWithUsername, error := service.Login(userClaims.Username)
+
+    if error != nil {
+      ctx.Status(http.StatusInternalServerError)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+
+    return ctx.JSON(presenter.SuccessLoginResponse(signedAccessToken, userClaims.StandardClaims, *userWithUsername))
   }
 }
 

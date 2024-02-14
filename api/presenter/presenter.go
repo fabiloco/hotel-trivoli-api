@@ -6,22 +6,22 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
 )
 
-type RegisterResponse struct {
-	ID          uint            `gorm:"primarykey"`
+type AuthResponse struct {
+	ID          uint                `gorm:"primarykey"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 
-	Username    string          `gorm:"not null" json:"username"`
-  Role        entities.Role   `gorm:"not null" json:"role"`
-  RoleID      uint            `gorm:"not null"`
-  Person      entities.Person `gorm:"not null" json:"person"`
-  PersonID    uint            `gorm:"not null"`
+	Username    string              `gorm:"not null" json:"username"`
+  Role        entities.Role       `gorm:"not null" json:"role"`
+  Person      entities.Person     `gorm:"not null" json:"person"`
 }
 
-type LoginResponse struct {
-  Token string `json:"token"`
+type TokenResponse struct {
+  Token       string              `json:"token"` 
+  Claims      jwt.StandardClaims  `json:"claims"`
 }
 
 func SuccessResponse(data interface{}) *fiber.Map {
@@ -33,7 +33,7 @@ func SuccessResponse(data interface{}) *fiber.Map {
 }
 
 func SuccessRegisterResponse(data entities.User) *fiber.Map {
-  userResponse := RegisterResponse{
+  userResponse := AuthResponse{
     ID: data.ID,
     CreatedAt: data.CreatedAt,
     UpdatedAt: data.UpdatedAt,
@@ -50,18 +50,29 @@ func SuccessRegisterResponse(data entities.User) *fiber.Map {
   }
 }
 
-func SuccessLoginResponse(token string) *fiber.Map {
-  loginResponse := LoginResponse{
+func SuccessLoginResponse(token string, claims jwt.StandardClaims, data entities.User) *fiber.Map {
+  userResponse := AuthResponse{
+    ID: data.ID,
+    CreatedAt: data.CreatedAt,
+    UpdatedAt: data.UpdatedAt,
+
+    Username: data.Username,
+    Role: data.Role,
+    Person: data.Person,
+  }
+
+  jwtToken := TokenResponse {
     Token: token,
+    Claims: claims, 
   }
 
   return &fiber.Map {
     "status": true,
     "error": nil,
-    "data": loginResponse,
+    "data": userResponse,
+    "jwt": jwtToken,
   }
 }
-
 
 func ErrorResponse(error error) *fiber.Map {
   return &fiber.Map {

@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fabiloco/hotel-trivoli-api/api/config"
-
 	"github.com/golang-jwt/jwt"
 )
 
@@ -25,12 +24,16 @@ func NewRefreshToken(claims jwt.StandardClaims) (string, error) {
  return refreshToken.SignedString([]byte(config.Config("TOKEN_SECRET")))
 }
 
-func ParseAccessToken(accessToken string) *UserClaims {
- parsedAccessToken, _ := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-  return []byte(config.Config("TOKEN_SECRET")), nil
- })
+func ParseAccessToken(accessToken string) (*UserClaims, error){
+  parsedAccessToken, error := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+    return []byte(config.Config("TOKEN_SECRET")), nil
+  })
 
- return parsedAccessToken.Claims.(*UserClaims)
+  if error != nil {
+    return nil, error 
+  }
+
+ return parsedAccessToken.Claims.(*UserClaims), nil
 }
 
 func ParseRefreshToken(refreshToken string) *jwt.StandardClaims {
