@@ -13,12 +13,12 @@ type Service struct {
 
 type CreateService struct {
 	Name    string  `valid:"required,stringlength(3|100)"`
-	Price   float32 `valid:"required,numeric"`
+	Price   float32 `valid:"required"`
   Details string  `valid:"required,stringlength(3|100)"`
 }
 
 type UpdateService struct {
 	Name    string  `valid:"optional,stringlength(3|100)"`
-	Price   float32 `valid:"optional,numeric"`
+	Price   float32 `valid:"optional"`
   Details string  `valid:"required,stringlength(3|100)"`
 }
