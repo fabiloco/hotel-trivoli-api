@@ -3,5 +3,6 @@ Content-Type: application/json
 
 {
   "name": "test2",
-  "details": "test2"
+  "details": "test2",
+  "price": -2
 }

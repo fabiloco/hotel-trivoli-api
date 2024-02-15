@@ -123,7 +123,7 @@ func Login(service auth.Service) fiber.Handler {
       Role: user.Role.Name,
       StandardClaims: jwt.StandardClaims{
       IssuedAt:  time.Now().Unix(),
-      ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+      ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
      },
     }
 
@@ -151,7 +151,7 @@ func Verify(service auth.Service) fiber.Handler {
     }
 
     userClaims.StandardClaims.IssuedAt = time.Now().Unix()
-    userClaims.StandardClaims.ExpiresAt = time.Now().Add(time.Minute * 15).Unix()
+    userClaims.StandardClaims.ExpiresAt = time.Now().Add(time.Hour * 24).Unix()
 
     signedAccessToken, err := utils.NewAccessToken(*userClaims)
     if err != nil {
