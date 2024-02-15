@@ -1,8 +1,8 @@
-PUT http://localhost:3001/api/v1/service/3
+PUT http://localhost:3001/api/v1/service/10
 Content-Type: application/json
 
 {
-  "name": "Motel tercer piso",
-  "details": "Servicio de motel en el tercer piso",
+  "name": "test put",
+  "details": "test put",
   "price": 22000
 }

@@ -27,6 +27,7 @@ func (s *service) InsertService(service *entities.CreateService) (*entities.Serv
   newService := entities.Service {
     Name: service.Name,
     Price: service.Price,
+    Details: service.Details,
   }
 
 	return s.repository.Create(&newService)
@@ -40,6 +41,7 @@ func (s *service) UpdateService(id uint, service *entities.UpdateService) (*enti
   newService := entities.Service {
     Name: service.Name,
     Price: service.Price,
+    Details: service.Details,
   }
 
 	return s.repository.Update(id, &newService)
