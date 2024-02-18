@@ -31,7 +31,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	r.db.Preload("Products").Find(&receipts)
+	r.db.Preload("Products").Preload("Service").Preload("User").Find(&receipts)
 
 	return &receipts, nil
 }
@@ -39,7 +39,7 @@ func (r *repository) Read() (*[]entities.Receipt, error) {
 func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 	var receipt entities.Receipt
 
-	result := r.db.Preload("Products").First(&receipt, id)
+	result := r.db.Preload("Products").Preload("Service").Preload("User").First(&receipt, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -51,7 +51,7 @@ func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Find(&receipts)
+	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("Service").Preload("User").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -64,7 +64,7 @@ func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, erro
 func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Products").Find(&receipts)
+	result := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Products").Preload("Service").Preload("User").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
