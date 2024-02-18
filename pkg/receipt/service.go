@@ -6,6 +6,7 @@ import (
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	"fabiloco/hotel-trivoli-api/pkg/room"
 	serviceModule "fabiloco/hotel-trivoli-api/pkg/service"
+	"fabiloco/hotel-trivoli-api/pkg/user"
 	"fmt"
 	"time"
 )
@@ -24,14 +25,16 @@ type service struct {
 	serviceRepository serviceModule.Repository
 	roomRepository room.Repository
 	productRepository product.Repository
+	userRepository user.Repository
 }
 
-func NewService(r Repository, sr serviceModule.Repository, pr product.Repository, rr room.Repository) Service {
+func NewService(r Repository, sr serviceModule.Repository, pr product.Repository, rr room.Repository, ur user.Repository) Service {
 	return &service{
 		repository: r,
     serviceRepository: sr,
     productRepository: pr,
     roomRepository: rr,
+    userRepository: ur,
 	}
 }
 
@@ -48,6 +51,13 @@ func (s *service) InsertReceipt(receipt *entities.CreateReceipt) (*entities.Rece
     return nil, errors.New(fmt.Sprintf("no room with id %d", receipt.Service))
   }
 
+  user, error := s.userRepository.ReadById(receipt.User)
+
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("no room with id %d", receipt.User))
+  }
+
+
   var products []entities.Product
 
   for i := 0; i < len(receipt.Products); i++{
@@ -63,9 +73,10 @@ func (s *service) InsertReceipt(receipt *entities.CreateReceipt) (*entities.Rece
   newReceipt := entities.Receipt {
     TotalTime: time.Duration(receipt.TotalTime),
     TotalPrice: receipt.TotalPrice,
+    Products: products,
     Service: *service,
     Room: *room,
-    Products: products,
+    User: *user,
   }
 
 	return s.repository.Create(&newReceipt)
@@ -88,6 +99,12 @@ func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*enti
     return nil, errors.New(fmt.Sprintf("no room with id %d", receipt.Service))
   }
 
+  user, error := s.userRepository.ReadById(receipt.User)
+
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("no room with id %d", receipt.User))
+  }
+
   var products []entities.Product
 
   for i := 0; i < len(receipt.Products); i++{
@@ -105,6 +122,7 @@ func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*enti
     TotalPrice: receipt.TotalPrice,
     Service: *service,
     Room: *room,
+    User: *user,
     Products: products,
   }
 

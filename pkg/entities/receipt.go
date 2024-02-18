@@ -16,6 +16,8 @@ type Receipt struct {
   ServiceID   uint            `gorm:"not null"`
   Room        Room            `gorm:"not null" json:"room"`
   RoomID      uint            `gorm:"not null"`
+  User        User            `gorm:"not null" json:"user"`
+  UserID      uint            `gorm:"not null"`
 }
 
 type CreateReceipt struct {
@@ -24,6 +26,7 @@ type CreateReceipt struct {
   Products    []uint          `valid:"required" json:"products"`
   Service     uint            `valid:"required,numeric" json:"service"`
   Room        uint            `valid:"required,numeric" json:"room"`
+  User        uint            `valid:"required,numeric" json:"user"`
 }
 
 type UpdateReceipt struct {
@@ -32,4 +35,5 @@ type UpdateReceipt struct {
   Products    []uint          `valid:"optional" json:"products"`
   Service     uint            `valid:"optional,numeric" json:"service"`
   Room        uint            `valid:"optional,numeric" json:"room"`
+  User        uint            `valid:"optional,numeric" json:"user"`
 }

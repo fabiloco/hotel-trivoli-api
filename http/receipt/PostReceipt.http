@@ -5,6 +5,7 @@ Content-Type: application/json
   "products": [25],
   "service": 2,
   "room": 1,
+  "user":1 ,
   "total_time": 100,
   "total_price": 1000
 }

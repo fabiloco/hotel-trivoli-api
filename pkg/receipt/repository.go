@@ -82,6 +82,7 @@ func (r *repository) Create(data *entities.Receipt) (*entities.Receipt, error) {
     Service: data.Service,
     Room: data.Room,
     Products: data.Products,
+    User: data.User,
 	}
 
 	result := r.db.Create(&receipt)
@@ -107,6 +108,7 @@ func (r *repository) Update(id uint, data *entities.Receipt) (*entities.Receipt,
       Service: data.Service,
       Room: data.Room,
       Products: data.Products,
+      User: data.User,
     },
   )
 
