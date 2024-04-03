@@ -14,13 +14,14 @@ services:
       - data:/var/lib/mysql
     ports:
       - '3306:3306'
-  app:
-    network_mode: host
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - '3001:3001'
-    depends_on:
-      - db
+
+  # app:
+  #   network_mode: host
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - '3001:3001'
+  #   depends_on:
+  #     - db

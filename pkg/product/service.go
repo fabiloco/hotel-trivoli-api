@@ -10,6 +10,7 @@ import (
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
 	InsertProduct (productType *entities.CreateProduct) (*entities.Product, error)
+  RestockProduct (id uint, productRestock *entities.RestockProduct) (*entities.Product, error)
 	FetchProducts () (*[]entities.Product, error)
   FetchProductById (id uint) (*entities.Product, error)
 	UpdateProduct (id uint, product *entities.UpdateProduct) (*entities.Product, error)
@@ -50,6 +51,18 @@ func (s *service) InsertProduct(product *entities.CreateProduct) (*entities.Prod
 
 
 	return s.productRepository.Create(&newProduct)
+}
+
+func (s *service) RestockProduct(id uint, productRestock *entities.RestockProduct) (*entities.Product, error) {
+  productWithId, error := s.productRepository.ReadById(id)
+
+  if error != nil {
+    return nil, errors.New(fmt.Sprintf("no product with id %d", id))
+  }
+
+  productWithId.Stock = productRestock.Stock
+
+	return s.productRepository.Update(id, productWithId)
 }
 
 func (s *service) FetchProducts() (*[]entities.Product, error) {

@@ -13,6 +13,10 @@ type Product struct {
 	Img   string  `gorm:"not null" json:"img"`    // product price
 }
 
+type RestockProduct struct {
+	Stock uint8   `valid:"required,numeric"`
+}
+
 type CreateProduct struct {
 	Name  string  `valid:"required,stringlength(3|100)"`
 	Stock uint8   `valid:"required,numeric"`

@@ -1,11 +1,12 @@
-POST https://hotel-trivoli-api.onrender.com/api/v1/auth/register
+POST http://localhost:3001/api/v1/auth/register
+Accept: application/json
 Content-Type: application/json
 
 {
-  "identification": "123456",
-  "firstname": "normal",
-  "lastname": "user",
+  "identification": "12345",
+  "firstname": "admin",
+  "lastname": "admin",
   "birthday": "2024-01-13T10:59:58-05:00",
-  "username": "user",
-  "password": "user1"
+  "username": "admin",
+  "password": "admin"
 } 

@@ -43,8 +43,8 @@ func seed(db *gorm.DB) {
 		{Name: "JP Chenet Rosada", Stock: 99, Price: 12000.0, Type: []entities.ProductType{productTypes[0]}, Img: "https://jumbocolombiaio.vtexassets.com/arquivos/ids/206164/3500610093708.jpg?v=637814201879370000"},
 		{Name: "Agua Cristalina", Stock: 99, Price: 2000.0, Type: []entities.ProductType{productTypes[0]}, Img: "https://mercayahorra.com/wp-content/uploads/2020/06/Agua-Cristalina-x300Ml.jpg"},
 		{Name: "Smirnoff Ice", Stock: 99, Price: 15000.0, Type: []entities.ProductType{productTypes[0]}, Img: "https://mistiendas.com.co/2413-large_default/smirnoff-ice-original-botella.jpg"},
-		{Name: "Serv. Aguardiente", Stock: 99, Price: 45000.0, Type: []entities.ProductType{productTypes[3]}, Img: "https://copservir.vtexassets.com/arquivos/ids/1170449/DTE-SS-COOL-NIGHT-GEL_F.jpg?v=638418477793370000"},
-		{Name: "Serv. Ron 8 Años", Stock: 99, Price: 90000.0, Type: []entities.ProductType{productTypes[3]}, Img: "https://copservir.vtexassets.com/arquivos/ids/1170449/DTE-SS-COOL-NIGHT-GEL_F.jpg?v=638418477793370000"},
+		{Name: "Serv. Aguardiente", Stock: 99, Price: 45000.0, Type: []entities.ProductType{productTypes[0]}, Img: "https://copservir.vtexassets.com/arquivos/ids/1170449/DTE-SS-COOL-NIGHT-GEL_F.jpg?v=638418477793370000"},
+		{Name: "Serv. Ron 8 Años", Stock: 99, Price: 90000.0, Type: []entities.ProductType{productTypes[0]}, Img: "https://copservir.vtexassets.com/arquivos/ids/1170449/DTE-SS-COOL-NIGHT-GEL_F.jpg?v=638418477793370000"},
 
 		{Name: "Manicero", Stock: 99, Price: 2000.0, Type: []entities.ProductType{productTypes[1]}, Img: "https://bodegalaesperanza.com/images/bodegalaesperanza/products/6032aeb97202f.jpeg"},
 		{Name: "Papa Margarita", Stock: 99, Price: 3000.0, Type: []entities.ProductType{productTypes[1]}, Img: "https://www.confipuma.com/app_data_archivos/confipuma.soomi.co/productos/producto_ba268b32e52ef9e1233086f1d7f3388b877b860a1642763324.png"},

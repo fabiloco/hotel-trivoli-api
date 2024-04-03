@@ -30,8 +30,6 @@ func ConnectDB() {
   )
 	DB, err = gorm.Open(mysql.Open(dns), &gorm.Config{})
 
-  println(dns)
-
 	if err != nil {
 		panic("failed to connect database")
 	}

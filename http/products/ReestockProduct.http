@@ -1,0 +1,6 @@
+PUT http://localhost:3001/api/v1/product/stock/1
+Content-Type: application/json
+
+{
+  "stock": 1
+}

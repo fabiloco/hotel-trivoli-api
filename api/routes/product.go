@@ -14,6 +14,7 @@ func ProductRouter(app fiber.Router, service product.Service) {
 	productGroup.Get("/", handlers.GetProducts(service))
   productGroup.Get("/:id", handlers.GetProductById(service))
 	productGroup.Post("/", handlers.PostProducts(service))
+  productGroup.Post("/stock/:id", handlers.PostRestockProducts(service))
   productGroup.Put("/:id", handlers.PutProduct(service))
   productGroup.Delete("/:id", handlers.DeleteProductById(service))
 }
