@@ -25,7 +25,14 @@ import (
 func main() {
 	app := fiber.New()
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+    AllowCredentials: true,
+    AllowOrigins: "http://localhost:5173, http://localhost:5174, http://localhost:5175, http://localhost:4173",
+    // AllowOriginsFunc: func(origin string) bool { return true }, --> this is dangerous
+		AllowHeaders: "Authorization, Origin, Content-Type, Accept, Accept-Language, Content-Length",
+  }))
+	
+  // app.Use(cors.New())
 
 	// Serve static assets
 	app.Static("/public", "./public")

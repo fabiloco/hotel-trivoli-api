@@ -126,7 +126,7 @@ func Login(service auth.Service) fiber.Handler {
       Role: user.Role.Name,
       StandardClaims: jwt.StandardClaims{
       IssuedAt:  time.Now().Unix(),
-      ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+      ExpiresAt: time.Now().Add(time.Hour * 128).Unix(),
      },
     }
 
