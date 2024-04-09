@@ -31,7 +31,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	r.db.Preload("Products").Preload("Service").Preload("User").Find(&receipts)
+	r.db.Preload("Products").Preload("Service").Preload("Room").Preload("User").Find(&receipts)
 
 	return &receipts, nil
 }
