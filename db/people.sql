@@ -1,0 +1,2 @@
+INSERT INTO hotel_trovoli.people (id, created_at, updated_at, deleted_at, firstname, lastname, identification, birthday) VALUES (1, '2024-04-03 14:15:18.823', '2024-04-03 14:15:18.823', null, 'admin', 'admin', '12345', '2024-01-13T10:59:58-05:00');
+INSERT INTO hotel_trovoli.people (id, created_at, updated_at, deleted_at, firstname, lastname, identification, birthday) VALUES (2, '2024-04-03 14:16:36.700', '2024-04-03 14:16:36.700', null, 'normal', 'user', '54321', '2024-01-13T10:59:58-05:00');

@@ -1,0 +1,2 @@
+INSERT INTO hotel_trovoli.users (id, created_at, updated_at, deleted_at, username, password, role_id, person_id) VALUES (1, '2024-04-03 14:15:18.824', '2024-04-03 14:15:18.824', null, 'admin', '$2a$14$oSMkGr/rX07dFf0PyWqdbuHhVziDUqifz8cEz4nUQS64A49PeRtZC', 2, 1);
+INSERT INTO hotel_trovoli.users (id, created_at, updated_at, deleted_at, username, password, role_id, person_id) VALUES (2, '2024-04-03 14:16:36.701', '2024-04-03 14:16:36.701', null, 'user', '$2a$14$2k1g2hYVUvvpWDrZhDrELuisIC44aglmH9mwEuWqz7CeHI1I/mNbW', 1, 2);
