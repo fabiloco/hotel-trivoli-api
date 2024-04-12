@@ -12,6 +12,77 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// PostReceipt   godoc
+// @Summary       Create a receipt
+// @Description   Create new receipts
+// @Tags          receipt
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test receipt"})
+// @Produce       json
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt [post]
+func GenerateReceipts(service receipt.Service) fiber.Handler {
+  return func(ctx *fiber.Ctx) error {
+    var body entities.CreateReceipt
+
+    if err := ctx.BodyParser(&body); err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(err))
+    }
+    validationErrors := utils.ValidateInput(ctx, body)
+
+    if validationErrors != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+    }
+
+    product, error := service.GenerateReceipt(&body)
+
+    if error != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+    return ctx.JSON(presenter.SuccessResponse(product))
+  }
+}
+
+// PostReceipt   godoc
+// @Summary       Create a receipt
+// @Description   Create new receipts
+// @Tags          receipt
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test receipt"})
+// @Produce       json
+// @Success       200  {array}   entities.Receipt
+// @Router        /api/v1/receipt [post]
+func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
+  return func(ctx *fiber.Ctx) error {
+    var body entities.CreateIndividualReceipt
+
+    if err := ctx.BodyParser(&body); err != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(err))
+    }
+    validationErrors := utils.ValidateInput(ctx, body)
+
+    if validationErrors != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+    }
+
+    product, error := service.GenerateIndividualReceipt(&body)
+
+    if error != nil {
+      ctx.Status(http.StatusBadRequest)
+      return ctx.JSON(presenter.ErrorResponse(error))
+    }
+
+    return ctx.JSON(presenter.SuccessResponse(product))
+  }
+}
+
+
 // ListReceipts   godoc
 // @Summary       List receipts
 // @Description   list avaliable receipts in the database
