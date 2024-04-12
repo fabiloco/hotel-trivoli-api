@@ -13,12 +13,16 @@ import (
 
 func seed(db *gorm.DB) {
   db.AutoMigrate(
-		&entities.Product{},
-		&entities.ProductType{},
-		&entities.Service{},
-		&entities.Room{},
-		&entities.RoomHistory{},
-		&entities.Receipt{},
+    &entities.Product{}, 
+    &entities.ProductType{}, 
+    &entities.Service{},
+    &entities.Room{},
+    &entities.RoomHistory{},
+    &entities.Receipt{},
+    &entities.IndividualReceipt{},
+    &entities.Role{}, 
+    &entities.Person{}, 
+    &entities.User{}, 
 	)
 
 	// Create ProductTypes
@@ -94,6 +98,16 @@ func seed(db *gorm.DB) {
 		{Number: 101},
 		{Number: 102},
 		{Number: 103},
+		{Number: 104},
+		{Number: 105},
+		{Number: 106},
+		{Number: 107},
+		{Number: 108},
+		{Number: 109},
+		{Number: 110},
+		{Number: 301},
+		{Number: 302},
+		{Number: 303},
 		// Add more mock data as needed
 	}
 
@@ -162,14 +176,38 @@ func seed(db *gorm.DB) {
 		db.Create(&rec)
 	}
 
+
+	// Create User
+	person := []entities.Person{
+		{
+      Firstname: "admin",
+      Lastname: "admin",
+      Identification: "12345",
+      Birthday: now_date.String(),
+		},
+		{
+      Firstname: "normal",
+      Lastname: "user",
+      Identification: "54321",
+      Birthday: now_date.String(),
+		},
+		// Add more mock data as needed
+	}
+
+	for _, rec := range person {
+		db.Create(&rec)
+	}
+
 	// Create User
 	user := []entities.User{
 		{
+      PersonID: 1,
       Username: "admin",
       Password: "admin",
       RoleID: 2,
 		},
 		{
+      PersonID: 2,
       Username: "user",
       Password: "normaluser",
       RoleID: 1,
