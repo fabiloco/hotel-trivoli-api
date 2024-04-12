@@ -49,6 +49,7 @@ func ConnectDB() {
     &entities.Room{},
     &entities.RoomHistory{},
     &entities.Receipt{},
+    &entities.IndividualReceipt{},
     &entities.Role{}, 
     &entities.Person{}, 
     &entities.User{}, 

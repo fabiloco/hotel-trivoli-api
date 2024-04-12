@@ -71,7 +71,12 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
     }
 
+    // return ctx.JSON(&fiber.Map{
+    //   "test":"test",
+    // })
+
     product, error := service.GenerateIndividualReceipt(&body)
+
 
     if error != nil {
       ctx.Status(http.StatusBadRequest)

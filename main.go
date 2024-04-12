@@ -6,6 +6,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/routes"
 	_ "fabiloco/hotel-trivoli-api/docs"
 	"fabiloco/hotel-trivoli-api/pkg/auth"
+	individualreceipt "fabiloco/hotel-trivoli-api/pkg/individual_receipt"
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	productType "fabiloco/hotel-trivoli-api/pkg/product_type"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
@@ -27,8 +28,8 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
     AllowCredentials: true,
-    AllowOrigins: "http://localhost:5173, http://localhost:5174, http://localhost:5175, http://localhost:4173",
-    // AllowOriginsFunc: func(origin string) bool { return true }, --> this is dangerous
+    // AllowOrigins: "http://localhost:5173, http://localhost:5174, http://localhost:5175, http://localhost:4173",
+    AllowOriginsFunc: func(origin string) bool { return true }, //--> this is dangerous
 		AllowHeaders: "Authorization, Origin, Content-Type, Accept, Accept-Language, Content-Length",
   }))
 	
@@ -61,6 +62,7 @@ func main() {
   roomRepo := room.NewRepository(database.DB)
   roomHistoryRepo := roomHistory.NewRepository(database.DB)
   receiptRepo := receipt.NewRepository(database.DB)
+  individualReceiptRepo := individualreceipt.NewRepository(database.DB)
 
   repositoryRepo := role.NewRepository(database.DB)
 
@@ -70,7 +72,7 @@ func main() {
   serviceService := service.NewService(serviceRepo)
   roomService := room.NewService(roomRepo)
   roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
-  receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo)
+  receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo, individualReceiptRepo)
 
   reportService := reports.NewService(productRepo, receiptRepo)
   authService := auth.NewService(userRepo, repositoryRepo)

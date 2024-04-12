@@ -32,13 +32,14 @@ type service struct {
 	userRepository user.Repository
 }
 
-func NewService(r Repository, sr serviceModule.Repository, pr product.Repository, rr room.Repository, ur user.Repository) Service {
+func NewService(r Repository, sr serviceModule.Repository, pr product.Repository, rr room.Repository, ur user.Repository, irr individualreceipt.Repository) Service {
 	return &service{
 		repository: r,
     serviceRepository: sr,
     productRepository: pr,
     roomRepository: rr,
     userRepository: ur,
+    individualReceiptRepository: irr,
 	}
 }
 
@@ -100,7 +101,6 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
 }
 
 func (s *service) GenerateIndividualReceipt(receipt *entities.CreateIndividualReceipt) (*entities.IndividualReceipt, error) {
-
   user, error := s.userRepository.ReadById(receipt.User)
 
   if error != nil {
@@ -131,7 +131,6 @@ func (s *service) GenerateIndividualReceipt(receipt *entities.CreateIndividualRe
 
     products = append(products, *productRestocked)
   }
-
   newReceipt := entities.IndividualReceipt {
     TotalPrice: receipt.TotalPrice,
     Products: products,

@@ -45,9 +45,6 @@ func Register(service auth.Service) fiber.Handler {
   return func(ctx *fiber.Ctx) error {
     var body RegisterUser
 
-    fmt.Println("test")
-    fmt.Println(body.Lastname)
-
     if err := ctx.BodyParser(&body); err != nil {
       ctx.Status(http.StatusBadRequest)
       return ctx.JSON(presenter.ErrorResponse(err))
@@ -129,8 +126,6 @@ func Login(service auth.Service) fiber.Handler {
       ExpiresAt: time.Now().Add(time.Hour * 128).Unix(),
      },
     }
-
-    fmt.Println(userClaims)
 
     signedAccessToken, err := utils.NewAccessToken(userClaims)
     if err != nil {
