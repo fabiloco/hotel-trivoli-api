@@ -14,6 +14,10 @@ type ReceiptsByDate struct {
   Date  string  `valid:"required,rfc3339" json:"date"`
 }
 
+type ReceiptsByUser struct {
+  UserID  uint  `valid:"required,numeric" json:"user_id"`
+}
+
 type ReceiptsBetweenDates struct {
 	StartDate string  `valid:"required,rfc3339" json:"start_date"`
 	EndDate   string  `valid:"required,rfc3339" json:"end_date"`
@@ -43,6 +47,75 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 		}
 
 		receipts, error := service.ReceiptByTargetDate(body.Date)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(receipts))
+	}
+}
+
+
+// ListReceiptsByDate   godoc
+// @Summary       Receipts by date
+// @Description   Report that shows the receipts created at a certain date
+// @Tags          receipt
+// @Accept        json
+// @Produce       json
+// @Success       200  {array}   ReceiptsByDate
+// @Router        /api/v1/reports/receipt-by-date [get]
+func GetReceiptsByUser(service reports.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body ReceiptsByUser
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		receipts, error := service.ReceiptByUser(body.UserID)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(receipts))
+	}
+}
+
+// ListReceiptsByDate   godoc
+// @Summary       Receipts by date
+// @Description   Report that shows the receipts created at a certain date
+// @Tags          receipt
+// @Accept        json
+// @Produce       json
+// @Success       200  {array}   ReceiptsByDate
+// @Router        /api/v1/reports/receipt-by-date [get]
+func GetReceiptsTodayByUser(service reports.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body ReceiptsByUser
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		receipts, error := service.ReceiptTodayByUser(body.UserID)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)

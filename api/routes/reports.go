@@ -8,6 +8,8 @@ import (
 
 func ReportsRouter(app fiber.Router, service reports.Service) {
   reportsGroup := app.Group("/reports")
-	reportsGroup.Get("/receipt-by-date", handlers.GetReceiptsByDate(service))
-	reportsGroup.Get("/receipt-between-dates", handlers.GetReceiptsBetweenDates(service))
+	reportsGroup.Post("/receipt-by-user", handlers.GetReceiptsByUser(service))
+	reportsGroup.Post("/receipt-today-by-user", handlers.GetReceiptsTodayByUser(service))
+	reportsGroup.Post("/receipt-by-date", handlers.GetReceiptsByDate(service))
+	reportsGroup.Post("/receipt-between-dates", handlers.GetReceiptsBetweenDates(service))
 }
