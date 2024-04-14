@@ -2,6 +2,7 @@ package main
 
 import (
 	"fabiloco/hotel-trivoli-api/api/config"
+	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fmt"
 	"strconv"
@@ -198,18 +199,22 @@ func seed(db *gorm.DB) {
 		db.Create(&rec)
 	}
 
+
+  adminPasswordHashed, _ := utils.HashPassword("admin")
+  userPasswordHashed, _ := utils.HashPassword("normaluser")
+
 	// Create User
 	user := []entities.User{
 		{
       PersonID: 1,
       Username: "admin",
-      Password: "admin",
+      Password: adminPasswordHashed,
       RoleID: 2,
 		},
 		{
       PersonID: 2,
       Username: "user",
-      Password: "normaluser",
+      Password: userPasswordHashed,
       RoleID: 1,
 		},
 		// Add more mock data as needed
