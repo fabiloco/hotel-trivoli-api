@@ -52,6 +52,7 @@ func (r *repository) Create(data *entities.Product) (*entities.Product, error) {
 		Stock: data.Stock,
 		Price: data.Price,
 		Type:  data.Type,
+    Img: data.Img,
 	}
 
 	result := r.db.Create(&product)
@@ -71,7 +72,13 @@ func (r *repository) Update(id uint, data *entities.Product) (*entities.Product,
 	}
 
 	result := r.db.Model(&product).Updates(
-    entities.Product{Name: data.Name, Price: data.Price, Stock: data.Stock, Type: data.Type},
+    entities.Product{
+      Name: data.Name,
+      Price: data.Price,
+      Stock: data.Stock,
+      Type: data.Type,
+      Img: data.Img,
+    },
   )
 
   if len(data.Type) != 0 {

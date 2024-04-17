@@ -9,11 +9,11 @@ import (
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	InsertProduct (productType *entities.CreateProduct) (*entities.Product, error)
+	InsertProduct (productType *entities.CreateProduct, file string) (*entities.Product, error)
   RestockProduct (id uint, productRestock *entities.RestockProduct) (*entities.Product, error)
 	FetchProducts () (*[]entities.Product, error)
   FetchProductById (id uint) (*entities.Product, error)
-	UpdateProduct (id uint, product *entities.UpdateProduct) (*entities.Product, error)
+  UpdateProduct (id uint, product *entities.UpdateProduct, file string) (*entities.Product, error)
 	RemoveProduct (id uint) (*entities.Product, error)
 }
 
@@ -29,7 +29,7 @@ func NewService(pr Repository, ptr productType.Repository) Service {
 	}
 }
 
-func (s *service) InsertProduct(product *entities.CreateProduct) (*entities.Product, error) {
+func (s *service) InsertProduct(product *entities.CreateProduct, file string) (*entities.Product, error) {
   var productTypesSlice []entities.ProductType
 
   for i := 0; i < len(product.Type); i++{
@@ -47,6 +47,7 @@ func (s *service) InsertProduct(product *entities.CreateProduct) (*entities.Prod
     Price: product.Price,
     Stock: product.Stock,
     Type: productTypesSlice,
+    Img: file,
   }
 
 
@@ -69,7 +70,7 @@ func (s *service) FetchProducts() (*[]entities.Product, error) {
 	return s.productRepository.Read()
 }
 
-func (s *service) UpdateProduct(id uint, product *entities.UpdateProduct) (*entities.Product, error) {
+func (s *service) UpdateProduct(id uint, product *entities.UpdateProduct, file string) (*entities.Product, error) {
   var productTypesSlice []entities.ProductType
 
   for i := 0; i < len(product.Type); i++{
@@ -82,11 +83,24 @@ func (s *service) UpdateProduct(id uint, product *entities.UpdateProduct) (*enti
     productTypesSlice = append(productTypesSlice, *productType)
   }
 
-  newProduct := entities.Product {
-    Name: product.Name,
-    Stock: product.Stock,
-    Price: product.Price,
+  var newProduct entities.Product
+  if file == "no file" {
+    newProduct = entities.Product {
+      Name: product.Name,
+      Stock: product.Stock,
+      Price: product.Price,
+      Type: productTypesSlice,
+    }
+  } else {
+    newProduct = entities.Product {
+      Name: product.Name,
+      Stock: product.Stock,
+      Price: product.Price,
+      Type: productTypesSlice,
+      Img: file,
+    }
   }
+  
 
 	return s.productRepository.Update(id, &newProduct)
 }

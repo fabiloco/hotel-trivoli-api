@@ -6,9 +6,9 @@ import (
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/product"
+	"fmt"
 	"net/http"
 	"strings"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -85,12 +85,31 @@ func PostProducts(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-		product, error := service.InsertProduct(&body)
+    file, err := ctx.FormFile("img")
+
+    if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+    }
+
+    filename, err := utils.GenerateFileName(file)
+
+    if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+    }
+
+		product, error := service.InsertProduct(&body, filename)
 
 		if error != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
+
+    if err := ctx.SaveFile(file, fmt.Sprintf("./public/img/%s", filename)); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+    }
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}
@@ -168,12 +187,33 @@ func PutProduct(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
 		}
 
-		product, error := service.UpdateProduct(uint(id), &body)
+    file, err := ctx.FormFile("img")
+
+    var filename = "no file"
+    if err == nil {
+      file, err := utils.GenerateFileName(file)
+
+      filename = file
+
+      if err != nil {
+        ctx.Status(http.StatusBadRequest)
+        return ctx.JSON(presenter.ErrorResponse(err))
+      }
+    }
+
+		product, error := service.UpdateProduct(uint(id), &body, filename)
 
 		if error != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
+
+    if filename != "no file" {
+      if err := ctx.SaveFile(file, fmt.Sprintf("./public/img/%s", filename)); err != nil {
+        ctx.Status(http.StatusBadRequest)
+        return ctx.JSON(presenter.ErrorResponse(err))
+      }
+    }
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}

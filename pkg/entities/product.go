@@ -1,6 +1,10 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"mime/multipart"
+
+	"gorm.io/gorm"
+)
 
 // Product model info
 // @Description Products information in stock
@@ -22,13 +26,13 @@ type CreateProduct struct {
 	Stock uint   `valid:"required,numeric"`
   Type  []uint  `valid:"required"`
 	Price float32 `valid:"required"`
-  Img   string  `valid:"required"`
+  Img   multipart.File  `valid:"required"`
 }
 
 type UpdateProduct struct {
-	Name  string  `valid:"stringlength(3|100),optional"`
-	Stock uint   `valid:"numeric,optional"`
-  Type  []uint  `valid:"optional"`
-	Price float32 `valid:"optional"`
-  Img   string  `valid:"optional"`
+	Name  string          `valid:"stringlength(3|100),optional"`
+	Stock uint            `valid:"numeric,optional"`
+  Type  []uint          `valid:"optional"`
+	Price float32         `valid:"optional"`
+  Img   multipart.File  `valid:"optional"`
 }
