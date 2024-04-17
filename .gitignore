@@ -30,3 +30,6 @@ tmp/
 .env
 .env.prod
 .env.dev
+
+app
+hotel-trivoli-api
