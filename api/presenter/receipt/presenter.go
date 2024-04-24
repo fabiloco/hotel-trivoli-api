@@ -33,34 +33,43 @@ type ReceiptResponse struct {
   User        entities.User           `json:"user"`
 }
 
+type IndividualReceiptResponse struct {
+	ID          uint                
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+
+  TotalPrice  float32                 `json:"total_price"`
+  Products    []ProductResponse       `json:"products"` 
+  User        entities.User           `json:"user"`
+}
+
 func SuccessReceiptResponse(receipt *entities.Receipt) *fiber.Map {
   var receiptResponse ReceiptResponse
 
-  var productsResponseList []ProductResponse
+  // Map to store products by their IDs
+  productsMap := make(map[uint]*ProductResponse)
 
-  // count quantity
-  for _, product := range(receipt.Products) {
-    var productResponse ProductResponse
-
-    var quantity int = 0
-
-    for _, productInside := range(receipt.Products) {
-      if product.ID == productInside.ID {
-        quantity += 1
+  for _, product := range receipt.Products {
+    if existingProduct, ok := productsMap[product.ID]; ok {
+      existingProduct.Quantity++
+    } else {
+      productsMap[product.ID] = &ProductResponse{
+        ID:        product.ID,
+        Name:      product.Name,
+        Type:      product.Type,
+        Price:     product.Price,
+        Img:       product.Img,
+        Quantity:  1,
+        CreatedAt: product.CreatedAt,
+        UpdatedAt: product.UpdatedAt,
       }
     }
+  }
 
-    productResponse.Name = product.Name
-    productResponse.Type = product.Type
-    productResponse.Price = product.Price
-    productResponse.Img = product.Img
-    productResponse.Quantity = quantity
-
-    productResponse.ID = product.ID
-    productResponse.CreatedAt = product.CreatedAt
-    productResponse.UpdatedAt = product.UpdatedAt
-
-    productsResponseList = append(productsResponseList, productResponse)
+  // Convert productsMap back to slice
+  var productsResponseList []ProductResponse
+  for _, product := range productsMap {
+    productsResponseList = append(productsResponseList, *product)
   }
 
 
@@ -77,4 +86,47 @@ func SuccessReceiptResponse(receipt *entities.Receipt) *fiber.Map {
   receiptResponse.UpdatedAt = receipt.UpdatedAt
 
   return presenter.SuccessResponse(receiptResponse)
+}
+
+
+func SuccessIndividualReceiptResponse(receipt *entities.IndividualReceipt) *fiber.Map {
+  var individualReceiptResponse IndividualReceiptResponse
+
+  // Map to store products by their IDs
+  productsMap := make(map[uint]*ProductResponse)
+
+  for _, product := range receipt.Products {
+    if existingProduct, ok := productsMap[product.ID]; ok {
+      existingProduct.Quantity++
+    } else {
+      productsMap[product.ID] = &ProductResponse{
+        ID:        product.ID,
+        Name:      product.Name,
+        Type:      product.Type,
+        Price:     product.Price,
+        Img:       product.Img,
+        Quantity:  1,
+        CreatedAt: product.CreatedAt,
+        UpdatedAt: product.UpdatedAt,
+      }
+    }
+  }
+
+  // Convert productsMap back to slice
+  var productsResponseList []ProductResponse
+  for _, product := range productsMap {
+    productsResponseList = append(productsResponseList, *product)
+  }
+
+
+  individualReceiptResponse.User = receipt.User
+  individualReceiptResponse.TotalPrice = receipt.TotalPrice
+
+  individualReceiptResponse.Products = productsResponseList
+
+  individualReceiptResponse.ID = receipt.ID
+  individualReceiptResponse.CreatedAt = receipt.CreatedAt
+  individualReceiptResponse.UpdatedAt = receipt.UpdatedAt
+
+  return presenter.SuccessResponse(individualReceiptResponse)
 }
