@@ -106,6 +106,8 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
     products = append(products, *productRestocked)
   }
 
+  fmt.Println(len(products))
+
   newReceipt := entities.Receipt {
     TotalTime: time.Duration(receipt.TotalTime),
     TotalPrice: receipt.TotalPrice,

@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"fabiloco/hotel-trivoli-api/api/presenter"
+	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
@@ -37,14 +38,16 @@ func GenerateReceipts(service receipt.Service) fiber.Handler {
     }
 
 
-    product, error := service.GenerateReceipt(&body)
+    receipt, error := service.GenerateReceipt(&body)
+
+
 
     if error != nil {
       ctx.Status(http.StatusBadRequest)
       return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    return ctx.JSON(presenter.SuccessResponse(product))
+    return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
   }
 }
 

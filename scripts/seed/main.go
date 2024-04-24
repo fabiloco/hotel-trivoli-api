@@ -13,6 +13,19 @@ import (
 )
 
 func seed(db *gorm.DB) {
+ // Drop tables
+  db.Migrator().DropTable(
+    &entities.Product{}, 
+    &entities.ProductType{}, 
+    &entities.Service{},
+    &entities.Room{},
+    &entities.RoomHistory{},
+    &entities.Receipt{},
+    &entities.IndividualReceipt{},
+    &entities.Role{}, 
+    &entities.Person{}, 
+    &entities.User{},
+  )
   db.AutoMigrate(
     &entities.Product{}, 
     &entities.ProductType{}, 

@@ -74,6 +74,7 @@ func SuccessLoginResponse(token string, claims jwt.StandardClaims, data entities
   }
 }
 
+
 func ErrorResponse(error error) *fiber.Map {
   return &fiber.Map {
     "status": false,

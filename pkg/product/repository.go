@@ -2,7 +2,6 @@ package product
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
-	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -72,8 +71,6 @@ func (r *repository) Update(id uint, data *entities.Product) (*entities.Product,
 	if error != nil {
 		return nil, error
 	}
-
-  fmt.Println(data.Stock)
 
 	result := r.db.Model(&product).Updates(
     entities.Product{
