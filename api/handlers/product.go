@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/asaskevich/govalidator"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -84,6 +86,11 @@ func PostProducts(service product.Service) fiber.Handler {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
+
+    if govalidator.IsNonPositive(float64(body.Price)) {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("Price can not have a negative value.")))
+    }
 
     file, err := ctx.FormFile("img")
 
@@ -180,6 +187,11 @@ func PutProduct(service product.Service) fiber.Handler {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
+
+    if govalidator.IsNonPositive(float64(body.Price)) {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("Price can not have a negative value.")))
+    }
 
 		id, err := ctx.ParamsInt("id")
 		if err != nil {

@@ -33,3 +33,7 @@ tmp/
 
 app
 hotel-trivoli-api
+
+*.png
+*.jpg
+*.jpeg
