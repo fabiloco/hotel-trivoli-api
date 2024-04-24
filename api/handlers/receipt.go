@@ -36,6 +36,7 @@ func GenerateReceipts(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
     }
 
+
     product, error := service.GenerateReceipt(&body)
 
     if error != nil {

@@ -62,8 +62,8 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
     return nil, errors.New(fmt.Sprintf("no room with id %d", receipt.User))
   }
 
-
   var products []entities.Product
+
 
   for i := 0; i < len(receipt.Products); i++{
     productWithId, error := s.productRepository.ReadById(receipt.Products[i])
@@ -71,6 +71,24 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
     if error != nil {
       return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
     }
+
+    // check if the existing stock is enough to process the parchuse
+    for j := 0; j < len(receipt.Products); j++ {
+      var productIdTimes int = 0
+
+      for _, productId := range receipt.Products {
+        if productId == receipt.Products[j] {
+          productIdTimes += 1
+        }
+      }
+
+      if productWithId.Stock - productIdTimes < 0 {
+        return nil, errors.New(
+          fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.", 
+            receipt.Products[j], productWithId.Stock, productIdTimes))
+      }
+    }
+
 
     product := entities.Product {
       Name:  productWithId.Name,
@@ -114,6 +132,23 @@ func (s *service) GenerateIndividualReceipt(receipt *entities.CreateIndividualRe
 
     if error != nil {
       return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+    }
+
+    // check if the existing stock is enough to process the parchuse
+    for j := 0; j < len(receipt.Products); j++ {
+      var productIdTimes int = 0
+
+      for _, productId := range receipt.Products {
+        if productId == receipt.Products[j] {
+          productIdTimes += 1
+        }
+      }
+
+      if productWithId.Stock - productIdTimes < 0 {
+        return nil, errors.New(
+          fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.", 
+            receipt.Products[j], productWithId.Stock, productIdTimes))
+      }
     }
 
     product := entities.Product {

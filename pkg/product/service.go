@@ -61,7 +61,9 @@ func (s *service) RestockProduct(id uint, productRestock *entities.RestockProduc
     return nil, errors.New(fmt.Sprintf("no product with id %d", id))
   }
 
+
   productWithId.Stock += productRestock.Stock
+
 
 	return s.productRepository.Update(id, productWithId)
 }
