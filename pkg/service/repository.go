@@ -50,7 +50,6 @@ func (r *repository) Create(data *entities.Service) (*entities.Service, error) {
 	service = entities.Service{
 		Name:  data.Name,
 		Price: data.Price,
-    Details: data.Details,
 	}
 
 	result := r.db.Create(&service)
@@ -73,7 +72,6 @@ func (r *repository) Update(id uint, data *entities.Service) (*entities.Service,
     entities.Service{
       Name: data.Name,
       Price: data.Price,
-      Details: data.Details,
     },
   )
 
