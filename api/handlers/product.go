@@ -8,6 +8,7 @@ import (
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -254,6 +255,12 @@ func DeleteProductById(service product.Service) fiber.Handler {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
+
+    err = os.Remove(fmt.Sprintf("./public/img/%s", product.Img)) 
+
+    if err != nil { 
+      fmt.Println(fmt.Sprint("Warning: ", err, " - File name: ", product.Img))
+    } 
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}
