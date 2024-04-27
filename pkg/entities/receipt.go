@@ -11,8 +11,6 @@ type Receipt struct {
 	gorm.Model
   TotalPrice  float32         `gorm:"not null" json:"total_price"`
   TotalTime   time.Duration   `gorm:"not null" json:"total_time"`
-  // Products    []Product       `gorm:"many2many:receipt_products" json:"products"` 
-  // ReceiptProducts    []ReceiptProducts       `gorm:"foreignKey:receipt_id" json:"products"` 
   Products    []ReceiptProduct`json:"products"`
   Service     Service         `gorm:"not null" json:"service"`
   ServiceID   uint            `gorm:"not null"`
@@ -25,7 +23,7 @@ type Receipt struct {
 type CreateReceipt struct {
   TotalPrice  float32         `valid:"required,numeric" json:"total_price"`
   TotalTime   uint            `valid:"required,numeric" json:"total_time"`
-  Products    []uint          `valid:"required" json:"products"`
+  Products    []uint          `valid:"optional" json:"products"`
   Service     uint            `valid:"required,numeric" json:"service"`
   Room        uint            `valid:"required,numeric" json:"room"`
   User        uint            `valid:"required,numeric" json:"user"`

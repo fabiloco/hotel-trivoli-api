@@ -173,9 +173,18 @@ func (s *service) GenerateIndividualReceipt(receipt *entities.CreateIndividualRe
 
     products = append(products, *productRestocked)
   }
+
+  var receiptProducts []entities.IndividualReceiptProduct
+  for _, product := range products {
+      receiptProduct := entities.IndividualReceiptProduct{
+          ProductID:    product.ID,
+      }
+      receiptProducts = append(receiptProducts, receiptProduct)
+  }
+
   newReceipt := entities.IndividualReceipt {
     TotalPrice: receipt.TotalPrice,
-    Products: products,
+    Products: receiptProducts,
     User: *user,
   }
 

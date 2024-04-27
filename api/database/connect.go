@@ -59,6 +59,7 @@ func ConnectDB() {
     &entities.Person{}, 
     &entities.User{}, 
     &entities.ReceiptProduct{},
+    &entities.IndividualReceiptProduct{},
   )
 
 

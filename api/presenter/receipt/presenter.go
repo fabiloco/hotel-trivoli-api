@@ -101,19 +101,23 @@ func SuccessIndividualReceiptResponse(receipt *entities.IndividualReceipt) *fibe
   // Map to store products by their IDs
   productsMap := make(map[uint]*ProductResponse)
 
-  for _, product := range receipt.Products {
-    if existingProduct, ok := productsMap[product.ID]; ok {
+  for _, receipt_product := range receipt.Products {
+    var product = entities.Product{}
+
+    database.DB.Find(&product, receipt_product.ProductID)
+
+    if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
       existingProduct.Quantity++
     } else {
-      productsMap[product.ID] = &ProductResponse{
-        ID:        product.ID,
+      productsMap[receipt_product.ProductID] = &ProductResponse{
+        ID:        receipt_product.ID,
         Name:      product.Name,
         Type:      product.Type,
         Price:     product.Price,
         Img:       product.Img,
         Quantity:  1,
-        CreatedAt: product.CreatedAt,
-        UpdatedAt: product.UpdatedAt,
+        CreatedAt: receipt_product.CreatedAt,
+        UpdatedAt: receipt_product.UpdatedAt,
       }
     }
   }
@@ -147,7 +151,6 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
     productsMap := make(map[uint]*ProductResponse)
 
     for _, receipt_product := range receipt.Products {
-
       var product = entities.Product{}
 
       database.DB.Find(&product, receipt_product.ProductID)

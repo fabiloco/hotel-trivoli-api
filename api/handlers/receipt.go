@@ -84,7 +84,7 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    return ctx.JSON(presenter.SuccessResponse(receipt))
+    return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
   }
 }
 
