@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
+
+	// receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/receipt"
@@ -82,7 +84,7 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
+    return ctx.JSON(presenter.SuccessResponse(receipt))
   }
 }
 
@@ -104,7 +106,8 @@ func GetReceipts(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    return ctx.JSON(presenter.SuccessResponse(receipts))
+    // return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
+    return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
   }
 }
 
@@ -125,14 +128,14 @@ func GetReceiptById(service receipt.Service) fiber.Handler {
       return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
     }
 
-    product, error := service.FetchReceiptById(uint(id))
+    receipt, error := service.FetchReceiptById(uint(id))
 
     if error != nil {
       ctx.Status(http.StatusInternalServerError)
       return ctx.JSON(presenter.ErrorResponse(error))
     }
 
-    return ctx.JSON(presenter.SuccessResponse(product))
+    return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
   }
 }
 

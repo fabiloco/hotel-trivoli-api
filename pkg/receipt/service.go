@@ -88,8 +88,7 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
             receipt.Products[j], productWithId.Stock, productIdTimes))
       }
     }
-
-
+    
     product := entities.Product {
       Name:  productWithId.Name,
       Stock: productWithId.Stock - 1,
@@ -106,12 +105,18 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
     products = append(products, *productRestocked)
   }
 
-  fmt.Println(len(products))
+  var receiptProducts []entities.ReceiptProduct
+  for _, product := range products {
+      receiptProduct := entities.ReceiptProduct{
+          ProductID:    product.ID,
+      }
+      receiptProducts = append(receiptProducts, receiptProduct)
+  }
 
   newReceipt := entities.Receipt {
     TotalTime: time.Duration(receipt.TotalTime),
     TotalPrice: receipt.TotalPrice,
-    Products: products,
+    Products: receiptProducts,
     Service: *service,
     Room: *room,
     User: *user,
@@ -212,7 +217,6 @@ func (s *service) InsertReceipt(receipt *entities.CreateReceipt) (*entities.Rece
   newReceipt := entities.Receipt {
     TotalTime: time.Duration(receipt.TotalTime),
     TotalPrice: receipt.TotalPrice,
-    Products: products,
     Service: *service,
     Room: *room,
     User: *user,
@@ -262,7 +266,6 @@ func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*enti
     Service: *service,
     Room: *room,
     User: *user,
-    Products: products,
   }
 
 	return s.repository.Update(id, &newReceipt)

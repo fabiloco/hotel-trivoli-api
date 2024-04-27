@@ -42,6 +42,11 @@ func ConnectDB() {
 
 	fmt.Println("Connection Opened to Database")
 
+ //  err = DB.SetupJoinTable(&entities.Receipt{}, "Person", &entities.ReceiptProduct{})
+	// if err != nil {
+	// 	panic("failed to setup join table")
+	// }
+
 	DB.AutoMigrate(
     &entities.Product{}, 
     &entities.ProductType{}, 
@@ -53,7 +58,9 @@ func ConnectDB() {
     &entities.Role{}, 
     &entities.Person{}, 
     &entities.User{}, 
+    &entities.ReceiptProduct{},
   )
+
 
 	fmt.Println("Database Migrated")
 }

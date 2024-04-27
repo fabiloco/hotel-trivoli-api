@@ -3,8 +3,8 @@ package receipt
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"time"
-
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Repository interface {
@@ -31,7 +31,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	r.db.Preload("Products").Preload("Service").Preload("Room").Preload("User").Find(&receipts)
+  r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Find(&receipts)
 
 	return &receipts, nil
 }
@@ -39,7 +39,7 @@ func (r *repository) Read() (*[]entities.Receipt, error) {
 func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 	var receipt entities.Receipt
 
-	result := r.db.Preload("Products").Preload("Service").Preload("User").First(&receipt, id)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").First(&receipt, id)
 
 	if result.Error != nil {
 		return nil, result.Error
