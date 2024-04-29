@@ -39,6 +39,8 @@ func seed(db *gorm.DB) {
     &entities.Role{}, 
     &entities.Person{}, 
     &entities.User{}, 
+    &entities.ReceiptProduct{},
+    &entities.IndividualReceiptProduct{},
 	)
 
 	// Create ProductTypes

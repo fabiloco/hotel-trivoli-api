@@ -53,7 +53,7 @@ func SuccessReceiptResponse(receipt *entities.Receipt) *fiber.Map {
   for _, receipt_product := range receipt.Products {
     var product = entities.Product{}
 
-    database.DB.Find(&product, receipt_product.ProductID)
+    database.DB.Preload("Type").Find(&product, receipt_product.ProductID)
 
     if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
       existingProduct.Quantity++
@@ -104,7 +104,7 @@ func SuccessIndividualReceiptResponse(receipt *entities.IndividualReceipt) *fibe
   for _, receipt_product := range receipt.Products {
     var product = entities.Product{}
 
-    database.DB.Find(&product, receipt_product.ProductID)
+    database.DB.Preload("Type").Find(&product, receipt_product.ProductID)
 
     if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
       existingProduct.Quantity++
@@ -153,7 +153,7 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
     for _, receipt_product := range receipt.Products {
       var product = entities.Product{}
 
-      database.DB.Find(&product, receipt_product.ProductID)
+      database.DB.Preload("Type").Find(&product, receipt_product.ProductID)
 
       if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
         existingProduct.Quantity++
