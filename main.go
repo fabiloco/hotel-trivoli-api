@@ -16,6 +16,8 @@ import (
 	roomHistory "fabiloco/hotel-trivoli-api/pkg/room_history"
 	"fabiloco/hotel-trivoli-api/pkg/service"
 	"fabiloco/hotel-trivoli-api/pkg/user"
+	"fabiloco/hotel-trivoli-api/printer"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -54,6 +56,13 @@ func main() {
 	}))
 
 	// app.Use(middleware.FormatResponse())
+
+  printer := printer.GetESCPOSPrinter()
+	err := printer.InitPrinter()
+	if err != nil {
+		fmt.Println("Error initializing printer:", err)
+		return
+	}
 
   productRepo := product.NewRepository(database.DB)
   productTypeRepo := productType.NewRepository(database.DB)
