@@ -18,8 +18,11 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/March-deng/goesc v0.0.0-20190831020418-439b7a811c97 // indirect
+	github.com/alexbrainman/printer v0.0.0-20200912035444-f40f26f0bdeb // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/bjarneh/latinx v0.0.0-20120329061922-4dfe9ba2a293 // indirect
+	github.com/conejoninja/go-escpos v0.0.0-20231212173355-ebe5a5666051 // indirect
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.3 // indirect
 	github.com/go-openapi/spec v0.20.12 // indirect

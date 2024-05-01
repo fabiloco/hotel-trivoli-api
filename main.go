@@ -29,13 +29,13 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-    AllowCredentials: true,
-    // AllowOrigins: "http://localhost:5173, http://localhost:5174, http://localhost:5175, http://localhost:4173",
-    AllowOriginsFunc: func(origin string) bool { return true }, //--> this is dangerous
-		AllowHeaders: "Authorization, Origin, Content-Type, Accept, Accept-Language, Content-Length",
-  }))
-	
-  // app.Use(cors.New())
+		AllowCredentials: true,
+		// AllowOrigins: "http://localhost:5173, http://localhost:5174, http://localhost:5175, http://localhost:4173",
+		AllowOriginsFunc: func(origin string) bool { return true }, //--> this is dangerous
+		AllowHeaders:     "Authorization, Origin, Content-Type, Accept, Accept-Language, Content-Length",
+	}))
+
+	// app.Use(cors.New())
 
 	// Serve static assets
 	app.Static("/public", "./public")
@@ -57,47 +57,46 @@ func main() {
 
 	// app.Use(middleware.FormatResponse())
 
-  printer := printer.GetESCPOSPrinter()
+	printer := printer.GetESCPOSPrinter()
 	err := printer.InitPrinter()
 	if err != nil {
 		fmt.Println("Error initializing printer:", err)
-		return
 	}
 
-  productRepo := product.NewRepository(database.DB)
-  productTypeRepo := productType.NewRepository(database.DB)
-  userRepo := user.NewRepository(database.DB)
-  serviceRepo := service.NewRepository(database.DB)
-  roomRepo := room.NewRepository(database.DB)
-  roomHistoryRepo := roomHistory.NewRepository(database.DB)
-  receiptRepo := receipt.NewRepository(database.DB)
-  individualReceiptRepo := individualreceipt.NewRepository(database.DB)
+	productRepo := product.NewRepository(database.DB)
+	productTypeRepo := productType.NewRepository(database.DB)
+	userRepo := user.NewRepository(database.DB)
+	serviceRepo := service.NewRepository(database.DB)
+	roomRepo := room.NewRepository(database.DB)
+	roomHistoryRepo := roomHistory.NewRepository(database.DB)
+	receiptRepo := receipt.NewRepository(database.DB)
+	individualReceiptRepo := individualreceipt.NewRepository(database.DB)
 
-  repositoryRepo := role.NewRepository(database.DB)
+	repositoryRepo := role.NewRepository(database.DB)
 
-  productService := product.NewService(productRepo, productTypeRepo)
-  productTypeService := productType.NewService(productTypeRepo)
-  userService := user.NewService(userRepo)
-  serviceService := service.NewService(serviceRepo)
-  roomService := room.NewService(roomRepo)
-  roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
-  receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo, individualReceiptRepo)
+	productService := product.NewService(productRepo, productTypeRepo)
+	productTypeService := productType.NewService(productTypeRepo)
+	userService := user.NewService(userRepo)
+	serviceService := service.NewService(serviceRepo)
+	roomService := room.NewService(roomRepo)
+	roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
+	receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo, individualReceiptRepo)
 
-  reportService := reports.NewService(productRepo, receiptRepo)
-  authService := auth.NewService(userRepo, repositoryRepo)
+	reportService := reports.NewService(productRepo, receiptRepo)
+	authService := auth.NewService(userRepo, repositoryRepo)
 
 	api := app.Group("/api/v1", logger.New())
 
-  routes.ProductRouter(api, productService)
-  routes.ProductTypeRouter(api, productTypeService)
-  routes.UserRouter(api, userService)
-  routes.ServiceRouter(api, serviceService)
-  routes.RoomRouter(api, roomService)
-  routes.RoomHistoryRouter(api, roomHistoryService)
-  routes.ReceiptRouter(api, receptService)
+	routes.ProductRouter(api, productService)
+	routes.ProductTypeRouter(api, productTypeService)
+	routes.UserRouter(api, userService)
+	routes.ServiceRouter(api, serviceService)
+	routes.RoomRouter(api, roomService)
+	routes.RoomHistoryRouter(api, roomHistoryService)
+	routes.ReceiptRouter(api, receptService)
 
-  routes.ReportsRouter(api, reportService)
-  routes.AuthRouter(api, authService)
+	routes.ReportsRouter(api, reportService)
+	routes.AuthRouter(api, authService)
 
 	// StoreHandler.Register(app)
 	app.Listen(getPort())

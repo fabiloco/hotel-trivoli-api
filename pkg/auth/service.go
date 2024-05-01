@@ -10,8 +10,8 @@ import (
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	Register (user *entities.CreateUser, person *entities.CreatePerson) (*entities.User, error)
-	Login (username string) (*entities.User, error)
+	Register(user *entities.CreateUser, person *entities.CreatePerson) (*entities.User, error)
+	Login(username string) (*entities.User, error)
 }
 
 type service struct {
@@ -28,33 +28,33 @@ func NewService(ur user.Repository, rr role.Repository) Service {
 
 func (s *service) Register(user *entities.CreateUser, person *entities.CreatePerson) (*entities.User, error) {
 	newPerson := entities.Person{
-    Firstname: person.Firstname,
-    Lastname: person.Lastname,
-    Identification: person.Identification,
-    Birthday: person.Birthday,
+		Firstname:      person.Firstname,
+		Lastname:       person.Lastname,
+		Identification: person.Identification,
+		Birthday:       person.Birthday,
 	}
 
 	newUser := entities.User{
-    Username: user.Username,
-    Password: user.Password,
-    Person: newPerson,
+		Username: user.Username,
+		Password: user.Password,
+		Person:   newPerson,
 	}
 
-  role, error := s.roleRepository.ReadById(user.Role)
+	role, error := s.roleRepository.ReadById(user.Role)
 
-  if error != nil {
-    role, error := s.roleRepository.ReadById(1)
-    if error != nil {
-      return nil, errors.New(fmt.Sprintf("No default roles setup. Please, seed the database with the default values and roles"))
-    }
-    newUser.Role = *role
-  } else {
-    newUser.Role = *role
-  }
+	if error != nil {
+		role, error := s.roleRepository.ReadById(1)
+		if error != nil {
+			return nil, errors.New(fmt.Sprintf("No default roles setup. Please, seed the database with the default values and roles"))
+		}
+		newUser.Role = *role
+	} else {
+		newUser.Role = *role
+	}
 
-  return s.userRepository.Create(&newUser)
+	return s.userRepository.Create(&newUser)
 }
 
 func (s *service) Login(username string) (*entities.User, error) {
-  return s.userRepository.ReadByUsername(username)
+	return s.userRepository.ReadByUsername(username)
 }
