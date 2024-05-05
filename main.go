@@ -25,6 +25,17 @@ import (
 	"github.com/gofiber/swagger"
 )
 
+func getPort() string {
+	port := config.Config("PORT")
+	if port == "" {
+		port = ":3001"
+	} else {
+		port = ":" + port
+	}
+
+	return port
+}
+
 func main() {
 	app := fiber.New()
 
@@ -41,6 +52,12 @@ func main() {
 	app.Static("/public", "./public")
 
 	database.ConnectDB()
+
+	app.Get("/healthcheck", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"healthcheck": true,
+		})
+	})
 
 	app.Get("/docs/*", swagger.HandlerDefault)
 
@@ -99,16 +116,5 @@ func main() {
 	routes.AuthRouter(api, authService)
 
 	// StoreHandler.Register(app)
-	app.Listen(getPort())
-}
-
-func getPort() string {
-	port := config.Config("PORT")
-	if port == "" {
-		port = ":3001"
-	} else {
-		port = ":" + port
-	}
-
-	return port
+	app.Listen(fmt.Sprint("0.0.0.0", getPort()))
 }

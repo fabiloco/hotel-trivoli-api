@@ -25,33 +25,32 @@ import (
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt [post]
 func GenerateReceipts(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.CreateReceipt
+	return func(ctx *fiber.Ctx) error {
+		var body entities.CreateReceipt
 
-    if err := ctx.BodyParser(&body); err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(err))
-    }
-    validationErrors := utils.ValidateInput(ctx, body)
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
 
-    if validationErrors != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
-    }
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+		}
 
+		receipt, error := service.GenerateReceipt(&body)
 
-    receipt, error := service.GenerateReceipt(&body)
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		printer.GetESCPOSPrinter().Print(receipt_presenter.ReceiptToReceiptResponse(receipt))
+		// printer.()
 
-    printer.GetESCPOSPrinter().Print(receipt_presenter.ReceiptToReceiptResponse(receipt))
-    // printer.()
-
-    return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
-  }
+		return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
+	}
 }
 
 // PostReceipt   godoc
@@ -64,31 +63,30 @@ func GenerateReceipts(service receipt.Service) fiber.Handler {
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt [post]
 func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.CreateIndividualReceipt
+	return func(ctx *fiber.Ctx) error {
+		var body entities.CreateIndividualReceipt
 
-    if err := ctx.BodyParser(&body); err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(err))
-    }
-    validationErrors := utils.ValidateInput(ctx, body)
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
 
-    if validationErrors != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
-    }
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+		}
 
-    receipt, error := service.GenerateIndividualReceipt(&body)
+		receipt, error := service.GenerateIndividualReceipt(&body)
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
-  }
+		return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
+	}
 }
-
 
 // ListReceipts   godoc
 // @Summary       List receipts
@@ -99,17 +97,23 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt [get]
 func GetReceipts(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    receipts, error := service.FetchReceipts()
+	return func(ctx *fiber.Ctx) error {
+		receipts, error := service.FetchReceipts()
+		individualReceipts, error := service.FetchIndividualReceipts()
 
-    if error != nil {
-      ctx.Status(http.StatusInternalServerError)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    // return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-    return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-  }
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
+		return ctx.JSON(response)
+	}
 }
 
 // GetReceiptById   godoc
@@ -117,27 +121,27 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 // @Description   Get a single receipt by its id
 // @Tags          receipt
 // @Accept        json
-// @Param			    id  path  number  true  "id of the receipt to retrieve" 
+// @Param			    id  path  number  true  "id of the receipt to retrieve"
 // @Produce       json
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt/{id} [get]
 func GetReceiptById(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    id, err := ctx.ParamsInt("id")
-    if err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-    }
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
 
-    receipt, error := service.FetchReceiptById(uint(id))
+		receipt, error := service.FetchReceiptById(uint(id))
 
-    if error != nil {
-      ctx.Status(http.StatusInternalServerError)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
-  }
+		return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
+	}
 }
 
 // PostReceipt   godoc
@@ -150,29 +154,29 @@ func GetReceiptById(service receipt.Service) fiber.Handler {
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt [post]
 func PostReceipts(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.CreateReceipt
+	return func(ctx *fiber.Ctx) error {
+		var body entities.CreateReceipt
 
-    if err := ctx.BodyParser(&body); err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(err))
-    }
-    validationErrors := utils.ValidateInput(ctx, body)
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
 
-    if validationErrors != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
-    }
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+		}
 
-    product, error := service.InsertReceipt(&body)
+		product, error := service.InsertReceipt(&body)
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(presenter.SuccessResponse(product))
-  }
+		return ctx.JSON(presenter.SuccessResponse(product))
+	}
 }
 
 // PutReceipt   godoc
@@ -181,40 +185,40 @@ func PostReceipts(service receipt.Service) fiber.Handler {
 // @Tags          receipt
 // @Accept        json
 // @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test product"})
-// @Param			    id  path  number  true  "id of the receipt to update" 
+// @Param			    id  path  number  true  "id of the receipt to update"
 // @Produce       json
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt/{id} [put]
 func PutReceipt(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.UpdateReceipt
+	return func(ctx *fiber.Ctx) error {
+		var body entities.UpdateReceipt
 
-    if err := ctx.BodyParser(&body); err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(err))
-    }
-    validationErrors := utils.ValidateInput(ctx, body)
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
 
-    if validationErrors != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
-    }
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
 
-    id, err := ctx.ParamsInt("id")
-    if err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-    }
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
 
-    product, error := service.UpdateReceipt(uint(id), &body)
+		product, error := service.UpdateReceipt(uint(id), &body)
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(presenter.SuccessResponse(product))
-  }
+		return ctx.JSON(presenter.SuccessResponse(product))
+	}
 }
 
 // DeleteReceiptById   godoc
@@ -222,26 +226,123 @@ func PutReceipt(service receipt.Service) fiber.Handler {
 // @Description   Delete existing receipt
 // @Tags          receipt
 // @Accept        json
-// @Param			    id  path  number  true  "id of the receipt to delete" 
+// @Param			    id  path  number  true  "id of the receipt to delete"
 // @Produce       json
 // @Success       200  {array}   entities.Receipt
 // @Router        /api/v1/receipt/{id} [delete]
 func DeleteReceiptById(service receipt.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    id, err := ctx.ParamsInt("id")
-    if err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-    }
-    
-    product, error := service.RemoveReceipt(uint(id))
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		product, error := service.RemoveReceipt(uint(id))
 
-    return ctx.JSON(presenter.SuccessResponse(product))
-  }
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(product))
+	}
 }
 
+type PrintReceipt struct {
+	Receipts           []uint `valid:"optional" json:"receipts"`
+	IndividualReceipts []uint `valid:"optional" json:"individual_receipts"`
+}
+
+func PrintReceipts(service receipt.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body PrintReceipt
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
+		}
+
+		var receipts []receipt_presenter.ReceiptResponse
+		for _, receiptId := range body.Receipts {
+			receipt, error := service.FetchReceiptById(receiptId)
+
+			if error != nil {
+				ctx.Status(http.StatusInternalServerError)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			receipts = append(receipts, *receipt_presenter.ReceiptToReceiptResponse(receipt))
+		}
+
+		var individualReceipts []receipt_presenter.IndividualReceiptResponse
+		for _, receiptId := range body.IndividualReceipts {
+			individualReceipt, error := service.FetchIndividualReceiptById(receiptId)
+
+			if error != nil {
+				ctx.Status(http.StatusInternalServerError)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			individualReceipts = append(individualReceipts, *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(individualReceipt))
+		}
+
+		var services []entities.Service
+		var products []receipt_presenter.ProductResponse
+
+		var totalServices float32
+		var totalProducts float32
+
+		for _, receipt := range receipts {
+			for _, product := range receipt.Products {
+				products = append(products, receipt_presenter.ProductResponse{
+					ID:        product.ID,
+					CreatedAt: product.CreatedAt,
+					UpdatedAt: product.UpdatedAt,
+					Name:      product.Name,
+					Quantity:  product.Quantity,
+					Type:      product.Type,
+					Price:     product.Price,
+					Img:       product.Img,
+				})
+
+				totalProducts += product.Price * float32(product.Quantity)
+			}
+
+			services = append(services, receipt.Service)
+			totalServices += receipt.Service.Price
+		}
+
+		for _, individualReceipt := range individualReceipts {
+			for _, product := range individualReceipt.Products {
+				products = append(products, receipt_presenter.ProductResponse{
+					ID:        product.ID,
+					CreatedAt: product.CreatedAt,
+					UpdatedAt: product.UpdatedAt,
+					Name:      product.Name,
+					Quantity:  product.Quantity,
+					Type:      product.Type,
+					Price:     product.Price,
+					Img:       product.Img,
+				})
+
+				totalProducts += product.Price * float32(product.Quantity)
+			}
+
+		}
+
+		printer.GetESCPOSPrinter().PrintReport(products, totalProducts, services, totalServices)
+		return ctx.JSON(presenter.SuccessResponse(fiber.Map{
+			"products":      products,
+			"totalProducts": totalProducts,
+			"services":      services,
+			"totalServices": totalServices,
+		}))
+	}
+}
