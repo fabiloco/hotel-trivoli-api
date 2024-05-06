@@ -22,6 +22,7 @@ require (
 	github.com/alexbrainman/printer v0.0.0-20200912035444-f40f26f0bdeb // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
 	github.com/bjarneh/latinx v0.0.0-20120329061922-4dfe9ba2a293 // indirect
+	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/conejoninja/go-escpos v0.0.0-20231212173355-ebe5a5666051 // indirect
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.3 // indirect
@@ -32,11 +33,14 @@ require (
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
+	github.com/leekchan/accounting v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect

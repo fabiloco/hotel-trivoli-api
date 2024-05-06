@@ -5,6 +5,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/printer"
+	"time"
 
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
@@ -47,7 +48,6 @@ func GenerateReceipts(service receipt.Service) fiber.Handler {
 		}
 
 		printer.GetESCPOSPrinter().Print(receipt_presenter.ReceiptToReceiptResponse(receipt))
-		// printer.()
 
 		return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
 	}
@@ -83,6 +83,8 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
+
+		printer.GetESCPOSPrinter().PrintIndividual(receipt_presenter.IndividualReceiptToIndividualReceiptResponse(receipt))
 
 		return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
 	}
@@ -262,12 +264,21 @@ func PrintReceipts(service receipt.Service) fiber.Handler {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
 		}
+
+		if len(body.Receipts) <= 0 && len(body.IndividualReceipts) <= 0 {
+			return ctx.JSON(presenter.SuccessResponse(fiber.Map{
+				"message": "no print",
+			}))
+		}
+
 		validationErrors := utils.ValidateInput(ctx, body)
 
 		if validationErrors != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ", "))))
 		}
+
+		var user entities.User
 
 		var receipts []receipt_presenter.ReceiptResponse
 		for _, receiptId := range body.Receipts {
@@ -279,6 +290,10 @@ func PrintReceipts(service receipt.Service) fiber.Handler {
 			}
 
 			receipts = append(receipts, *receipt_presenter.ReceiptToReceiptResponse(receipt))
+
+			if user.ID == 0 {
+				user = receipt.User
+			}
 		}
 
 		var individualReceipts []receipt_presenter.IndividualReceiptResponse
@@ -291,6 +306,10 @@ func PrintReceipts(service receipt.Service) fiber.Handler {
 			}
 
 			individualReceipts = append(individualReceipts, *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(individualReceipt))
+
+			if user.ID == 0 {
+				user = individualReceipt.User
+			}
 		}
 
 		var services []entities.Service
@@ -334,14 +353,62 @@ func PrintReceipts(service receipt.Service) fiber.Handler {
 
 				totalProducts += product.Price * float32(product.Quantity)
 			}
-
 		}
 
-		printer.GetESCPOSPrinter().PrintReport(products, totalProducts, services, totalServices)
+		productsMap := make(map[uint]*receipt_presenter.ProductResponse)
+
+		for _, product := range products {
+			if existingProduct, ok := productsMap[product.ID]; ok {
+				existingProduct.Quantity += product.Quantity
+			} else {
+				productsMap[product.ID] = &receipt_presenter.ProductResponse{
+					ID:       product.ID,
+					Name:     product.Name,
+					Type:     product.Type,
+					Price:    product.Price,
+					Img:      product.Img,
+					Quantity: product.Quantity,
+				}
+			}
+		}
+
+		var productsResponseList []receipt_presenter.ProductResponse
+		for _, product := range productsMap {
+			productsResponseList = append(productsResponseList, *product)
+		}
+
+		servicesMap := make(map[uint]*receipt_presenter.ServiceResponse)
+
+		for _, service := range services {
+			if existingService, ok := servicesMap[service.ID]; ok {
+				existingService.Quantity += 1
+			} else {
+				servicesMap[service.ID] = &receipt_presenter.ServiceResponse{
+					Name:     service.Name,
+					Price:    service.Price,
+					Quantity: 1,
+				}
+			}
+		}
+
+		var serviceResponseList []receipt_presenter.ServiceResponse
+		for _, service := range servicesMap {
+			serviceResponseList = append(serviceResponseList, *service)
+		}
+
+		printer.GetESCPOSPrinter().PrintReport(
+			productsResponseList,
+			totalProducts,
+			serviceResponseList,
+			totalServices,
+			user,
+			time.Now(),
+		)
+
 		return ctx.JSON(presenter.SuccessResponse(fiber.Map{
-			"products":      products,
+			"products":      productsResponseList,
 			"totalProducts": totalProducts,
-			"services":      services,
+			"services":      serviceResponseList,
 			"totalServices": totalServices,
 		}))
 	}

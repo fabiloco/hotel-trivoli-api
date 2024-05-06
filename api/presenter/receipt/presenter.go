@@ -21,6 +21,12 @@ type ProductResponse struct {
 	Img      string                 `json:"img"`
 }
 
+type ServiceResponse struct {
+	Name     string  `json:"name"`  // service name
+	Price    float32 `json:"price"` // service price
+	Quantity int     `json:"quantity"`
+}
+
 type ReceiptResponse struct {
 	ID        uint
 	CreatedAt time.Time
@@ -59,7 +65,7 @@ func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
 			existingProduct.Quantity++
 		} else {
 			productsMap[receipt_product.ProductID] = &ProductResponse{
-				ID:        receipt_product.ID,
+				ID:        receipt_product.ProductID,
 				Name:      product.Name,
 				Type:      product.Type,
 				Price:     product.Price,
@@ -107,7 +113,7 @@ func IndividualReceiptToIndividualReceiptResponse(receipt *entities.IndividualRe
 			existingProduct.Quantity++
 		} else {
 			productsMap[receipt_product.ProductID] = &ProductResponse{
-				ID:        receipt_product.ID,
+				ID:        receipt_product.ProductID,
 				Name:      product.Name,
 				Type:      product.Type,
 				Price:     product.Price,

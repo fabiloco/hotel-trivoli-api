@@ -17,14 +17,13 @@ type Repository interface {
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error)
 }
 
-
 type repository struct {
 	db *gorm.DB
 }
 
 func NewRepository(db *gorm.DB) *repository {
 	return &repository{
-    db: db,
+		db: db,
 	}
 }
 
@@ -60,7 +59,6 @@ func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.IndividualRec
 	return &receipts, nil
 }
 
-
 func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error) {
 	var receipts []entities.IndividualReceipt
 
@@ -77,9 +75,9 @@ func (r *repository) Create(data *entities.IndividualReceipt) (*entities.Individ
 	var receipt entities.IndividualReceipt
 
 	receipt = entities.IndividualReceipt{
-    TotalPrice: data.TotalPrice,
-    Products: data.Products,
-    User: data.User,
+		TotalPrice: data.TotalPrice,
+		Products:   data.Products,
+		User:       data.User,
 	}
 
 	result := r.db.Create(&receipt)
@@ -99,12 +97,12 @@ func (r *repository) Update(id uint, data *entities.IndividualReceipt) (*entitie
 	}
 
 	result := r.db.Model(&receipt).Updates(
-    entities.IndividualReceipt{
-      TotalPrice: data.TotalPrice,
-      Products: data.Products,
-      User: data.User,
-    },
-  )
+		entities.IndividualReceipt{
+			TotalPrice: data.TotalPrice,
+			Products:   data.Products,
+			User:       data.User,
+		},
+	)
 
 	if result.Error != nil {
 		return nil, result.Error

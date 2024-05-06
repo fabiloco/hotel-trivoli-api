@@ -15,14 +15,13 @@ type Repository interface {
 	ReadByUsername(username string) (*entities.User, error)
 }
 
-
 type repository struct {
 	db *gorm.DB
 }
 
 func NewRepository(db *gorm.DB) *repository {
 	return &repository{
-    db: db,
+		db: db,
 	}
 }
 
@@ -37,7 +36,7 @@ func (r *repository) Read() (*[]entities.User, error) {
 func (r *repository) ReadById(id uint) (*entities.User, error) {
 	var user entities.User
 
-	result := r.db.Find(&user, id)
+	result := r.db.Preload("Person").Find(&user, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -62,10 +61,10 @@ func (r *repository) Create(data *entities.User) (*entities.User, error) {
 	var user entities.User
 
 	user = entities.User{
-    Username: data.Username,
-    Password: data.Password,
-    Role: data.Role,
-    Person: data.Person,
+		Username: data.Username,
+		Password: data.Password,
+		Role:     data.Role,
+		Person:   data.Person,
 	}
 
 	result := r.db.Create(&user)
@@ -85,13 +84,13 @@ func (r *repository) Update(id uint, data *entities.User) (*entities.User, error
 	}
 
 	result := r.db.Model(&user).Updates(
-    entities.User{
-      Password: data.Password,
-      Username: data.Username,
-      Role: data.Role,
-      Person: data.Person,
-    },
-  )
+		entities.User{
+			Password: data.Password,
+			Username: data.Username,
+			Role:     data.Role,
+			Person:   data.Person,
+		},
+	)
 
 	if result.Error != nil {
 		return nil, result.Error

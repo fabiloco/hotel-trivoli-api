@@ -289,9 +289,27 @@ func (s *service) RemoveReceipt(ID uint) (*entities.Receipt, error) {
 }
 
 func (s *service) FetchReceiptById(ID uint) (*entities.Receipt, error) {
-	return s.repository.ReadById(ID)
+	receipt, receipt_error := s.repository.ReadById(ID)
+
+	user, error := s.userRepository.ReadById(receipt.UserID)
+	if error != nil {
+		return nil, errors.New(fmt.Sprintf("no user with id %d", receipt.User))
+	}
+
+	receipt.User = *user
+
+	return receipt, receipt_error
 }
 
 func (s *service) FetchIndividualReceiptById(ID uint) (*entities.IndividualReceipt, error) {
-	return s.individualReceiptRepository.ReadById(ID)
+	individual_receipt, receipt_error := s.individualReceiptRepository.ReadById(ID)
+
+	user, error := s.userRepository.ReadById(individual_receipt.UserID)
+	if error != nil {
+		return nil, errors.New(fmt.Sprintf("no user with id %d", individual_receipt.User))
+	}
+
+	individual_receipt.User = *user
+
+	return individual_receipt, receipt_error
 }
