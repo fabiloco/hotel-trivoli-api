@@ -38,6 +38,7 @@ type ReceiptResponse struct {
 	Service    entities.Service  `json:"service"`
 	Room       entities.Room     `json:"room"`
 	User       entities.User     `json:"user"`
+	Shift      entities.Shift    `json:"shift"`
 }
 
 type IndividualReceiptResponse struct {
@@ -90,6 +91,7 @@ func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
 	receiptResponse.TotalTime = receipt.TotalTime
 
 	receiptResponse.Products = productsResponseList
+	receiptResponse.Shift = receipt.Shift
 
 	receiptResponse.ID = receipt.ID
 	receiptResponse.CreatedAt = receipt.CreatedAt
@@ -183,6 +185,8 @@ func SuccessReceiptResponse(receipt *entities.Receipt) *fiber.Map {
 	receiptResponse.TotalTime = receipt.TotalTime
 
 	receiptResponse.Products = productsResponseList
+
+	receiptResponse.Shift = receipt.Shift
 
 	receiptResponse.ID = receipt.ID
 	receiptResponse.CreatedAt = receipt.CreatedAt
@@ -330,6 +334,7 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
 		receiptResponse.TotalTime = receipt.TotalTime
 
 		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
 
 		receiptResponse.ID = receipt.ID
 		receiptResponse.CreatedAt = receipt.CreatedAt

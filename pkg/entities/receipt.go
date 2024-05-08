@@ -3,6 +3,7 @@ package entities
 import (
 	"time"
 
+	"github.com/guregu/null/v5"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +20,8 @@ type Receipt struct {
 	RoomID     uint             `gorm:"not null"`
 	User       User             `gorm:"not null" json:"user"`
 	UserID     uint             `gorm:"not null"`
+	Shift      Shift            ` json:"shift"`
+	ShiftID    null.Int
 }
 
 type CreateReceipt struct {
@@ -28,6 +31,7 @@ type CreateReceipt struct {
 	Service    uint    `valid:"required,numeric" json:"service"`
 	Room       uint    `valid:"required,numeric" json:"room"`
 	User       uint    `valid:"required,numeric" json:"user"`
+	Shift      uint    `valid:"optional,numeric" json:"shift"`
 }
 
 type UpdateReceipt struct {
@@ -37,4 +41,5 @@ type UpdateReceipt struct {
 	Service    uint    `valid:"optional,numeric" json:"service"`
 	Room       uint    `valid:"optional,numeric" json:"room"`
 	User       uint    `valid:"optional,numeric" json:"user"`
+	Shift      uint    `valid:"optional,numeric" json:"shift"`
 }

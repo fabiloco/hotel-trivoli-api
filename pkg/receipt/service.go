@@ -2,14 +2,17 @@ package receipt
 
 import (
 	"errors"
+	"fmt"
+	"time"
+
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	individualreceipt "fabiloco/hotel-trivoli-api/pkg/individual_receipt"
 	"fabiloco/hotel-trivoli-api/pkg/product"
 	"fabiloco/hotel-trivoli-api/pkg/room"
 	serviceModule "fabiloco/hotel-trivoli-api/pkg/service"
 	"fabiloco/hotel-trivoli-api/pkg/user"
-	"fmt"
-	"time"
+
+	"github.com/guregu/null/v5"
 )
 
 // Service is an interface from which our api module can access our repository of all our models
@@ -121,6 +124,7 @@ func (s *service) GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Re
 		Service:    *service,
 		Room:       *room,
 		User:       *user,
+		ShiftID:    null.IntFromPtr(nil),
 	}
 
 	return s.repository.Create(&newReceipt)
@@ -229,6 +233,7 @@ func (s *service) InsertReceipt(receipt *entities.CreateReceipt) (*entities.Rece
 		Service:    *service,
 		Room:       *room,
 		User:       *user,
+		ShiftID:    null.IntFromPtr(nil),
 	}
 
 	return s.repository.Create(&newReceipt)
@@ -279,6 +284,7 @@ func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*enti
 		Service:    *service,
 		Room:       *room,
 		User:       *user,
+		ShiftID:    null.IntFromPtr(nil),
 	}
 
 	return s.repository.Update(id, &newReceipt)
