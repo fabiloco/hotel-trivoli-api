@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
+	shift_presenter "fabiloco/hotel-trivoli-api/api/presenter/shift"
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/shift"
@@ -30,7 +31,8 @@ func GetShifts(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
+		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
+		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts)))
 	}
 }
 
