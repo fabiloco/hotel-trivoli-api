@@ -5,6 +5,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/printer"
+	"fmt"
 	"time"
 
 	"fabiloco/hotel-trivoli-api/api/utils"
@@ -136,6 +137,8 @@ func GetReceiptById(service receipt.Service) fiber.Handler {
 		}
 
 		receipt, error := service.FetchReceiptById(uint(id))
+
+		fmt.Println("here")
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
