@@ -101,7 +101,7 @@ func main() {
 	roomHistoryService := roomHistory.NewService(roomHistoryRepo, roomRepo, serviceRepo)
 	receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo, individualReceiptRepo)
 
-	reportService := reports.NewService(productRepo, receiptRepo)
+	reportService := reports.NewService(productRepo, receiptRepo, individualReceiptRepo)
 	shiftService := shift.NewService(shiftRepo, receiptRepo)
 
 	authService := auth.NewService(userRepo, repositoryRepo)

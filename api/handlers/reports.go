@@ -3,24 +3,26 @@ package handlers
 import (
 	"errors"
 	"fabiloco/hotel-trivoli-api/api/presenter"
+	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/reports"
 	"net/http"
 	"strings"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 type ReceiptsByDate struct {
-  Date  string  `valid:"required,rfc3339" json:"date"`
+	Date string `valid:"required,rfc3339" json:"date"`
 }
 
 type ReceiptsByUser struct {
-  UserID  uint  `valid:"required,numeric" json:"user_id"`
+	UserID uint `valid:"required,numeric" json:"user_id"`
 }
 
 type ReceiptsBetweenDates struct {
-	StartDate string  `valid:"required,rfc3339" json:"start_date"`
-	EndDate   string  `valid:"required,rfc3339" json:"end_date"`
+	StartDate string `valid:"required,rfc3339" json:"start_date"`
+	EndDate   string `valid:"required,rfc3339" json:"end_date"`
 }
 
 // ListReceiptsByDate   godoc
@@ -53,10 +55,21 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(receipts))
+		individualReceipts, error := service.IndividualReceiptByTargetDate(body.Date)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		return ctx.JSON(response)
 	}
 }
-
 
 // ListReceiptsByDate   godoc
 // @Summary       Receipts by date
@@ -88,7 +101,19 @@ func GetReceiptsByUser(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(receipts))
+		individualReceipts, error := service.IndividualReceiptByUser(body.UserID)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		return ctx.JSON(response)
 	}
 }
 
@@ -122,7 +147,19 @@ func GetReceiptsTodayByUser(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(receipts))
+		individualReceipts, error := service.IndividualReceiptTodayByUser(body.UserID)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		return ctx.JSON(response)
 	}
 }
 
@@ -156,7 +193,18 @@ func GetReceiptsBetweenDates(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(receipts))
+		individualReceipts, error := service.IndividualReceiptsBetweenDates(body.StartDate, body.EndDate)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		return ctx.JSON(response)
 	}
 }
-
