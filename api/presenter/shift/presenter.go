@@ -12,6 +12,7 @@ type ShiftResponse struct {
 	ShiftID            null.Int                                      `json:"shift_id"`
 	Receipts           []receipt_presenter.ReceiptResponse           `json:"receipts"`
 	IndividualReceipts []receipt_presenter.IndividualReceiptResponse `json:"individual_receipts"`
+	User               entities.User                                 `json:"user"`
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
 }
@@ -26,6 +27,7 @@ func ReceiptsToShiftsResponse(receipts *[]entities.Receipt, individual_receipts 
 				ShiftID:   receipt.ShiftID,
 				CreatedAt: receipt.Shift.CreatedAt,
 				UpdatedAt: receipt.Shift.UpdatedAt,
+				User:      receipt.User,
 				Receipts:  []receipt_presenter.ReceiptResponse{},
 			}
 			shiftsMap[receipt.ShiftID].Receipts = append(shiftsMap[receipt.ShiftID].Receipts, *receipt_presenter.ReceiptToReceiptResponse(&receipt))
@@ -40,6 +42,7 @@ func ReceiptsToShiftsResponse(receipts *[]entities.Receipt, individual_receipts 
 				ShiftID:            individual_receipt.ShiftID,
 				CreatedAt:          individual_receipt.Shift.CreatedAt,
 				UpdatedAt:          individual_receipt.Shift.UpdatedAt,
+				User:               individual_receipt.User,
 				IndividualReceipts: []receipt_presenter.IndividualReceiptResponse{},
 			}
 			shiftsMap[individual_receipt.ShiftID].IndividualReceipts = append(shiftsMap[individual_receipt.ShiftID].IndividualReceipts, *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(&individual_receipt))
