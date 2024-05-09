@@ -130,22 +130,37 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 // @Router        /api/v1/receipt/{id} [get]
 func GetReceiptById(service receipt.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		id, err := ctx.ParamsInt("id")
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-		}
-
-		receipt, error := service.FetchReceiptById(uint(id))
-
-		fmt.Println("here")
+		idStr := ctx.Params("id")
+		id, error := utils.ConvertReceiptsId(idStr)
 
 		if error != nil {
-			ctx.Status(http.StatusInternalServerError)
-			return ctx.JSON(presenter.ErrorResponse(error))
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(fmt.Sprint("Error converting param to id: ", error))))
 		}
 
-		return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
+		if utils.ReceiptIdPatternMatch(idStr) {
+			receipt, error := service.FetchReceiptById(uint(id))
+
+			if error != nil {
+				ctx.Status(http.StatusInternalServerError)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
+		} else if utils.IndividualReceiptIdPatternMatch(idStr) {
+			receipt, error := service.FetchIndividualReceiptById(uint(id))
+			fmt.Println("here")
+
+			if error != nil {
+				ctx.Status(http.StatusInternalServerError)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
+		} else {
+
+			return ctx.JSON(presenter.ErrorResponse(errors.New("Id does not match with the pattern")))
+		}
 	}
 }
 
@@ -209,20 +224,40 @@ func PutReceipt(service receipt.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-		id, err := ctx.ParamsInt("id")
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-		}
-
-		product, error := service.UpdateReceipt(uint(id), &body)
+		idStr := ctx.Params("id")
+		id, error := utils.ConvertReceiptsId(idStr)
 
 		if error != nil {
 			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(error))
+			return ctx.JSON(presenter.ErrorResponse(errors.New(fmt.Sprint("Error converting param to id: ", error))))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(product))
+		if utils.ReceiptIdPatternMatch(idStr) {
+			product, error := service.UpdateReceipt(uint(id), &body)
+
+			if error != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(presenter.SuccessResponse(product))
+		} else if utils.IndividualReceiptIdPatternMatch(idStr) {
+			product, error := service.UpdateIndividualReceipt(uint(id), &entities.UpdateIndividualReceipt{
+				TotalPrice: body.TotalPrice,
+				Products:   body.Products,
+				User:       body.User,
+				Shift:      body.Shift,
+			})
+
+			if error != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(presenter.SuccessResponse(product))
+		} else {
+			return ctx.JSON(presenter.ErrorResponse(errors.New("Id does not match with the pattern")))
+		}
 	}
 }
 
@@ -237,20 +272,35 @@ func PutReceipt(service receipt.Service) fiber.Handler {
 // @Router        /api/v1/receipt/{id} [delete]
 func DeleteReceiptById(service receipt.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		id, err := ctx.ParamsInt("id")
-		if err != nil {
-			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-		}
-
-		product, error := service.RemoveReceipt(uint(id))
+		idStr := ctx.Params("id")
+		id, error := utils.ConvertReceiptsId(idStr)
 
 		if error != nil {
 			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(error))
+			return ctx.JSON(presenter.ErrorResponse(errors.New(fmt.Sprint("Error converting param to id: ", error))))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(product))
+		if utils.ReceiptIdPatternMatch(idStr) {
+			product, error := service.RemoveReceipt(uint(id))
+
+			if error != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(presenter.SuccessResponse(product))
+		} else if utils.IndividualReceiptIdPatternMatch(idStr) {
+			product, error := service.RemoveIndividualReceipt(uint(id))
+
+			if error != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+
+			return ctx.JSON(presenter.SuccessResponse(product))
+		} else {
+			return ctx.JSON(presenter.ErrorResponse(errors.New("Id does not match with the pattern")))
+		}
 	}
 }
 

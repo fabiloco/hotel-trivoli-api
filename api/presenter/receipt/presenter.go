@@ -4,6 +4,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/database"
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,7 +29,7 @@ type ServiceResponse struct {
 }
 
 type ReceiptResponse struct {
-	ID        uint
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
@@ -42,7 +43,7 @@ type ReceiptResponse struct {
 }
 
 type IndividualReceiptResponse struct {
-	ID        uint
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
@@ -93,7 +94,7 @@ func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
 	receiptResponse.Products = productsResponseList
 	receiptResponse.Shift = receipt.Shift
 
-	receiptResponse.ID = receipt.ID
+	receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
 	receiptResponse.CreatedAt = receipt.CreatedAt
 	receiptResponse.UpdatedAt = receipt.UpdatedAt
 
@@ -138,7 +139,7 @@ func IndividualReceiptToIndividualReceiptResponse(receipt *entities.IndividualRe
 
 	receiptResponse.Products = productsResponseList
 
-	receiptResponse.ID = receipt.ID
+	receiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 	receiptResponse.CreatedAt = receipt.CreatedAt
 	receiptResponse.UpdatedAt = receipt.UpdatedAt
 
@@ -188,7 +189,7 @@ func SuccessReceiptResponse(receipt *entities.Receipt) *fiber.Map {
 
 	receiptResponse.Shift = receipt.Shift
 
-	receiptResponse.ID = receipt.ID
+	receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
 	receiptResponse.CreatedAt = receipt.CreatedAt
 	receiptResponse.UpdatedAt = receipt.UpdatedAt
 
@@ -233,7 +234,7 @@ func SuccessIndividualReceiptResponse(receipt *entities.IndividualReceipt) *fibe
 
 	individualReceiptResponse.Products = productsResponseList
 
-	individualReceiptResponse.ID = receipt.ID
+	individualReceiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 	individualReceiptResponse.CreatedAt = receipt.CreatedAt
 	individualReceiptResponse.UpdatedAt = receipt.UpdatedAt
 
@@ -281,7 +282,7 @@ func SuccessIndividualReceiptsResponse(individualReceipts *[]entities.Individual
 
 		receiptResponse.Products = productsResponseList
 
-		receiptResponse.ID = receipt.ID
+		receiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 		receiptResponse.CreatedAt = receipt.CreatedAt
 		receiptResponse.UpdatedAt = receipt.UpdatedAt
 
@@ -336,7 +337,7 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
 		receiptResponse.Products = productsResponseList
 		receiptResponse.Shift = receipt.Shift
 
-		receiptResponse.ID = receipt.ID
+		receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
 		receiptResponse.CreatedAt = receipt.CreatedAt
 		receiptResponse.UpdatedAt = receipt.UpdatedAt
 

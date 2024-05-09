@@ -18,14 +18,21 @@ import (
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
 	InsertReceipt(receipt *entities.CreateReceipt) (*entities.Receipt, error)
+
 	GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Receipt, error)
 	GenerateIndividualReceipt(receipt *entities.CreateIndividualReceipt) (*entities.IndividualReceipt, error)
+
 	FetchReceipts() (*[]entities.Receipt, error)
 	FetchIndividualReceipts() (*[]entities.IndividualReceipt, error)
+
 	FetchReceiptById(id uint) (*entities.Receipt, error)
 	FetchIndividualReceiptById(id uint) (*entities.IndividualReceipt, error)
+
 	UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*entities.Receipt, error)
+	UpdateIndividualReceipt(id uint, receipt *entities.UpdateIndividualReceipt) (*entities.IndividualReceipt, error)
+
 	RemoveReceipt(id uint) (*entities.Receipt, error)
+	RemoveIndividualReceipt(id uint) (*entities.IndividualReceipt, error)
 }
 
 type service struct {
@@ -290,8 +297,40 @@ func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*enti
 	return s.repository.Update(id, &newReceipt)
 }
 
+func (s *service) UpdateIndividualReceipt(id uint, receipt *entities.UpdateIndividualReceipt) (*entities.IndividualReceipt, error) {
+	user, error := s.userRepository.ReadById(receipt.User)
+
+	if error != nil {
+		return nil, errors.New(fmt.Sprintf("no user with id %d", receipt.User))
+	}
+
+	var products []entities.Product
+
+	for i := 0; i < len(receipt.Products); i++ {
+		product, error := s.productRepository.ReadById(receipt.Products[i])
+
+		if error != nil {
+			return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+		}
+
+		products = append(products, *product)
+	}
+
+	newReceipt := entities.IndividualReceipt{
+		TotalPrice: receipt.TotalPrice,
+		User:       *user,
+		ShiftID:    null.IntFromPtr(nil),
+	}
+
+	return s.individualReceiptRepository.Update(id, &newReceipt)
+}
+
 func (s *service) RemoveReceipt(ID uint) (*entities.Receipt, error) {
 	return s.repository.Delete(ID)
+}
+
+func (s *service) RemoveIndividualReceipt(ID uint) (*entities.IndividualReceipt, error) {
+	return s.individualReceiptRepository.Delete(ID)
 }
 
 func (s *service) FetchReceiptById(ID uint) (*entities.Receipt, error) {
@@ -299,14 +338,5 @@ func (s *service) FetchReceiptById(ID uint) (*entities.Receipt, error) {
 }
 
 func (s *service) FetchIndividualReceiptById(ID uint) (*entities.IndividualReceipt, error) {
-	individual_receipt, receipt_error := s.individualReceiptRepository.ReadById(ID)
-
-	user, error := s.userRepository.ReadById(individual_receipt.UserID)
-	if error != nil {
-		return nil, errors.New(fmt.Sprintf("no user with id %d", individual_receipt.User))
-	}
-
-	individual_receipt.User = *user
-
-	return individual_receipt, receipt_error
+	return s.individualReceiptRepository.ReadById(ID)
 }
