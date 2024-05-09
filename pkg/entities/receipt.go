@@ -20,7 +20,7 @@ type Receipt struct {
 	RoomID     uint             `gorm:"not null"`
 	User       User             `gorm:"not null" json:"user"`
 	UserID     uint             `gorm:"not null"`
-	Shift      Shift            ` json:"shift"`
+	Shift      Shift            `json:"shift"`
 	ShiftID    null.Int
 }
 

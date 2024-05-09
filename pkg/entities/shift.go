@@ -11,9 +11,11 @@ type Shift struct {
 }
 
 type CreateShift struct {
-	Receipts []uint `valid:"required" json:"receipts"`
+	Receipts           []uint `valid:"optional" json:"receipts"`
+	IndividualReceipts []uint `valid:"optional" json:"individual_receipts"`
 }
 
 type UpdateShift struct {
-	Receipts []uint `valid:"optional" json:"receipts"`
+	Receipts           []uint `valid:"optional" json:"receipts"`
+	IndividualReceipts []uint `valid:"optional" json:"individual_receipts"`
 }

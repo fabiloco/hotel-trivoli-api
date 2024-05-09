@@ -8,6 +8,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/shift"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,7 +25,7 @@ import (
 // @Router        /api/v1/shift [get]
 func GetShifts(service shift.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		receipts, error := service.FetchAllShifts()
+		receipts, individual_receipts, error := service.FetchAllShifts()
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
@@ -32,7 +33,7 @@ func GetShifts(service shift.Service) fiber.Handler {
 		}
 
 		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts)))
+		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
 	}
 }
 
@@ -53,7 +54,9 @@ func GetShiftById(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
 		}
 
-		receipts, error := service.FetchShiftsById(uint(id))
+		receipts, individual_receipts, error := service.FetchShiftsById(uint(id))
+
+		fmt.Println(individual_receipts)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)

@@ -13,6 +13,10 @@ type Repository interface {
 	Update(id uint, data *entities.IndividualReceipt) (*entities.IndividualReceipt, error)
 	Delete(id uint) (*entities.IndividualReceipt, error)
 	ReadById(id uint) (*entities.IndividualReceipt, error)
+
+	ReadByShiftNotNull() (*[]entities.IndividualReceipt, error)
+	ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error)
+
 	ReadByDate(targetDate time.Time) (*[]entities.IndividualReceipt, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error)
 }
@@ -104,6 +108,10 @@ func (r *repository) Update(id uint, data *entities.IndividualReceipt) (*entitie
 		},
 	)
 
+	receipt.Shift = data.Shift
+
+	r.db.Save(receipt)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -125,4 +133,28 @@ func (r *repository) Delete(id uint) (*entities.IndividualReceipt, error) {
 	}
 
 	return receipt, nil
+}
+
+func (r *repository) ReadByShiftNotNull() (*[]entities.IndividualReceipt, error) {
+	var receipts []entities.IndividualReceipt
+
+	result := r.db.Preload("User").Preload("User.Person").Where("shift_id IS NOT NULL").Find(&receipts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &receipts, nil
+}
+
+func (r *repository) ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error) {
+	var receipt []entities.IndividualReceipt
+
+	result := r.db.Preload("User").Preload("User.Person").Where("shift_id = ?", id).First(&receipt)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &receipt, nil
 }

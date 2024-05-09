@@ -2,7 +2,6 @@ package receipt
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
-	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -15,8 +14,10 @@ type Repository interface {
 	Update(id uint, data *entities.Receipt) (*entities.Receipt, error)
 	Delete(id uint) (*entities.Receipt, error)
 	ReadById(id uint) (*entities.Receipt, error)
+
 	ReadByShiftNotNull() (*[]entities.Receipt, error)
 	ReadAllByShiftId(id uint) (*[]entities.Receipt, error)
+
 	ReadByDate(targetDate time.Time) (*[]entities.Receipt, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error)
 }
@@ -127,9 +128,6 @@ func (r *repository) Update(id uint, data *entities.Receipt) (*entities.Receipt,
 		return nil, error
 	}
 
-	fmt.Println("antes de editar")
-	fmt.Println(data.Shift)
-
 	result := r.db.Model(&receipt).Updates(
 		entities.Receipt{
 			TotalPrice: data.TotalPrice,
@@ -144,9 +142,6 @@ func (r *repository) Update(id uint, data *entities.Receipt) (*entities.Receipt,
 	receipt.Shift = data.Shift
 
 	r.db.Save(receipt)
-
-	fmt.Println("luego de editar")
-	fmt.Println(receipt.Shift)
 
 	if result.Error != nil {
 		return nil, result.Error

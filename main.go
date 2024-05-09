@@ -102,7 +102,7 @@ func main() {
 	receptService := receipt.NewService(receiptRepo, serviceRepo, productRepo, roomRepo, userRepo, individualReceiptRepo)
 
 	reportService := reports.NewService(productRepo, receiptRepo, individualReceiptRepo)
-	shiftService := shift.NewService(shiftRepo, receiptRepo)
+	shiftService := shift.NewService(shiftRepo, receiptRepo, individualReceiptRepo)
 
 	authService := auth.NewService(userRepo, repositoryRepo)
 
