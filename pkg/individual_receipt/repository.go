@@ -103,14 +103,20 @@ func (r *repository) Update(id uint, data *entities.IndividualReceipt) (*entitie
 	result := r.db.Model(&receipt).Updates(
 		entities.IndividualReceipt{
 			TotalPrice: data.TotalPrice,
-			Products:   data.Products,
-			User:       data.User,
 		},
 	)
 
+	receipt.User = data.User
 	receipt.Shift = data.Shift
 
 	r.db.Save(receipt)
+
+	if len(data.Products) > 0 {
+		r.db.Delete(receipt.Products)
+		r.db.Save(receipt)
+		receipt.Products = data.Products
+		r.db.Save(receipt)
+	}
 
 	if result.Error != nil {
 		return nil, result.Error

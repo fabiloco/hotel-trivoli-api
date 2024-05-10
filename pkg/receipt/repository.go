@@ -132,16 +132,22 @@ func (r *repository) Update(id uint, data *entities.Receipt) (*entities.Receipt,
 		entities.Receipt{
 			TotalPrice: data.TotalPrice,
 			TotalTime:  data.TotalTime,
-			Service:    data.Service,
-			Room:       data.Room,
-			Products:   data.Products,
-			User:       data.User,
 		},
 	)
 
+	receipt.Service = data.Service
+	receipt.User = data.User
+	receipt.Room = data.Room
 	receipt.Shift = data.Shift
 
 	r.db.Save(receipt)
+
+	if len(data.Products) > 0 {
+		r.db.Delete(receipt.Products)
+		r.db.Save(receipt)
+		receipt.Products = data.Products
+		r.db.Save(receipt)
+	}
 
 	if result.Error != nil {
 		return nil, result.Error
