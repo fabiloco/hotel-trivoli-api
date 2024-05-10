@@ -50,6 +50,7 @@ type IndividualReceiptResponse struct {
 	TotalPrice float32           `json:"total_price"`
 	Products   []ProductResponse `json:"products"`
 	User       entities.User     `json:"user"`
+	Shift      entities.Shift    `json:"shift"`
 }
 
 func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
@@ -138,6 +139,7 @@ func IndividualReceiptToIndividualReceiptResponse(receipt *entities.IndividualRe
 	receiptResponse.TotalPrice = receipt.TotalPrice
 
 	receiptResponse.Products = productsResponseList
+	receiptResponse.Shift = receipt.Shift
 
 	receiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 	receiptResponse.CreatedAt = receipt.CreatedAt
@@ -233,6 +235,7 @@ func SuccessIndividualReceiptResponse(receipt *entities.IndividualReceipt) *fibe
 	individualReceiptResponse.TotalPrice = receipt.TotalPrice
 
 	individualReceiptResponse.Products = productsResponseList
+	individualReceiptResponse.Shift = receipt.Shift
 
 	individualReceiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 	individualReceiptResponse.CreatedAt = receipt.CreatedAt
@@ -281,6 +284,7 @@ func SuccessIndividualReceiptsResponse(individualReceipts *[]entities.Individual
 		receiptResponse.TotalPrice = receipt.TotalPrice
 
 		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
 
 		receiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
 		receiptResponse.CreatedAt = receipt.CreatedAt

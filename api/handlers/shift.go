@@ -78,7 +78,7 @@ func GetShiftById(service shift.Service) fiber.Handler {
 // @Router        /api/v1/shift [post]
 func PostShifts(service shift.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var body entities.CreateShift
+		var body entities.CreateShiftWithCode
 
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
@@ -91,7 +91,40 @@ func PostShifts(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-		shift, error := service.InsertShift(&body)
+		var receiptIds []uint
+
+		for _, receiptId := range body.Receipts {
+			if !utils.ReceiptIdPatternMatch(receiptId) {
+				return ctx.JSON(presenter.ErrorResponse(errors.New("An id does not match with the pattern")))
+			}
+
+			idParsed, error := utils.ConvertReceiptsId(receiptId)
+			if error != nil {
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+			receiptIds = append(receiptIds, idParsed)
+		}
+
+		var individualReceiptIds []uint
+
+		for _, individualReceiptId := range body.IndividualReceipts {
+			if !utils.IndividualReceiptIdPatternMatch(individualReceiptId) {
+				return ctx.JSON(presenter.ErrorResponse(errors.New("An id does not match with the pattern")))
+			}
+
+			idParsed, error := utils.ConvertReceiptsId(individualReceiptId)
+			if error != nil {
+				return ctx.JSON(presenter.ErrorResponse(error))
+			}
+			individualReceiptIds = append(individualReceiptIds, idParsed)
+		}
+
+		bodyParsed := entities.CreateShift{
+			Receipts:           receiptIds,
+			IndividualReceipts: individualReceiptIds,
+		}
+
+		shift, error := service.InsertShift(&bodyParsed)
 
 		if error != nil {
 			ctx.Status(http.StatusBadRequest)

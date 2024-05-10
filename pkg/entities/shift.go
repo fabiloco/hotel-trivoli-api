@@ -19,3 +19,13 @@ type UpdateShift struct {
 	Receipts           []uint `valid:"optional" json:"receipts"`
 	IndividualReceipts []uint `valid:"optional" json:"individual_receipts"`
 }
+
+type CreateShiftWithCode struct {
+	Receipts           []string `valid:"optional" json:"receipts"`
+	IndividualReceipts []string `valid:"optional" json:"individual_receipts"`
+}
+
+type UpdateShiftWithCode struct {
+	Receipts           []string `valid:"optional" json:"receipts"`
+	IndividualReceipts []string `valid:"optional" json:"individual_receipts"`
+}
