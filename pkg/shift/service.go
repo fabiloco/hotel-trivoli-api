@@ -67,7 +67,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 	for _, receipt := range receipts {
 		receipt.Shift = *shiftCreated
 
-		_, error := s.receiptRepository.Update(receipt.ID, &receipt)
+		_, error := s.receiptRepository.UpdateShift(receipt.ID, &receipt)
 
 		if error != nil {
 			return nil, errors.New(fmt.Sprintf("error editing receipt with id %d", receipt.ID))
@@ -77,7 +77,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 	for _, individual_receipt := range individual_receipts {
 		individual_receipt.Shift = *shiftCreated
 
-		_, error := s.individualReceiptRepository.Update(individual_receipt.ID, &individual_receipt)
+		_, error := s.individualReceiptRepository.UpdateShift(individual_receipt.ID, &individual_receipt)
 
 		if error != nil {
 			return nil, errors.New(fmt.Sprintf("error editing individual receipt with id %d", individual_receipt.ID))

@@ -11,7 +11,10 @@ import (
 type Repository interface {
 	Create(data *entities.Receipt) (*entities.Receipt, error)
 	Read() (*[]entities.Receipt, error)
+
 	Update(id uint, data *entities.Receipt) (*entities.Receipt, error)
+	UpdateShift(id uint, data *entities.Receipt) (*entities.Receipt, error)
+
 	Delete(id uint) (*entities.Receipt, error)
 	ReadById(id uint) (*entities.Receipt, error)
 
@@ -35,7 +38,7 @@ func NewRepository(db *gorm.DB) *repository {
 func (r *repository) Read() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Find(&receipts)
+	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
 
 	return &receipts, nil
 }
@@ -43,7 +46,7 @@ func (r *repository) Read() (*[]entities.Receipt, error) {
 func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 	var receipt entities.Receipt
 
-	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").First(&receipt, id)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").First(&receipt, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -55,7 +58,7 @@ func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Where("shift_id IS NOT NULL").Find(&receipts)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -67,7 +70,7 @@ func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
 func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
 	var receipt []entities.Receipt
 
-	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Where("shift_id = ?", id).First(&receipt)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -79,7 +82,7 @@ func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
 func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("Service").Preload("User").Preload("User.Person").Find(&receipts)
+	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("Service").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -91,7 +94,7 @@ func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, erro
 func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Products").Preload("Service").Preload("User").Preload("User.Person").Find(&receipts)
+	result := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).Preload("Products").Preload("Service").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -152,6 +155,20 @@ func (r *repository) Update(id uint, data *entities.Receipt) (*entities.Receipt,
 	if result.Error != nil {
 		return nil, result.Error
 	}
+
+	return receipt, nil
+}
+
+func (r *repository) UpdateShift(id uint, data *entities.Receipt) (*entities.Receipt, error) {
+	receipt, error := r.ReadById(id)
+
+	if error != nil {
+		return nil, error
+	}
+
+	receipt.Shift = data.Shift
+
+	r.db.Save(receipt)
 
 	return receipt, nil
 }
