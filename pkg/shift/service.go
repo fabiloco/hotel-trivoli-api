@@ -88,17 +88,9 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 }
 
 func (s *service) FetchShiftsById(id uint) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
-	receipts, error := s.receiptRepository.ReadAllByShiftId(id)
+	receipts, _ := s.receiptRepository.ReadAllByShiftId(id)
 
-	if error != nil {
-		return nil, nil, error
-	}
-
-	individual_receipts, error := s.individualReceiptRepository.ReadAllByShiftId(id)
-
-	if error != nil {
-		return nil, nil, error
-	}
+	individual_receipts, _ := s.individualReceiptRepository.ReadAllByShiftId(id)
 
 	return receipts, individual_receipts, nil
 }

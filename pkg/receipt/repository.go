@@ -73,7 +73,8 @@ func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
 	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
 
 	if result.Error != nil {
-		return nil, result.Error
+		empty := []entities.Receipt{}
+		return &empty, result.Error
 	}
 
 	return &receipt, nil

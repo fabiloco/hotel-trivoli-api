@@ -161,7 +161,7 @@ func (r *repository) Delete(id uint) (*entities.IndividualReceipt, error) {
 func (r *repository) ReadByShiftNotNull() (*[]entities.IndividualReceipt, error) {
 	var receipts []entities.IndividualReceipt
 
-	result := r.db.Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL").Find(&receipts)
+	result := r.db.Preload("User").Preload("User.Person").Preload("Products").Preload("Shift").Where("shift_id IS NOT NULL").Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -173,10 +173,11 @@ func (r *repository) ReadByShiftNotNull() (*[]entities.IndividualReceipt, error)
 func (r *repository) ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error) {
 	var receipt []entities.IndividualReceipt
 
-	result := r.db.Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
+	result := r.db.Preload("User").Preload("User.Person").Preload("Products").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
 
 	if result.Error != nil {
-		return nil, result.Error
+		empty := []entities.IndividualReceipt{}
+		return &empty, result.Error
 	}
 
 	return &receipt, nil
