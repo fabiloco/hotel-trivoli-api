@@ -104,6 +104,10 @@ func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*
 	return &receipts, nil
 }
 
+type ReadTotalsResult struct {
+	TotalPrice float64
+}
+
 func (r *repository) Create(data *entities.Receipt) (*entities.Receipt, error) {
 	var receipt entities.Receipt
 

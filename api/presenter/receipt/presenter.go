@@ -53,6 +53,26 @@ type IndividualReceiptResponse struct {
 	Shift      entities.Shift    `json:"shift"`
 }
 
+func ReceiptsToReceiptsResponses(receipts []entities.Receipt) []ReceiptResponse {
+	var receiptsResponses []ReceiptResponse
+
+	for _, receipt := range receipts {
+		receiptsResponses = append(receiptsResponses, *ReceiptToReceiptResponse(&receipt))
+	}
+
+	return receiptsResponses
+}
+
+func IndividualReceiptsToIndividualReceiptsResponses(individualReceipts []entities.IndividualReceipt) []IndividualReceiptResponse {
+	var receiptsResponses []IndividualReceiptResponse
+
+	for _, receipt := range individualReceipts {
+		receiptsResponses = append(receiptsResponses, *IndividualReceiptToIndividualReceiptResponse(&receipt))
+	}
+
+	return receiptsResponses
+}
+
 func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
 	var receiptResponse ReceiptResponse
 

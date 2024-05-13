@@ -208,3 +208,80 @@ func GetReceiptsBetweenDates(service reports.Service) fiber.Handler {
 		return ctx.JSON(response)
 	}
 }
+
+type TotalReceipt struct {
+	TotalProduct  float64 `json:"total_products"`
+	TotalServices float64 `json:"total_services"`
+}
+
+type TotalIndividualReceipt struct {
+	TotalProduct float64 `json:"total_products"`
+}
+
+func GetTotalBetweenDates(service reports.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body ReceiptsBetweenDates
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		receipts, error := service.ReceiptsBetweenDates(body.StartDate, body.EndDate)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		individualReceipts, error := service.IndividualReceiptsBetweenDates(body.StartDate, body.EndDate)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		receiptsResponses := receipt_presenter.ReceiptsToReceiptsResponses(*receipts)
+		var receiptsTotalProducts float64 = 0
+		var receiptsTotalService float64 = 0
+
+		for _, receiptResponse := range receiptsResponses {
+			for _, product := range receiptResponse.Products {
+				receiptsTotalProducts += float64(product.Price) * float64(product.Quantity)
+			}
+
+			receiptsTotalService += float64(receiptResponse.Service.Price)
+		}
+
+		receiptsTotalBetweenDates := TotalReceipt{
+			TotalProduct:  receiptsTotalProducts,
+			TotalServices: receiptsTotalService,
+		}
+
+		individualReceiptsResponses := receipt_presenter.IndividualReceiptsToIndividualReceiptsResponses(*individualReceipts)
+		var individualReceiptsTotalProducts float64 = 0
+
+		for _, receiptResponse := range individualReceiptsResponses {
+			for _, product := range receiptResponse.Products {
+				individualReceiptsTotalProducts += float64(product.Price) * float64(product.Quantity)
+			}
+		}
+
+		individualReceiptsTotalBetweenDates := TotalIndividualReceipt{
+			TotalProduct: individualReceiptsTotalProducts,
+		}
+
+		response := fiber.Map{
+			"receipts":           receiptsTotalBetweenDates,
+			"individualReceipts": individualReceiptsTotalBetweenDates,
+		}
+
+		return ctx.JSON(response)
+	}
+}
