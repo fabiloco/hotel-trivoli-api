@@ -17,6 +17,7 @@ type Repository interface {
 	Delete(id uint) (*entities.IndividualReceipt, error)
 	ReadById(id uint) (*entities.IndividualReceipt, error)
 
+	ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error)
 	ReadByShiftNotNull() (*[]entities.IndividualReceipt, error)
 	ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error)
 
@@ -162,6 +163,18 @@ func (r *repository) ReadByShiftNotNull() (*[]entities.IndividualReceipt, error)
 	var receipts []entities.IndividualReceipt
 
 	result := r.db.Preload("User").Preload("User.Person").Preload("Products").Preload("Shift").Where("shift_id IS NOT NULL").Find(&receipts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &receipts, nil
+}
+
+func (r *repository) ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error) {
+	var receipts []entities.IndividualReceipt
+
+	result := r.db.Preload("Products").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL and created_at BETWEEN ? AND ?", startDate, endDate).Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error

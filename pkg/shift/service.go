@@ -6,6 +6,7 @@ import (
 	individualreceipt "fabiloco/hotel-trivoli-api/pkg/individual_receipt"
 	receipt "fabiloco/hotel-trivoli-api/pkg/receipt"
 	"fmt"
+	"time"
 )
 
 // Service is an interface from which our api module can access our repository of all our models
@@ -13,6 +14,7 @@ type Service interface {
 	InsertShift(receipt *entities.CreateShift) (*entities.Shift, error)
 	FetchShiftsById(id uint) (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
 	FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
+	FetchShiftsBetweenDate(startDate string, endDate string) (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
 	UpdateShift(id uint, receipt *entities.UpdateShift) (*entities.Shift, error)
 	RemoveShift(id uint) (*entities.Shift, error)
 }
@@ -103,6 +105,32 @@ func (s *service) FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualR
 	}
 
 	individual_receipts, error := s.individualReceiptRepository.ReadByShiftNotNull()
+
+	if error != nil {
+		return nil, nil, error
+	}
+
+	return receipts, individual_receipts, nil
+}
+
+func (s *service) FetchShiftsBetweenDate(startDate string, endDate string) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
+	sd, error := time.Parse(time.RFC3339, startDate)
+	if error != nil {
+		return nil, nil, errors.New(fmt.Sprintf("error parsing Date %s", startDate))
+	}
+
+	ed, error := time.Parse(time.RFC3339, endDate)
+	if error != nil {
+		return nil, nil, errors.New(fmt.Sprintf("error parsing Date %s", endDate))
+	}
+
+	receipts, error := s.receiptRepository.ReadByShiftBetweenDatesNotNull(sd, ed)
+
+	if error != nil {
+		return nil, nil, error
+	}
+
+	individual_receipts, error := s.individualReceiptRepository.ReadByShiftBetweenDatesNotNull(sd, ed)
 
 	if error != nil {
 		return nil, nil, error

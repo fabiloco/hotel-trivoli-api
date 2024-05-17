@@ -134,6 +134,43 @@ func PostShifts(service shift.Service) fiber.Handler {
 }
 
 // ListShifts   godoc
+// @Summary       Create Shifts
+// @Description   Create new Shifts
+// @Tags          Shift
+// @Accept        json
+// @Param			    body  body  string  true  "Body of the request" SchemaExample({\n"name": "test Shift",\n"price": 2000,\n"stock": 100,\n"type": "test type"\n})
+// @Produce       json
+// @Success       200  {array}   entities.Shift
+// @Router        /api/v1/shift/between-dates [post]
+func GetShiftsBetweenDates(service shift.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body ReceiptsBetweenDates
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		receipts, individual_receipts, error := service.FetchShiftsBetweenDate(body.StartDate, body.EndDate)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
+		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
+	}
+}
+
+// ListShifts   godoc
 // @Summary       Update Shifts
 // @Description   Edit existing Shift
 // @Tags          Shift
