@@ -59,7 +59,7 @@ func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
 func (r *repository) ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error) {
 	var receipts []entities.Receipt
 
-	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL and created_at BETWEEN ? AND ?", startDate, endDate).Find(&receipts)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL and updated_at BETWEEN ? AND ?", startDate, endDate).Find(&receipts)
 
 	if result.Error != nil {
 		return nil, result.Error
