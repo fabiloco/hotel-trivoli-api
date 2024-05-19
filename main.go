@@ -114,7 +114,7 @@ func main() {
 	routes.ServiceRouter(api, serviceService)
 	routes.RoomRouter(api, roomService)
 	routes.RoomHistoryRouter(api, roomHistoryService)
-	routes.ReceiptRouter(api, receptService)
+	routes.ReceiptRouter(api, receptService, shiftService)
 
 	routes.ReportsRouter(api, reportService)
 	routes.ShiftRouter(api, shiftService)
