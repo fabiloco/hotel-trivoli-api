@@ -18,14 +18,14 @@ type IndividualReceipt struct {
 }
 
 type CreateIndividualReceipt struct {
-	TotalPrice float32 `valid:"required,numeric" json:"total_price"`
+	TotalPrice float32 `valid:"required" json:"total_price"`
 	Products   []uint  `valid:"optional" json:"products"`
 	User       uint    `valid:"required,numeric" json:"user"`
 	Shift      uint    `valid:"optional,numeric" json:"shift"`
 }
 
 type UpdateIndividualReceipt struct {
-	TotalPrice float32 `valid:"optional,numeric" json:"total_price"`
+	TotalPrice float32 `valid:"optional" json:"total_price"`
 	Products   []uint  `valid:"optional" json:"products"`
 	User       uint    `valid:"optional,numeric" json:"user"`
 	Shift      uint    `valid:"optional,numeric" json:"shift"`
