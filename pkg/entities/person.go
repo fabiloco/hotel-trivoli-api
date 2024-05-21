@@ -23,5 +23,5 @@ type UpdatePerson struct {
 	Firstname      string `valid:"optional,stringlength(3|100)" json:"firstname"`
 	Lastname       string `valid:"optional,stringlength(3|100)" json:"lastname"`
 	Identification string `valid:"optional,numeric" json:"identification"`
-	Birthday       string `gorm:"not null" json:"birthday" json:"birthday"`
+	Birthday       string `gorm:"not null" json:"birthday"`
 }
