@@ -31,7 +31,6 @@ func GetShifts(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
 		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
 	}
 }
