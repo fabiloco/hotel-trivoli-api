@@ -83,6 +83,10 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.PrintLn(receipt.Service.Name)
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln(ac.FormatMoney(receipt.Service.Price), " COP"))
+	p.printer.Align(escpos.AlignLeft)
+	p.printer.PrintLn("Servicio:")
+	p.printer.Align(escpos.AlignRight)
+	p.printer.Print(fmt.Sprintln(receipt.TotalTime))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.Size(2, 2)

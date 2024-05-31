@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fabiloco/hotel-trivoli-api/api/config"
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
-	"fmt"
-	"strconv"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -195,24 +192,26 @@ func seed(db *gorm.DB) {
 
 func main() {
 	var DB *gorm.DB
-	p := config.Config("DB_PORT")
+	// p := config.Config("DB_PORT")
 
-	port, err := strconv.ParseUint(p, 10, 32)
+	// port, err := strconv.ParseUint(p, 10, 32)
 
-	if err != nil {
-		println("Error parsing DB_PORT variable.")
-	}
+	// if err != nil {
+	// 	println("Error parsing DB_PORT variable.")
+	// }
 
-	dns := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		config.Config("DB_USER"),
-		config.Config("DB_PASSWORD"),
-		config.Config("DB_HOST"),
-		port,
-		config.Config("DB_NAME"),
-	)
+	// dns := fmt.Sprintf(
+	// 	"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	// 	config.Config("DB_USER"),
+	// 	config.Config("DB_PASSWORD"),
+	// 	config.Config("DB_HOST"),
+	// 	port,
+	// 	config.Config("DB_NAME"),
+	// )
 
-	DB, err = gorm.Open(mysql.Open(dns), &gorm.Config{})
+	dns := "root:root@tcp(localhost:3306)/hotel_trivoli?charset=utf8mb4&parseTime=True&loc=Local"
+
+	DB, err := gorm.Open(mysql.Open(dns), &gorm.Config{})
 
 	if err != nil {
 		panic("failed to connect database")

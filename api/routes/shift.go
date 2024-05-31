@@ -14,4 +14,6 @@ func ShiftRouter(app fiber.Router, service shift.Service) {
 	shiftGroup.Post("/", handlers.PostShifts(service))
 	shiftGroup.Put("/:id", handlers.PutShift(service))
 	shiftGroup.Delete("/:id", handlers.DeleteShiftById(service))
+
+	shiftGroup.Post("/between-dates", handlers.GetShiftsBetweenDates(service))
 }
