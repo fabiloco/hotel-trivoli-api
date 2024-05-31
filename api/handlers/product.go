@@ -88,24 +88,24 @@ func PostProducts(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-    if govalidator.IsNonPositive(float64(body.Price)) {
+		if govalidator.IsNonPositive(float64(body.Price)) {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(errors.New("Price can not have a negative value.")))
-    }
+		}
 
-    file, err := ctx.FormFile("img")
+		file, err := ctx.FormFile("img")
 
-    if err != nil {
+		if err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
-    }
+		}
 
-    filename, err := utils.GenerateFileName(file)
+		filename, err := utils.GenerateFileName(file)
 
-    if err != nil {
+		if err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
-    }
+		}
 
 		product, error := service.InsertProduct(&body, filename)
 
@@ -114,10 +114,10 @@ func PostProducts(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-    if err := ctx.SaveFile(file, fmt.Sprintf("./public/img/%s", filename)); err != nil {
+		if err := ctx.SaveFile(file, fmt.Sprintf("public/img/%s", filename)); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
-    }
+		}
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}
@@ -175,8 +175,9 @@ func PostRestockProducts(service product.Service) fiber.Handler {
 // @Success       200  {array}   entities.Product
 // @Router        /api/v1/product/{id} [put]
 func PutProduct(service product.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.UpdateProduct
+	return func(ctx *fiber.Ctx) error {
+		var body entities.UpdateProduct
+		fmt.Println("here")
 
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
@@ -189,10 +190,10 @@ func PutProduct(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-    if govalidator.IsNonPositive(float64(body.Price)) {
+		if govalidator.IsNonPositive(float64(body.Price)) {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(errors.New("Price can not have a negative value.")))
-    }
+		}
 
 		id, err := ctx.ParamsInt("id")
 		if err != nil {
@@ -200,19 +201,19 @@ func PutProduct(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
 		}
 
-    file, err := ctx.FormFile("img")
+		file, err := ctx.FormFile("img")
 
-    var filename = "no file"
-    if err == nil {
-      file, err := utils.GenerateFileName(file)
+		var filename = "no file"
+		if err == nil {
+			file, err := utils.GenerateFileName(file)
 
-      filename = file
+			filename = file
 
-      if err != nil {
-        ctx.Status(http.StatusBadRequest)
-        return ctx.JSON(presenter.ErrorResponse(err))
-      }
-    }
+			if err != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(err))
+			}
+		}
 
 		product, error := service.UpdateProduct(uint(id), &body, filename)
 
@@ -221,12 +222,12 @@ func PutProduct(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-    if filename != "no file" {
-      if err := ctx.SaveFile(file, fmt.Sprintf("./public/img/%s", filename)); err != nil {
-        ctx.Status(http.StatusBadRequest)
-        return ctx.JSON(presenter.ErrorResponse(err))
-      }
-    }
+		if filename != "no file" {
+			if err := ctx.SaveFile(file, fmt.Sprintf("public/img/%s", filename)); err != nil {
+				ctx.Status(http.StatusBadRequest)
+				return ctx.JSON(presenter.ErrorResponse(err))
+			}
+		}
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}
@@ -256,11 +257,11 @@ func DeleteProductById(service product.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-    err = os.Remove(fmt.Sprintf("./public/img/%s", product.Img)) 
+		err = os.Remove(fmt.Sprintf("./public/img/%s", product.Img))
 
-    if err != nil { 
-      fmt.Println(fmt.Sprint("Warning: ", err, " - File name: ", product.Img))
-    } 
+		if err != nil {
+			fmt.Println(fmt.Sprint("Warning: ", err, " - File name: ", product.Img))
+		}
 
 		return ctx.JSON(presenter.SuccessResponse(product))
 	}

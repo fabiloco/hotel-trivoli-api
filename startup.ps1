@@ -1,0 +1,1 @@
+Start-Process -FilePath "launch.bat" -NoNewWindow
