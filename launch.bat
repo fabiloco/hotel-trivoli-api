@@ -26,4 +26,4 @@ IF ERRORLEVEL 1 (
 )
 
 echo "starting client app"
-START "" "C:\Users\faals\AppData\Local\Hotel Trivoli\Hotel Trivoli.exe"
+@REM START "" "C:\Users\faals\AppData\Local\Hotel Trivoli\Hotel Trivoli.exe"

@@ -68,6 +68,10 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.Smooth(true)
 
 	p.printer.Size(1, 1)
+
+	p.printer.PrintLn("Wilson Vanegas Hernández")
+	p.printer.PrintLn("Nit: 10.777.579-3")
+	p.printer.PrintLn("Régimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", receipt.CreatedAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
@@ -86,7 +90,7 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.PrintLn("Servicio:")
 	p.printer.Align(escpos.AlignRight)
-	p.printer.Print(fmt.Sprintln(receipt.TotalTime))
+	p.printer.Print(fmt.Sprintln("Tiempo total: ", FormatDuration(receipt.TotalTime)))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.Size(2, 2)
@@ -113,6 +117,8 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.PrintLn(receipt.Service.Name)
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln(ac.FormatMoney(receipt.TotalPrice), " COP"))
+
+	fmt.Println("Total: ", receipt.TotalPrice)
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
@@ -136,6 +142,9 @@ func (p *ESCPOSPrinter) PrintIndividual(receipt *receipt_presenter.IndividualRec
 	p.printer.Smooth(true)
 
 	p.printer.Size(1, 1)
+	p.printer.PrintLn("Wilson Vanegas Hernández")
+	p.printer.PrintLn("Nit: 10.777.579-3")
+	p.printer.PrintLn("Régimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", receipt.CreatedAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
@@ -166,6 +175,8 @@ func (p *ESCPOSPrinter) PrintIndividual(receipt *receipt_presenter.IndividualRec
 	p.printer.Size(1, 1)
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln(ac.FormatMoney(receipt.TotalPrice), " COP"))
+
+	fmt.Println("Total: ", receipt.TotalPrice)
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
@@ -200,6 +211,9 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.Smooth(true)
 
 	p.printer.Size(1, 1)
+	p.printer.PrintLn("Wilson Vanegas Hernández")
+	p.printer.PrintLn("Nit: 10.777.579-3")
+	p.printer.PrintLn("Régimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", createdAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
@@ -267,4 +281,24 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.Cut()
 	p.printer.End()
 	p.printer.Close()
+}
+
+func FormatDuration(d time.Duration) string {
+	minutes := int(d.Minutes())
+
+	if minutes < 30 {
+		return "30 minutos"
+	}
+
+	if minutes <= 60 {
+		return "1 hora"
+	}
+
+	hours := minutes / 60
+	minutes = minutes % 60
+
+	if hours > 0 {
+		return fmt.Sprintf("%dh %dm", hours, minutes)
+	}
+	return fmt.Sprintf("%d hora", minutes)
 }
