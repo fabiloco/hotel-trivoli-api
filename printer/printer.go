@@ -90,7 +90,7 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.PrintLn("Servicio:")
 	p.printer.Align(escpos.AlignRight)
-	p.printer.Print(fmt.Sprintln("Tiempo total: ", FormatDuration(receipt.TotalTime)))
+	p.printer.Print(fmt.Sprintln("Tiempo total: ", FormatDuration(receipt.TotalTime*time.Second)))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.Size(2, 2)
@@ -117,8 +117,6 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.PrintLn(receipt.Service.Name)
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln(ac.FormatMoney(receipt.TotalPrice), " COP"))
-
-	fmt.Println("Total: ", receipt.TotalPrice)
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
@@ -175,8 +173,6 @@ func (p *ESCPOSPrinter) PrintIndividual(receipt *receipt_presenter.IndividualRec
 	p.printer.Size(1, 1)
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln(ac.FormatMoney(receipt.TotalPrice), " COP"))
-
-	fmt.Println("Total: ", receipt.TotalPrice)
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
@@ -282,23 +278,19 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.End()
 	p.printer.Close()
 }
-
 func FormatDuration(d time.Duration) string {
 	minutes := int(d.Minutes())
 
-	if minutes < 30 {
-		return "30 minutos"
-	}
+	// if minutes < 30 {
+	// 	return "00:30"
+	// }
 
 	if minutes <= 60 {
-		return "1 hora"
+		return "01:00"
 	}
 
 	hours := minutes / 60
 	minutes = minutes % 60
 
-	if hours > 0 {
-		return fmt.Sprintf("%dh %dm", hours, minutes)
-	}
-	return fmt.Sprintf("%d hora", minutes)
+	return fmt.Sprintf("%02d:%02d", hours, minutes)
 }
