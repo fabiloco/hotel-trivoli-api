@@ -360,7 +360,6 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			individualReceiptIds = append(individualReceiptIds, idParsed)
 		}
 
-
 		bodyParsed := entities.CreateShift{
 			Receipts:           receiptIds,
 			IndividualReceipts: individualReceiptIds,
@@ -371,7 +370,6 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
-
 
 		var user entities.User
 
@@ -413,6 +411,8 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 		var totalServices float32
 		var totalProducts float32
 
+		var totalPrice float32
+
 		for _, receipt := range receipts {
 			for _, product := range receipt.Products {
 				products = append(products, receipt_presenter.ProductResponse{
@@ -431,6 +431,7 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 
 			services = append(services, receipt.Service)
 			totalServices += receipt.Service.Price
+			totalPrice += receipt.TotalPrice
 		}
 
 		for _, individualReceipt := range individualReceipts {
@@ -448,6 +449,8 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 
 				totalProducts += product.Price * float32(product.Quantity)
 			}
+
+			totalPrice += individualReceipt.TotalPrice
 		}
 
 		productsMap := make(map[uint]*receipt_presenter.ProductResponse)
@@ -498,6 +501,7 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			totalServices,
 			user,
 			time.Now(),
+			totalPrice,
 		)
 
 		return ctx.JSON(presenter.SuccessResponse(fiber.Map{
@@ -505,6 +509,7 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			"totalProducts": totalProducts,
 			"services":      serviceResponseList,
 			"totalServices": totalServices,
+			"totalPrice":    totalPrice,
 		}))
 	}
 }

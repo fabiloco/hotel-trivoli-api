@@ -69,15 +69,20 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 
 	p.printer.Size(1, 1)
 
-	p.printer.PrintLn("Wilson Vanegas Hernández")
+	p.printer.PrintLn("Wilson Vanegas Hernandez")
 	p.printer.PrintLn("Nit: 10.777.579-3")
-	p.printer.PrintLn("Régimen simplificado")
+	p.printer.PrintLn("Regimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", receipt.CreatedAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
 	p.printer.PrintLn(fmt.Sprint("Vendedor: ", receipt.User.Person.Firstname, " ", receipt.User.Person.Lastname))
 	p.printer.PrintLn(fmt.Sprint("Habitacion: ", receipt.Room.Number))
 	p.printer.PrintLn(fmt.Sprint("Numero de recibo: ", receipt.ID))
+
+	var totalProducts = 0.0
+	for _, product := range receipt.Products {
+		totalProducts += float64(product.Price) * float64(product.Quantity)
+	}
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
@@ -91,6 +96,9 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.PrintLn("Servicio:")
 	p.printer.Align(escpos.AlignRight)
 	p.printer.Print(fmt.Sprintln("Tiempo total: ", FormatDuration(receipt.TotalTime*time.Second)))
+	p.printer.Print(fmt.Sprintln("Precio por tiempo:", ac.FormatMoney(receipt.TotalPrice-receipt.Service.Price-float32(totalProducts)), " COP"))
+
+	// fmt.Println(fmt.Sprintln("Precio por tiempo:", ac.FormatMoney(receipt.TotalPrice-(receipt.Service.Price+float32(totalProducts))), " COP"))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.Size(2, 2)
@@ -140,9 +148,9 @@ func (p *ESCPOSPrinter) PrintIndividual(receipt *receipt_presenter.IndividualRec
 	p.printer.Smooth(true)
 
 	p.printer.Size(1, 1)
-	p.printer.PrintLn("Wilson Vanegas Hernández")
+	p.printer.PrintLn("Wilson Vanegas Hernandez")
 	p.printer.PrintLn("Nit: 10.777.579-3")
-	p.printer.PrintLn("Régimen simplificado")
+	p.printer.PrintLn("Regimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", receipt.CreatedAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
@@ -194,6 +202,7 @@ func (p *ESCPOSPrinter) PrintReport(
 	totalService float32,
 	user entities.User,
 	createdAt time.Time,
+	totalPrice float32,
 ) {
 	if p.printer == nil {
 		fmt.Println("Printer not initialized.")
@@ -209,7 +218,7 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.Size(1, 1)
 	p.printer.PrintLn("Wilson Vanegas Hernández")
 	p.printer.PrintLn("Nit: 10.777.579-3")
-	p.printer.PrintLn("Régimen simplificado")
+	p.printer.PrintLn("Regimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", createdAt.Format("01/02/2006")))
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
@@ -222,11 +231,21 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.Size(1, 1)
 
 	for _, service := range services {
+		var thisTotalService = (service.Price * float32(service.Quantity))
+
 		p.printer.Align(escpos.AlignLeft)
 		p.printer.Print(fmt.Sprintln("(", service.Quantity, ")", service.Name))
 		p.printer.Align(escpos.AlignRight)
-		p.printer.Print(fmt.Sprintln(ac.FormatMoney(service.Price*float32(service.Quantity)), " COP"))
+		p.printer.Print(fmt.Sprintln(ac.FormatMoney(thisTotalService), " COP"))
+		// fmt.Println(fmt.Sprintln("service total this: ", ac.FormatMoney(thisTotalService), " COP"))
 	}
+	p.printer.Align(escpos.AlignLeft)
+	p.printer.PrintLn("Precio despues de hora:")
+	p.printer.Align(escpos.AlignRight)
+	p.printer.Print(fmt.Sprintln(ac.FormatMoney(totalPrice-totalService-totalProduct), " COP"))
+	// fmt.Println(fmt.Sprintln("total service time: ", ac.FormatMoney(totalPrice-totalService-totalProduct), " COP"))
+
+	// p.printer.Print(fmt.Sprintln("Precio por tiempo:", ac.FormatMoney(receipt.TotalPrice-receipt.Service.Price-float32(totalProducts)), " COP"))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.Size(2, 2)
@@ -261,12 +280,18 @@ func (p *ESCPOSPrinter) PrintReport(
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.PrintLn("Total de servicios:")
 	p.printer.Align(escpos.AlignRight)
-	p.printer.Print(fmt.Sprintln(ac.FormatMoney(totalService), " COP"))
+	p.printer.Print(fmt.Sprintln(ac.FormatMoney(totalPrice-totalProduct), " COP"))
 
 	p.printer.Align(escpos.AlignLeft)
 	p.printer.PrintLn("Total venta del turno:")
 	p.printer.Align(escpos.AlignRight)
-	p.printer.Print(fmt.Sprintln(ac.FormatMoney(totalProduct+totalService), " COP"))
+	p.printer.Print(fmt.Sprintln(ac.FormatMoney(totalPrice), " COP"))
+
+	// fmt.Println(fmt.Sprintln("total de servicios + el tiempo", ac.FormatMoney(totalPrice-totalProduct)))
+
+	// fmt.Println(fmt.Sprintln("total de servicios", ac.FormatMoney(totalPrice-totalProduct)))
+	// fmt.Println(fmt.Sprintln("total de productos", ac.FormatMoney(totalProduct)))
+	// fmt.Println(fmt.Sprintln("total de price", ac.FormatMoney(totalPrice)))
 
 	p.printer.Size(2, 2)
 	p.printer.PrintLn("------------------------")
