@@ -131,6 +131,7 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.Size(1, 1)
 
 	p.printer.Feed(2)
+	// p.printer.Write(fmt.Sprintf("\x1B", "\x70", "\x00"))
 	p.printer.Cut()
 	p.printer.End()
 	p.printer.Close()
@@ -187,6 +188,7 @@ func (p *ESCPOSPrinter) PrintIndividual(receipt *receipt_presenter.IndividualRec
 	p.printer.Size(1, 1)
 
 	p.printer.Feed(2)
+	// p.printer.Write(fmt.Sprintf("\x1B", "\x70", "\x00"))
 	p.printer.Cut()
 	p.printer.End()
 	p.printer.Close()

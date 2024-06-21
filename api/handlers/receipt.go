@@ -343,6 +343,7 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			if error != nil {
 				return ctx.JSON(presenter.ErrorResponse(error))
 			}
+
 			receiptIds = append(receiptIds, idParsed)
 		}
 
@@ -360,42 +361,37 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 			individualReceiptIds = append(individualReceiptIds, idParsed)
 		}
 
-		bodyParsed := entities.CreateShift{
-			Receipts:           receiptIds,
-			IndividualReceipts: individualReceiptIds,
-		}
-
-		_, error := shiftService.InsertShift(&bodyParsed)
-		if error != nil {
-			ctx.Status(http.StatusBadRequest)
-			return ctx.JSON(presenter.ErrorResponse(error))
-		}
-
 		var user entities.User
 
 		var receipts []receipt_presenter.ReceiptResponse
+		var existingReceiptIds []uint
 		for _, receiptId := range receiptIds {
 			receipt, error := service.FetchReceiptById(receiptId)
 
 			if error != nil {
 				ctx.Status(http.StatusInternalServerError)
-				return ctx.JSON(presenter.ErrorResponse(error))
-			}
+				// return ctx.JSON(presenter.ErrorResponse(error))
+			} else {
 
-			receipts = append(receipts, *receipt_presenter.ReceiptToReceiptResponse(receipt))
+				existingReceiptIds = append(existingReceiptIds, receiptId)
 
-			if user.ID == 0 {
-				user = receipt.User
+				if user.ID == 0 {
+					user = receipt.User
+				}
+				receipts = append(receipts, *receipt_presenter.ReceiptToReceiptResponse(receipt))
 			}
 		}
 
 		var individualReceipts []receipt_presenter.IndividualReceiptResponse
+		var existingIndividualReceiptIds []uint
 		for _, receiptId := range individualReceiptIds {
 			individualReceipt, error := service.FetchIndividualReceiptById(receiptId)
 
 			if error != nil {
 				ctx.Status(http.StatusInternalServerError)
-				return ctx.JSON(presenter.ErrorResponse(error))
+				// return ctx.JSON(presenter.ErrorResponse(error))
+			} else {
+				existingIndividualReceiptIds = append(existingIndividualReceiptIds, receiptId)
 			}
 
 			individualReceipts = append(individualReceipts, *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(individualReceipt))
@@ -404,6 +400,17 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 				user = individualReceipt.User
 			}
 		}
+
+		// bodyParsed := entities.CreateShift{
+		// 	Receipts:           existingReceiptIds,
+		// 	IndividualReceipts: existingIndividualReceiptIds,
+		// }
+
+		// _, error := shiftService.InsertShift(&bodyParsed)
+		// if error != nil {
+		// 	ctx.Status(http.StatusBadRequest)
+		// 	return ctx.JSON(presenter.ErrorResponse(error))
+		// }
 
 		var services []entities.Service
 		var products []receipt_presenter.ProductResponse
