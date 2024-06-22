@@ -279,109 +279,193 @@ func (s *service) FetchIndividualReceiptById(ID uint) (*entities.IndividualRecei
 	return s.individualReceiptRepository.ReadById(ID)
 }
 
+// func (s *service) productToReceiptProduct(receipt *entities.CreateReceipt) ([]entities.ReceiptProduct, error) {
+// 	var products []entities.Product
+
+// 	for i := 0; i < len(receipt.Products); i++ {
+// 		productWithId, error := s.productRepository.ReadById(receipt.Products[i])
+
+// 		if error != nil {
+// 			return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+// 		}
+
+// 		// check if the existing stock is enough to process the parchuse
+// 		for j := 0; j < len(receipt.Products); j++ {
+// 			var productIdTimes int = 0
+
+// 			for _, productId := range receipt.Products {
+// 				if productId == receipt.Products[j] {
+// 					productIdTimes += 1
+// 				}
+// 			}
+
+// 			if productWithId.Stock-productIdTimes < 0 {
+// 				return nil, errors.New(
+// 					fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.",
+// 						receipt.Products[j], productWithId.Stock, productIdTimes))
+// 			}
+// 		}
+
+// 		product := entities.Product{
+// 			Name:  productWithId.Name,
+// 			Stock: productWithId.Stock - 1,
+// 			Price: productWithId.Price,
+// 			Type:  productWithId.Type,
+// 		}
+
+// 		productRestocked, error := s.productRepository.Update(receipt.Products[i], &product)
+
+// 		if error != nil {
+// 			return nil, errors.New(fmt.Sprintf("Error restocking product with id: %d", receipt.Products[i]))
+// 		}
+
+// 		products = append(products, *productRestocked)
+// 	}
+
+// 	var receiptProducts []entities.ReceiptProduct
+// 	for _, product := range products {
+// 		receiptProduct := entities.ReceiptProduct{
+// 			ProductID: product.ID,
+// 		}
+// 		receiptProducts = append(receiptProducts, receiptProduct)
+// 	}
+
+// 	return receiptProducts, nil
+// }
+
 func (s *service) productToReceiptProduct(receipt *entities.CreateReceipt) ([]entities.ReceiptProduct, error) {
+	productCounts := make(map[uint]int)
 	var products []entities.Product
 
-	for i := 0; i < len(receipt.Products); i++ {
-		productWithId, error := s.productRepository.ReadById(receipt.Products[i])
+	for _, productId := range receipt.Products {
+		productCounts[productId]++
+	}
 
-		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+	for productId, count := range productCounts {
+		productWithId, err := s.productRepository.ReadById(productId)
+		if err != nil {
+			return nil, fmt.Errorf("no product with id %d", productId)
 		}
 
-		// check if the existing stock is enough to process the parchuse
-		for j := 0; j < len(receipt.Products); j++ {
-			var productIdTimes int = 0
-
-			for _, productId := range receipt.Products {
-				if productId == receipt.Products[j] {
-					productIdTimes += 1
-				}
-			}
-
-			if productWithId.Stock-productIdTimes < 0 {
-				return nil, errors.New(
-					fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.",
-						receipt.Products[j], productWithId.Stock, productIdTimes))
-			}
+		if productWithId.Stock < count {
+			return nil, fmt.Errorf("not enough stock for product with id %d. Available: %d, required: %d",
+				productId, productWithId.Stock, count)
 		}
 
-		product := entities.Product{
-			Name:  productWithId.Name,
-			Stock: productWithId.Stock - 1,
-			Price: productWithId.Price,
-			Type:  productWithId.Type,
-		}
+		productWithId.Stock -= count
 
-		productRestocked, error := s.productRepository.Update(receipt.Products[i], &product)
-
-		if error != nil {
-			return nil, errors.New(fmt.Sprintf("Error restocking product with id: %d", receipt.Products[i]))
+		productRestocked, err := s.productRepository.Update(productId, productWithId)
+		if err != nil {
+			return nil, fmt.Errorf("error updating product with id %d", productId)
 		}
 
 		products = append(products, *productRestocked)
 	}
 
 	var receiptProducts []entities.ReceiptProduct
-	for _, product := range products {
-		receiptProduct := entities.ReceiptProduct{
-			ProductID: product.ID,
+	for productId, count := range productCounts {
+		for i := 0; i < count; i++ {
+			receiptProduct := entities.ReceiptProduct{
+				ProductID: productId,
+			}
+			receiptProducts = append(receiptProducts, receiptProduct)
 		}
-		receiptProducts = append(receiptProducts, receiptProduct)
 	}
 
 	return receiptProducts, nil
 }
 
+// func (s *service) productToIndividualReceiptProduct(receipt *entities.CreateIndividualReceipt) ([]entities.IndividualReceiptProduct, error) {
+// 	var products []entities.Product
+
+// 	for i := 0; i < len(receipt.Products); i++ {
+// 		productWithId, error := s.productRepository.ReadById(receipt.Products[i])
+
+// 		if error != nil {
+// 			return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+// 		}
+
+// 		// check if the existing stock is enough to process the parchuse
+// 		for j := 0; j < len(receipt.Products); j++ {
+// 			var productIdTimes int = 0
+
+// 			for _, productId := range receipt.Products {
+// 				if productId == receipt.Products[j] {
+// 					productIdTimes += 1
+// 				}
+// 			}
+
+// 			if productWithId.Stock-productIdTimes < 0 {
+// 				return nil, errors.New(
+// 					fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.",
+// 						receipt.Products[j], productWithId.Stock, productIdTimes))
+// 			}
+// 		}
+
+// 		product := entities.Product{
+// 			Name:  productWithId.Name,
+// 			Stock: productWithId.Stock - 1,
+// 			Price: productWithId.Price,
+// 			Type:  productWithId.Type,
+// 		}
+
+// 		productRestocked, error := s.productRepository.Update(receipt.Products[i], &product)
+
+// 		if error != nil {
+// 			return nil, errors.New(fmt.Sprintf("Error restocking product with id: %d", receipt.Products[i]))
+// 		}
+
+// 		products = append(products, *productRestocked)
+// 	}
+
+// 	var receiptProducts []entities.IndividualReceiptProduct
+// 	for _, product := range products {
+// 		receiptProduct := entities.IndividualReceiptProduct{
+// 			ProductID: product.ID,
+// 		}
+// 		receiptProducts = append(receiptProducts, receiptProduct)
+// 	}
+
+// 	return receiptProducts, nil
+// }
+
 func (s *service) productToIndividualReceiptProduct(receipt *entities.CreateIndividualReceipt) ([]entities.IndividualReceiptProduct, error) {
+	productCounts := make(map[uint]int)
 	var products []entities.Product
 
-	for i := 0; i < len(receipt.Products); i++ {
-		productWithId, error := s.productRepository.ReadById(receipt.Products[i])
+	for _, productId := range receipt.Products {
+		productCounts[productId]++
+	}
 
-		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no product with id %d", receipt.Products[i]))
+	for productId, count := range productCounts {
+		productWithId, err := s.productRepository.ReadById(productId)
+		if err != nil {
+			return nil, fmt.Errorf("no product with id %d", productId)
 		}
 
-		// check if the existing stock is enough to process the parchuse
-		for j := 0; j < len(receipt.Products); j++ {
-			var productIdTimes int = 0
-
-			for _, productId := range receipt.Products {
-				if productId == receipt.Products[j] {
-					productIdTimes += 1
-				}
-			}
-
-			if productWithId.Stock-productIdTimes < 0 {
-				return nil, errors.New(
-					fmt.Sprintf("not enough stock in the product with id %d to process the receipt. product stock: %d. product times in body: %d.",
-						receipt.Products[j], productWithId.Stock, productIdTimes))
-			}
+		if productWithId.Stock < count {
+			return nil, fmt.Errorf("not enough stock for product with id %d. Available: %d, required: %d",
+				productId, productWithId.Stock, count)
 		}
 
-		product := entities.Product{
-			Name:  productWithId.Name,
-			Stock: productWithId.Stock - 1,
-			Price: productWithId.Price,
-			Type:  productWithId.Type,
-		}
+		productWithId.Stock -= count
 
-		productRestocked, error := s.productRepository.Update(receipt.Products[i], &product)
-
-		if error != nil {
-			return nil, errors.New(fmt.Sprintf("Error restocking product with id: %d", receipt.Products[i]))
+		productRestocked, err := s.productRepository.Update(productId, productWithId)
+		if err != nil {
+			return nil, fmt.Errorf("error updating product with id %d", productId)
 		}
 
 		products = append(products, *productRestocked)
 	}
 
 	var receiptProducts []entities.IndividualReceiptProduct
-	for _, product := range products {
-		receiptProduct := entities.IndividualReceiptProduct{
-			ProductID: product.ID,
+	for productId, count := range productCounts {
+		for i := 0; i < count; i++ {
+			receiptProduct := entities.IndividualReceiptProduct{
+				ProductID: productId,
+			}
+			receiptProducts = append(receiptProducts, receiptProduct)
 		}
-		receiptProducts = append(receiptProducts, receiptProduct)
 	}
 
 	return receiptProducts, nil
