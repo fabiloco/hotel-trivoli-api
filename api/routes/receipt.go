@@ -20,4 +20,7 @@ func ReceiptRouter(app fiber.Router, service receipt.Service, shiftService shift
 	receiptGroup.Post("/generate-individual", handlers.GenerateIndividualReceipts(service))
 
 	receiptGroup.Post("/print-receipts", handlers.PrintReceipts(service, shiftService))
+
+	receiptGroup.Post("/print-shift/:id", handlers.PrintShift(service, shiftService))
+	// receiptGroup.Post("/print-receipt/:id", handlers.PrintReceipt(service, shiftService))
 }

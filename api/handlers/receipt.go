@@ -518,3 +518,148 @@ func PrintReceipts(service receipt.Service, shiftService shift.Service) fiber.Ha
 		}))
 	}
 }
+
+func PrintShift(service receipt.Service, shiftService shift.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
+
+		receipts_from_shifts, individual_receipts_from_shifts, error := shiftService.FetchShiftsById(uint(id))
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		var user entities.User
+
+		var receipts []receipt_presenter.ReceiptResponse
+		for _, receipt := range *receipts_from_shifts {
+			receipts = append(receipts, *receipt_presenter.ReceiptToReceiptResponse(&receipt))
+			if user.ID == 0 {
+				user = receipt.User
+			}
+		}
+
+		var individualReceipts []receipt_presenter.IndividualReceiptResponse
+		for _, receipt_individual := range *individual_receipts_from_shifts {
+			individualReceipts = append(individualReceipts, *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(&receipt_individual))
+			if user.ID == 0 {
+				user = receipt_individual.User
+			}
+		}
+
+		var services []entities.Service
+		var products []receipt_presenter.ProductResponse
+
+		var totalServices float32
+		var totalProducts float32
+
+		var totalPrice float32
+
+		for _, receipt := range receipts {
+			for _, product := range receipt.Products {
+				products = append(products, receipt_presenter.ProductResponse{
+					ID:        product.ID,
+					CreatedAt: product.CreatedAt,
+					UpdatedAt: product.UpdatedAt,
+					Name:      product.Name,
+					Quantity:  product.Quantity,
+					Type:      product.Type,
+					Price:     product.Price,
+					Img:       product.Img,
+				})
+
+				totalProducts += product.Price * float32(product.Quantity)
+			}
+
+			services = append(services, receipt.Service)
+			totalServices += receipt.Service.Price
+			totalPrice += receipt.TotalPrice
+		}
+
+		for _, individualReceipt := range individualReceipts {
+			for _, product := range individualReceipt.Products {
+				products = append(products, receipt_presenter.ProductResponse{
+					ID:        product.ID,
+					CreatedAt: product.CreatedAt,
+					UpdatedAt: product.UpdatedAt,
+					Name:      product.Name,
+					Quantity:  product.Quantity,
+					Type:      product.Type,
+					Price:     product.Price,
+					Img:       product.Img,
+				})
+
+				totalProducts += product.Price * float32(product.Quantity)
+			}
+
+			totalPrice += individualReceipt.TotalPrice
+		}
+
+		productsMap := make(map[uint]*receipt_presenter.ProductResponse)
+
+		for _, product := range products {
+			if existingProduct, ok := productsMap[product.ID]; ok {
+				existingProduct.Quantity += product.Quantity
+			} else {
+				productsMap[product.ID] = &receipt_presenter.ProductResponse{
+					ID:       product.ID,
+					Name:     product.Name,
+					Type:     product.Type,
+					Price:    product.Price,
+					Img:      product.Img,
+					Quantity: product.Quantity,
+				}
+			}
+		}
+
+		var productsResponseList []receipt_presenter.ProductResponse
+		for _, product := range productsMap {
+			productsResponseList = append(productsResponseList, *product)
+		}
+
+		servicesMap := make(map[uint]*receipt_presenter.ServiceResponse)
+
+		for _, service := range services {
+			if existingService, ok := servicesMap[service.ID]; ok {
+				existingService.Quantity += 1
+			} else {
+				servicesMap[service.ID] = &receipt_presenter.ServiceResponse{
+					Name:     service.Name,
+					Price:    service.Price,
+					Quantity: 1,
+				}
+			}
+		}
+
+		var serviceResponseList []receipt_presenter.ServiceResponse
+		for _, service := range servicesMap {
+			serviceResponseList = append(serviceResponseList, *service)
+		}
+
+		// return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
+
+		printer.GetESCPOSPrinter().PrintReport(
+			productsResponseList,
+			totalProducts,
+			serviceResponseList,
+			totalServices,
+			user,
+			time.Now(),
+			totalPrice,
+		)
+
+		return ctx.JSON(presenter.SuccessResponse(fiber.Map{
+			"products":      productsResponseList,
+			"totalProducts": totalProducts,
+			"services":      serviceResponseList,
+			"totalServices": totalServices,
+			"totalPrice":    totalPrice,
+		}))
+	}
+}

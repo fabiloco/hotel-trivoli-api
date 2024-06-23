@@ -7,7 +7,6 @@ import (
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/shift"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -53,7 +52,6 @@ func GetShiftById(service shift.Service) fiber.Handler {
 		}
 
 		receipts, individual_receipts, error := service.FetchShiftsById(uint(id))
-		fmt.Println(individual_receipts)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
