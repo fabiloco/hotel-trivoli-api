@@ -305,7 +305,7 @@ func DeleteReceiptById(service receipt.Service) fiber.Handler {
 	}
 }
 
-type PrintReceipt struct {
+type PrintReceiptType struct {
 	Receipts           []uint `valid:"optional" json:"receipts"`
 	IndividualReceipts []uint `valid:"optional" json:"individual_receipts"`
 }
@@ -661,5 +661,53 @@ func PrintShift(service receipt.Service, shiftService shift.Service) fiber.Handl
 			"totalServices": totalServices,
 			"totalPrice":    totalPrice,
 		}))
+	}
+}
+
+// endpoint to just print an existing receipt, without creating a new one
+func PrintReceipt(service receipt.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		idStr := ctx.Params("id")
+		if !utils.ReceiptIdPatternMatch(idStr) {
+			return ctx.JSON(presenter.ErrorResponse(errors.New("An id does not match with the pattern")))
+		}
+
+		idParsed, error := utils.ConvertReceiptsId(idStr)
+		if error != nil {
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		receipt, error := service.FetchReceiptById(idParsed)
+		if error != nil {
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		printer.GetESCPOSPrinter().Print(receipt_presenter.ReceiptToReceiptResponse(receipt))
+
+		return ctx.JSON(receipt_presenter.SuccessReceiptResponse(receipt))
+	}
+}
+
+// endpoint to just print an existing individual receipt, without creating a new one
+func PrintIndividualReceipt(service receipt.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		idStr := ctx.Params("id")
+		if !utils.IndividualReceiptIdPatternMatch(idStr) {
+			return ctx.JSON(presenter.ErrorResponse(errors.New("An id does not match with the pattern")))
+		}
+
+		idParsed, error := utils.ConvertReceiptsId(idStr)
+		if error != nil {
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		receipt, error := service.FetchIndividualReceiptById(idParsed)
+		if error != nil {
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		printer.GetESCPOSPrinter().PrintIndividual(receipt_presenter.IndividualReceiptToIndividualReceiptResponse(receipt))
+
+		return ctx.JSON(receipt_presenter.SuccessIndividualReceiptResponse(receipt))
 	}
 }
