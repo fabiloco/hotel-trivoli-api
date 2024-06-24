@@ -2,6 +2,7 @@ package receipt
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -83,7 +84,7 @@ func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
 func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
 	var receipt []entities.Receipt
 
-	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
+	result := r.db.Preload("Products").Preload(clause.Associations).Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id = ?", id).Find(&receipt)
 
 	if result.Error != nil {
 		empty := []entities.Receipt{}
@@ -187,6 +188,8 @@ func (r *repository) UpdateShift(id uint, data *entities.Receipt) (*entities.Rec
 	receipt.Shift = data.Shift
 
 	r.db.Save(receipt)
+
+	fmt.Println(receipt)
 
 	return receipt, nil
 }

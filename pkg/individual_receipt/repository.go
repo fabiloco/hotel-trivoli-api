@@ -186,7 +186,7 @@ func (r *repository) ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate
 func (r *repository) ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error) {
 	var receipt []entities.IndividualReceipt
 
-	result := r.db.Preload("User").Preload("User.Person").Preload("Products").Preload("Shift").Where("shift_id = ?", id).First(&receipt)
+	result := r.db.Preload("User").Preload("User.Person").Preload("Products").Preload("Shift").Where("shift_id = ?", id).Find(&receipt)
 
 	if result.Error != nil {
 		empty := []entities.IndividualReceipt{}
