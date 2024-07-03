@@ -107,6 +107,7 @@ func (r *repository) Delete(id uint) (*entities.User, error) {
 	}
 
 	result := r.db.Delete(&user, id)
+	r.db.Unscoped().Delete(&user, id)
 
 	if result.Error != nil {
 		return nil, result.Error
