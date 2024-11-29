@@ -73,14 +73,22 @@ func (p *ESCPOSPrinter) Print(receipt *receipt_presenter.ReceiptResponse) {
 	p.printer.PrintLn("Nit: 10.777.579-3")
 	p.printer.PrintLn("Regimen simplificado")
 	p.printer.PrintLn(fmt.Sprint("Fecha: ", receipt.CreatedAt.Format("01/02/2006")))
+
+	horaEntrada := receipt.CreatedAt.Add(-time.Duration(receipt.TotalTime) * time.Second)
+	horaSalida := receipt.CreatedAt
+
+	p.printer.PrintLn(fmt.Sprint("Hora de entrada: ", horaEntrada.Format("15:04")))
+	p.printer.PrintLn(fmt.Sprint("Hora de salida: ", horaSalida.Format("15:04")))
+
 	p.printer.PrintLn("Direccion: Monteria, Cordoba")
 	p.printer.PrintLn("NIT/CC: 22222222 2")
 	p.printer.PrintLn(fmt.Sprint("Vendedor: ", receipt.User.Person.Firstname, " ", receipt.User.Person.Lastname))
 	p.printer.PrintLn("Habitacion:")
 
 	p.printer.Size(2, 2)
-	p.printer.PrintLn(fmt.Sprint(receipt.Room.Number))
 	p.printer.Align(escpos.AlignRight)
+	p.printer.PrintLn(fmt.Sprint(receipt.Room.Number))
+	p.printer.Align(escpos.AlignLeft)
 
 	p.printer.Size(1, 1)
 	p.printer.PrintLn(fmt.Sprint("Numero de recibo: ", receipt.ID))
