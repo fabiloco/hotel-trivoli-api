@@ -36,6 +36,36 @@ func GetProducts(service product.Service) fiber.Handler {
 	}
 }
 
+// ListProductsPaginated   godoc
+// @Summary       List products paginated
+// @Description   list avaliable products in the database with pagination
+// @Tags          product
+// @Accept        json
+// @Produce       json
+// @Param         page      query  int  false  "Page number (default: 1)"
+// @Param         pageSize  query  int  false  "Page size (default: 10, max: 100)"
+// @Success       200  {object}   entities.PaginatedResponse
+// @Router        /api/v1/product/paginated [get]
+func GetProductsPaginated(service product.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var params entities.PaginationParams
+
+		if err := ctx.QueryParser(&params); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+
+		paginatedProducts, error := service.FetchProductsPaginated(&params)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(paginatedProducts))
+	}
+}
+
 // ListProducts   godoc
 // @Summary       Get a product
 // @Description   Get a single product by its id

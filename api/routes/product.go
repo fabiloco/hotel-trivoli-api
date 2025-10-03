@@ -9,12 +9,12 @@ import (
 )
 
 func ProductRouter(app fiber.Router, service product.Service) {
-  productGroup := app.Group("/product")
-	// productGroup.Get("/", middleware.JWTMiddleware(), handlers.GetProducts(service))
+	productGroup := app.Group("/product")
+	productGroup.Get("/paginated", handlers.GetProductsPaginated(service))
 	productGroup.Get("/", handlers.GetProducts(service))
-  productGroup.Get("/:id", handlers.GetProductById(service))
+	productGroup.Get("/:id", handlers.GetProductById(service))
 	productGroup.Post("/", handlers.PostProducts(service))
-  productGroup.Post("/stock/:id", handlers.PostRestockProducts(service))
-  productGroup.Put("/:id", handlers.PutProduct(service))
-  productGroup.Delete("/:id", handlers.DeleteProductById(service))
+	productGroup.Post("/stock/:id", handlers.PostRestockProducts(service))
+	productGroup.Put("/:id", handlers.PutProduct(service))
+	productGroup.Delete("/:id", handlers.DeleteProductById(service))
 }

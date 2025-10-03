@@ -4,11 +4,12 @@ import "fabiloco/hotel-trivoli-api/pkg/entities"
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	InsertProductType (productType *entities.CreateProductType) (*entities.ProductType, error)
-	FetchProductTypes () (*[]entities.ProductType, error)
-  FetchProductTypeById (id uint) (*entities.ProductType, error)
-	UpdateProductType (id uint, productType *entities.UpdateProductType) (*entities.ProductType, error)
-	RemoveProductType (id uint) (*entities.ProductType, error)
+	InsertProductType(productType *entities.CreateProductType) (*entities.ProductType, error)
+	FetchProductTypes() (*[]entities.ProductType, error)
+	FetchProductTypesPaginated(params *entities.PaginationParams) (*entities.PaginatedResponse, error)
+	FetchProductTypeById(id uint) (*entities.ProductType, error)
+	UpdateProductType(id uint, productType *entities.UpdateProductType) (*entities.ProductType, error)
+	RemoveProductType(id uint) (*entities.ProductType, error)
 }
 
 type service struct {
@@ -22,9 +23,9 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) InsertProductType(productType *entities.CreateProductType) (*entities.ProductType, error) {
-  newProductType := entities.ProductType {
-    Name: productType.Name,
-  }
+	newProductType := entities.ProductType{
+		Name: productType.Name,
+	}
 
 	return s.repository.Create(&newProductType)
 }
@@ -33,10 +34,19 @@ func (s *service) FetchProductTypes() (*[]entities.ProductType, error) {
 	return s.repository.Read()
 }
 
+func (s *service) FetchProductTypesPaginated(params *entities.PaginationParams) (*entities.PaginatedResponse, error) {
+	productTypes, total, err := s.repository.ReadPaginated(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return entities.NewPaginatedResponse(productTypes, total, params.Page, params.PageSize), nil
+}
+
 func (s *service) UpdateProductType(id uint, productType *entities.UpdateProductType) (*entities.ProductType, error) {
-  newProductType := entities.ProductType {
-    Name: productType.Name,
-  }
+	newProductType := entities.ProductType{
+		Name: productType.Name,
+	}
 
 	return s.repository.Update(id, &newProductType)
 }
