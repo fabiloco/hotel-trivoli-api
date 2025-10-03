@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"fabiloco/hotel-trivoli-api/api/presenter"
+	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/user"
 	"net/http"
 
@@ -18,16 +19,16 @@ import (
 // @Success       200  {array}   entities.User
 // @Router        /api/v1/user [get]
 func GetUsers(service user.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    users, error := service.FetchUsers()
+	return func(ctx *fiber.Ctx) error {
+		users, error := service.FetchUsers()
 
-    if error != nil {
-      ctx.Status(http.StatusInternalServerError)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(presenter.SuccessResponse(users))
-  }
+		return ctx.JSON(presenter.SuccessResponse(users))
+	}
 }
 
 // GetUserById   godoc
@@ -35,27 +36,27 @@ func GetUsers(service user.Service) fiber.Handler {
 // @Description   Get a single user by its id
 // @Tags          user
 // @Accept        json
-// @Param			    id  path  number  true  "id of the user to retrieve" 
+// @Param			    id  path  number  true  "id of the user to retrieve"
 // @Produce       json
 // @Success       200  {array}   entities.User
 // @Router        /api/v1/user/{id} [get]
 func GetUserById(service user.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    id, err := ctx.ParamsInt("id")
-    if err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-    }
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
 
-    user, error := service.FetchUserById(uint(id))
+		user, error := service.FetchUserById(uint(id))
 
-    if error != nil {
-      ctx.Status(http.StatusInternalServerError)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
 
-    return ctx.JSON(presenter.SuccessResponse(user))
-  }
+		return ctx.JSON(presenter.SuccessResponse(user))
+	}
 }
 
 // DeleteUserById   godoc
@@ -63,26 +64,58 @@ func GetUserById(service user.Service) fiber.Handler {
 // @Description   Delete existing user
 // @Tags          user
 // @Accept        json
-// @Param			    id  path  number  true  "id of the user to delete" 
+// @Param			    id  path  number  true  "id of the user to delete"
 // @Produce       json
 // @Success       200  {array}   entities.User
 // @Router        /api/v1/user/{id} [delete]
 func DeleteUserById(service user.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    id, err := ctx.ParamsInt("id")
-    if err != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
-    }
-    
-    user, error := service.RemoveUser(uint(id))
+	return func(ctx *fiber.Ctx) error {
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
 
-    if error != nil {
-      ctx.Status(http.StatusBadRequest)
-      return ctx.JSON(presenter.ErrorResponse(error))
-    }
+		user, error := service.RemoveUser(uint(id))
 
-    return ctx.JSON(presenter.SuccessResponse(user))
-  }
+		if error != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(user))
+	}
 }
 
+func UpdateUserById(service user.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+
+		id, err := ctx.ParamsInt("id")
+		if err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New("param id not valid")))
+		}
+
+		var patchData entities.UserPatch
+		if err := ctx.BodyParser(&patchData); err != nil {
+			// Si el cuerpo de la solicitud JSON es incorrecto
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Estructura de datos de actualización inválida.",
+			})
+		}
+
+		updatedUser, serviceErr := service.UpdateUserById(uint(id), &patchData)
+
+		if serviceErr != nil {
+			// Manejo de errores específicos del servicio (ej. no encontrado, conflicto, etc.)
+			// Es ideal mapear los errores para retornar el status HTTP correcto
+			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": serviceErr.Error(),
+			})
+		}
+
+		// 4. RETORNAR LA RESPUESTA EXITOSA (HTTP 200 OK)
+		return ctx.Status(fiber.StatusOK).JSON(updatedUser)
+
+	}
+}
