@@ -33,6 +33,26 @@ func GetServices(service service.Service) fiber.Handler {
 	}
 }
 
+func GetServicesPaginated(service service.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var params entities.PaginationParams
+
+		if err := ctx.QueryParser(&params); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+
+		paginatedServices, error := service.FetchServicesPaginated(&params)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(paginatedServices))
+	}
+}
+
 // GetServiceById   godoc
 // @Summary       Get a service
 // @Description   Get a single service by its id
@@ -107,8 +127,8 @@ func PostServices(service service.Service) fiber.Handler {
 // @Success       200  {array}   entities.Service
 // @Router        /api/v1/service/{id} [put]
 func PutService(service service.Service) fiber.Handler {
-  return func(ctx *fiber.Ctx) error {
-    var body entities.UpdateService
+	return func(ctx *fiber.Ctx) error {
+		var body entities.UpdateService
 
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
