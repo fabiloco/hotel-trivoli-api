@@ -22,8 +22,10 @@ type Service interface {
 	GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Receipt, error)
 	GenerateIndividualReceipt(receipt *entities.CreateIndividualReceipt) (*entities.IndividualReceipt, error)
 
-	FetchReceipts() (*[]entities.Receipt, error)
-	FetchIndividualReceipts() (*[]entities.IndividualReceipt, error)
+	//FetchReceipts() (*[]entities.Receipt, error)
+	FetchReceipts(limit, offset int) (*[]entities.Receipt, int64, error)
+	//FetchIndividualReceipts() (*[]entities.IndividualReceipt, error)
+	FetchIndividualReceipts(limit, offset int) (*[]entities.IndividualReceipt, int64, error)
 
 	FetchReceiptById(id uint) (*entities.Receipt, error)
 	FetchIndividualReceiptById(id uint) (*entities.IndividualReceipt, error)
@@ -158,12 +160,13 @@ func (s *service) InsertReceipt(receipt *entities.CreateReceipt) (*entities.Rece
 	return s.repository.Create(&newReceipt)
 }
 
-func (s *service) FetchReceipts() (*[]entities.Receipt, error) {
-	return s.repository.Read()
+// func (s *service) FetchReceipts() (*[]entities.Receipt, error) {
+func (s *service) FetchReceipts(limit, offset int) (*[]entities.Receipt, int64, error) {
+	return s.repository.Read(limit, offset)
 }
 
-func (s *service) FetchIndividualReceipts() (*[]entities.IndividualReceipt, error) {
-	return s.individualReceiptRepository.Read()
+func (s *service) FetchIndividualReceipts(limit, offset int) (*[]entities.IndividualReceipt, int64, error) {
+	return s.individualReceiptRepository.Read(limit, offset)
 }
 
 func (s *service) UpdateReceipt(id uint, receipt *entities.UpdateReceipt) (*entities.Receipt, error) {

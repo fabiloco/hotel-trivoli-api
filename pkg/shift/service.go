@@ -13,7 +13,8 @@ import (
 type Service interface {
 	InsertShift(receipt *entities.CreateShift) (*entities.Shift, error)
 	FetchShiftsById(id uint) (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
-	FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
+	//FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
+	FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]entities.IndividualReceipt, int64, error)
 	FetchShiftsBetweenDate(startDate string, endDate string) (*[]entities.Receipt, *[]entities.IndividualReceipt, error)
 	UpdateShift(id uint, receipt *entities.UpdateShift) (*entities.Shift, error)
 	RemoveShift(id uint) (*entities.Shift, error)
@@ -97,8 +98,25 @@ func (s *service) FetchShiftsById(id uint) (*[]entities.Receipt, *[]entities.Ind
 	return receipts, individual_receipts, nil
 }
 
-func (s *service) FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
-	receipts, error := s.receiptRepository.ReadByShiftNotNull()
+// func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
+func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]entities.IndividualReceipt, int64, error) {
+
+	receipts, totalReceipts, err := s.receiptRepository.ReadByShiftNotNull(limit, offset)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	individualReceipts, totalIndividuals, err := s.individualReceiptRepository.ReadByShiftNotNull(limit, offset)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	// si quieres paginar sobre los dos juntos, definamos qué total devolver
+	total := totalReceipts + totalIndividuals
+
+	return receipts, individualReceipts, total, nil
+
+	/* receipts, error := s.receiptRepository.ReadByShiftNotNull()
 
 	if error != nil {
 		return nil, nil, error
@@ -110,7 +128,7 @@ func (s *service) FetchAllShifts() (*[]entities.Receipt, *[]entities.IndividualR
 		return nil, nil, error
 	}
 
-	return receipts, individual_receipts, nil
+	return receipts, individual_receipts, nil */
 }
 
 func (s *service) FetchShiftsBetweenDate(startDate string, endDate string) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {

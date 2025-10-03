@@ -64,7 +64,7 @@ func (s *service) ReceiptByUser(userId uint) (*[]entities.Receipt, error) {
 	//   return nil, errors.New(fmt.Sprintf("error parsing Date %s", targetDate))
 	// }
 
-	receipts, error := s.receiptRepository.Read()
+	receipts, _, error := s.receiptRepository.Read(0, 0)
 
 	if error != nil {
 		return nil, error
@@ -131,7 +131,7 @@ func (s *service) IndividualReceiptByUser(userId uint) (*[]entities.IndividualRe
 	//   return nil, errors.New(fmt.Sprintf("error parsing Date %s", targetDate))
 	// }
 
-	receipts, error := s.individualReceiptRepository.Read()
+	receipts, _, error := s.individualReceiptRepository.Read(0, 0)
 
 	if error != nil {
 		return nil, error

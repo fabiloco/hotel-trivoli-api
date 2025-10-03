@@ -102,21 +102,27 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
 // @Router        /api/v1/receipt [get]
 func GetReceipts(service receipt.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		receipts, error := service.FetchReceipts()
-		individualReceipts, error := service.FetchIndividualReceipts()
+
+		_, limit, offset := utils.GetPaginationParams(ctx)
+
+		receipts, _, error := service.FetchReceipts(limit, offset)
+		//individualReceipts, _, error := service.FetchIndividualReceipts(limit, offset)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
+		//totalTotal := total //+ total2
+
 		response := fiber.Map{
-			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
-			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+			"receipts": receipt_presenter.SuccessReceiptsResponse(receipts),
+			//	"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 
 		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
 		return ctx.JSON(response)
+		//return ctx.JSON(utils.Paginate(ctx, totalTotal, receipts))
 	}
 }
 

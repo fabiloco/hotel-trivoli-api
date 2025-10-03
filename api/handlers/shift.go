@@ -23,7 +23,20 @@ import (
 // @Router        /api/v1/shift [get]
 func GetShifts(service shift.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		receipts, individual_receipts, error := service.FetchAllShifts()
+
+		_, limit, offset := utils.GetPaginationParams(ctx)
+
+		receipts, individualReceipts, total, err := service.FetchAllShifts(limit, offset)
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+
+		data := shift_presenter.ReceiptsToShiftsResponse(receipts, individualReceipts)
+
+		return ctx.JSON(utils.Paginate(ctx, total, data))
+
+		/* receipts, individual_receipts, error := service.FetchAllShifts()
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
@@ -31,6 +44,7 @@ func GetShifts(service shift.Service) fiber.Handler {
 		}
 
 		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
+		*/
 	}
 }
 

@@ -11,7 +11,7 @@ import (
 
 type Repository interface {
 	Create(data *entities.Receipt) (*entities.Receipt, error)
-	Read() (*[]entities.Receipt, error)
+	Read(limit, offset int) (*[]entities.Receipt, int64, error)
 
 	Update(id uint, data *entities.Receipt) (*entities.Receipt, error)
 	UpdateShift(id uint, data *entities.Receipt) (*entities.Receipt, error)
@@ -20,7 +20,8 @@ type Repository interface {
 	ReadById(id uint) (*entities.Receipt, error)
 
 	ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error)
-	ReadByShiftNotNull() (*[]entities.Receipt, error)
+	//ReadByShiftNotNull() (*[]entities.Receipt, error)
+	ReadByShiftNotNull(limit, offset int) (*[]entities.Receipt, int64, error)
 	ReadAllByShiftId(id uint) (*[]entities.Receipt, error)
 
 	ReadByDate(targetDate time.Time) (*[]entities.Receipt, error)
@@ -37,12 +38,21 @@ func NewRepository(db *gorm.DB) *repository {
 	}
 }
 
-func (r *repository) Read() (*[]entities.Receipt, error) {
+func (r *repository) Read(limit, offset int) (*[]entities.Receipt, int64, error) {
 	var receipts []entities.Receipt
 
-	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
+	var total int64
 
-	return &receipts, nil
+	if err := r.db.Model(&entities.Receipt{}).
+		Where("shift_id IS NOT NULL").
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Limit(limit).
+		Offset(offset).Find(&receipts)
+
+	return &receipts, total, nil
 }
 
 func (r *repository) ReadById(id uint) (*entities.Receipt, error) {
@@ -69,8 +79,36 @@ func (r *repository) ReadByShiftBetweenDatesNotNull(startDate time.Time, endDate
 	return &receipts, nil
 }
 
-func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
+// func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
+func (r *repository) ReadByShiftNotNull(limit, offset int) (*[]entities.Receipt, int64, error) {
+
 	var receipts []entities.Receipt
+	var total int64
+
+	if err := r.db.Model(&entities.Receipt{}).
+		Where("shift_id IS NOT NULL").
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	result := r.db.Preload("Products").
+		Preload("Service").
+		Preload("Room").
+		Preload("User").
+		Preload("User.Person").
+		Preload("Shift").
+		Where("shift_id IS NOT NULL").
+		Limit(limit).
+		Offset(offset).
+		Find(&receipts)
+
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	return &receipts, total, nil
+
+	/* var receipts []entities.Receipt
 
 	result := r.db.Preload("Products").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Where("shift_id IS NOT NULL").Find(&receipts)
 
@@ -78,7 +116,7 @@ func (r *repository) ReadByShiftNotNull() (*[]entities.Receipt, error) {
 		return nil, result.Error
 	}
 
-	return &receipts, nil
+	return &receipts, nil */
 }
 
 func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
