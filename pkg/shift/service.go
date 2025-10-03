@@ -112,7 +112,10 @@ func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]ent
 	}
 
 	// si quieres paginar sobre los dos juntos, definamos qué total devolver
-	total := totalReceipts + totalIndividuals
+	total := totalReceipts
+	if totalReceipts < totalIndividuals {
+		total = totalIndividuals
+	}
 
 	return receipts, individualReceipts, total, nil
 

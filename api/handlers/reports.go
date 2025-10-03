@@ -37,6 +37,8 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var body ReceiptsByDate
 
+		_, limit, offset := utils.GetPaginationParams(ctx)
+
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
@@ -48,18 +50,22 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-		receipts, error := service.ReceiptByTargetDate(body.Date)
+		receipts, total, error := service.ReceiptByTargetDate(body.Date, limit, offset)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		individualReceipts, error := service.IndividualReceiptByTargetDate(body.Date)
+		individualReceipts, total2, error := service.IndividualReceiptByTargetDate(body.Date, limit, offset)
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+		totalTotal := total
+		if total < total2 {
+			totalTotal = total2
 		}
 
 		response := fiber.Map{
@@ -67,7 +73,8 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 
-		return ctx.JSON(response)
+		return ctx.JSON(utils.Paginate(ctx, totalTotal, response))
+		//return ctx.JSON(response)
 	}
 }
 
@@ -81,7 +88,46 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 // @Router        /api/v1/reports/receipt-by-date [get]
 func GetReceiptsByUser(service reports.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+
+		_, limit, offset := utils.GetPaginationParams(ctx)
 		var body ReceiptsByUser
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		receipts, total, error := service.ReceiptByUser(body.UserID, limit, offset)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		individualReceipts, total2, error := service.IndividualReceiptByUser(body.UserID, limit, offset)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		totalTotal := total + total2
+
+		response := fiber.Map{
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+		}
+
+		//return ctx.JSON(response)
+		return ctx.JSON(utils.Paginate(ctx, totalTotal, response))
+
+		/* var body ReceiptsByUser
 
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
@@ -113,7 +159,7 @@ func GetReceiptsByUser(service reports.Service) fiber.Handler {
 			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 
-		return ctx.JSON(response)
+		return ctx.JSON(response) */
 	}
 }
 

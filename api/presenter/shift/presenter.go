@@ -18,7 +18,78 @@ type ShiftResponse struct {
 }
 
 func ReceiptsToShiftsResponse(receipts *[]entities.Receipt, individual_receipts *[]entities.IndividualReceipt) *[]ShiftResponse {
-	var shiftsResponse []ShiftResponse
+
+	// --- FASE 1: PRE-MAPEO Y CONVERSIÓN DE DATOS (Una pasada por slice) ---
+
+	// 1. Convertir todos los recibos principales a sus DTOs de respuesta
+	mappedReceipts := make([]receipt_presenter.ReceiptResponse, len(*receipts))
+	for i, receipt := range *receipts {
+		// Asumiendo que esta es una función de presentación eficiente que
+		// retorna el DTO por valor o puntero
+		mappedReceipts[i] = *receipt_presenter.ReceiptToReceiptResponse(&receipt)
+	}
+
+	// 2. Convertir todos los recibos individuales a sus DTOs de respuesta
+	mappedIndividualReceipts := make([]receipt_presenter.IndividualReceiptResponse, len(*individual_receipts))
+	for i, ir := range *individual_receipts {
+		mappedIndividualReceipts[i] = *receipt_presenter.IndividualReceiptToIndividualReceiptResponse(&ir)
+	}
+
+	// --- FASE 2: AGRUPACIÓN RÁPIDA (Solo acceso a memoria) ---
+
+	shiftsMap := make(map[null.Int]*ShiftResponse)
+
+	// 3. Agrupar Recibos Principales
+	for i := range mappedReceipts {
+		// Usar la referencia a la struct pre-mapeada
+		receipt := &mappedReceipts[i]
+		shiftID := (*receipts)[i].ShiftID // Obtener el ShiftID de la entidad original
+
+		if _, ok := shiftsMap[shiftID]; !ok {
+			// Inicializar el ShiftResponse
+			shiftsMap[shiftID] = &ShiftResponse{
+				ShiftID: shiftID,
+				// Usar la entidad original para datos del Shift/User que no requieren conversión
+				CreatedAt: (*receipts)[i].Shift.CreatedAt,
+				UpdatedAt: (*receipts)[i].Shift.UpdatedAt,
+				User:      (*receipts)[i].User,
+				Receipts:  make([]receipt_presenter.ReceiptResponse, 0), // Inicializa la slice
+			}
+		}
+		// Añadir el DTO pre-mapeado a la slice
+		shiftsMap[shiftID].Receipts = append(shiftsMap[shiftID].Receipts, *receipt)
+	}
+
+	// 4. Agrupar Recibos Individuales
+	for i := range mappedIndividualReceipts {
+		// Usar la referencia a la struct pre-mapeada
+		ir := &mappedIndividualReceipts[i]
+		shiftID := (*individual_receipts)[i].ShiftID // Obtener el ShiftID de la entidad original
+
+		if _, ok := shiftsMap[shiftID]; !ok {
+			// Inicializar si el Shift no existía (basado en recibos individuales)
+			shiftsMap[shiftID] = &ShiftResponse{
+				ShiftID:            shiftID,
+				CreatedAt:          (*individual_receipts)[i].Shift.CreatedAt,
+				UpdatedAt:          (*individual_receipts)[i].Shift.UpdatedAt,
+				User:               (*individual_receipts)[i].User,
+				IndividualReceipts: make([]receipt_presenter.IndividualReceiptResponse, 0),
+			}
+		}
+		// Añadir el DTO pre-mapeado a la slice
+		shiftsMap[shiftID].IndividualReceipts = append(shiftsMap[shiftID].IndividualReceipts, *ir)
+	}
+
+	// --- FASE 3: CONVERSIÓN FINAL ---
+	// 5. Convertir el mapa a slice (igual que antes)
+	shiftsResponse := make([]ShiftResponse, 0, len(shiftsMap))
+	for _, shiftResponse := range shiftsMap {
+		shiftsResponse = append(shiftsResponse, *shiftResponse)
+	}
+
+	return &shiftsResponse
+
+	/* var shiftsResponse []ShiftResponse
 	shiftsMap := make(map[null.Int]*ShiftResponse)
 
 	for _, receipt := range *receipts {
@@ -55,5 +126,5 @@ func ReceiptsToShiftsResponse(receipts *[]entities.Receipt, individual_receipts 
 		shiftsResponse = append(shiftsResponse, *shiftResponse)
 	}
 
-	return &shiftsResponse
+	return &shiftsResponse */
 }
