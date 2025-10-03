@@ -5,6 +5,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/api/utils"
+	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/reports"
 	"net/http"
 	"strings"
@@ -23,6 +24,13 @@ type ReceiptsByUser struct {
 type ReceiptsBetweenDates struct {
 	StartDate string `valid:"required,rfc3339" json:"start_date"`
 	EndDate   string `valid:"required,rfc3339" json:"end_date"`
+}
+
+type ReceiptsBetweenDatesPaginated struct {
+	StartDate string `valid:"required,rfc3339" json:"start_date"`
+	EndDate   string `valid:"required,rfc3339" json:"end_date"`
+	Page      int    `json:"page"`
+	PageSize  int    `json:"pageSize"`
 }
 
 // ListReceiptsByDate   godoc
@@ -206,6 +214,55 @@ func GetReceiptsBetweenDates(service reports.Service) fiber.Handler {
 		}
 
 		return ctx.JSON(response)
+	}
+}
+
+// ListReceiptsBetweenDatesPaginated   godoc
+// @Summary       Receipts between dates paginated
+// @Description   Report that shows the receipts created between a range of dates with pagination
+// @Tags          receipt
+// @Accept        json
+// @Produce       json
+// @Success       200  {object}   entities.PaginatedResponse
+// @Router        /api/v1/reports/receipt-between-dates-paginated [post]
+func GetReceiptsBetweenDatesPaginated(service reports.Service) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		var body ReceiptsBetweenDatesPaginated
+
+		if err := ctx.BodyParser(&body); err != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+		validationErrors := utils.ValidateInput(ctx, body)
+
+		if validationErrors != nil {
+			ctx.Status(http.StatusBadRequest)
+			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
+		}
+
+		params := &entities.PaginationParams{
+			Page:     body.Page,
+			PageSize: body.PageSize,
+		}
+
+		paginatedResponse, totalReceipts, totalIndividualReceipts, error := service.ReceiptsBetweenDatesPaginated(body.StartDate, body.EndDate, params)
+
+		if error != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(error))
+		}
+
+		response := fiber.Map{
+			"data":                    paginatedResponse.Data,
+			"total":                   paginatedResponse.Total,
+			"page":                    paginatedResponse.Page,
+			"pageSize":                paginatedResponse.PageSize,
+			"totalPages":              paginatedResponse.TotalPages,
+			"totalReceipts":           totalReceipts,
+			"totalIndividualReceipts": totalIndividualReceipts,
+		}
+
+		return ctx.JSON(presenter.SuccessResponse(response))
 	}
 }
 

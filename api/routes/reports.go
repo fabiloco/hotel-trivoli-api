@@ -13,6 +13,7 @@ func ReportsRouter(app fiber.Router, service reports.Service) {
 	reportsGroup.Post("/receipt-today-by-user", handlers.GetReceiptsTodayByUser(service))
 	reportsGroup.Post("/receipt-by-date", handlers.GetReceiptsByDate(service))
 	reportsGroup.Post("/receipt-between-dates", handlers.GetReceiptsBetweenDates(service))
+	reportsGroup.Post("/receipt-between-dates-paginated", handlers.GetReceiptsBetweenDatesPaginated(service))
 
 	reportsGroup.Post("/total-between-dates", handlers.GetTotalBetweenDates(service))
 }

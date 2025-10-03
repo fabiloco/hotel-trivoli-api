@@ -26,6 +26,7 @@ type Repository interface {
 
 	ReadByDate(targetDate time.Time) (*[]entities.Receipt, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error)
+	ReadBetweenDatesPaginated(startDate time.Time, endDate time.Time, params *entities.PaginationParams) (*[]entities.Receipt, int64, error)
 }
 
 type repository struct {
@@ -154,6 +155,36 @@ func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*
 	}
 
 	return &receipts, nil
+}
+
+func (r *repository) ReadBetweenDatesPaginated(startDate time.Time, endDate time.Time, params *entities.PaginationParams) (*[]entities.Receipt, int64, error) {
+	var receipts []entities.Receipt
+	var total int64
+
+	params.Normalize()
+
+	if err := r.db.Model(&entities.Receipt{}).
+		Where("created_at BETWEEN ? AND ?", startDate, endDate).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := params.GetOffset()
+	limit := params.GetLimit()
+
+	if err := r.db.Where("created_at BETWEEN ? AND ?", startDate, endDate).
+		Preload("Products").
+		Preload("Service").
+		Preload("User").
+		Preload("User.Person").
+		Preload("Shift").
+		Offset(offset).
+		Limit(limit).
+		Find(&receipts).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return &receipts, total, nil
 }
 
 type ReadTotalsResult struct {

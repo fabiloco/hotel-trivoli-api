@@ -16,6 +16,7 @@ type Service interface {
 	ReceiptByUser(userId uint) (*[]entities.Receipt, error)
 	ReceiptTodayByUser(userId uint) (*[]entities.Receipt, error)
 	ReceiptsBetweenDates(startDate string, endDate string) (*[]entities.Receipt, error)
+	ReceiptsBetweenDatesPaginated(startDate string, endDate string, params *entities.PaginationParams) (*entities.PaginatedResponse, int64, int64, error)
 
 	IndividualReceiptByTargetDate(targetDate string) (*[]entities.IndividualReceipt, error)
 	IndividualReceiptByUser(userId uint) (*[]entities.IndividualReceipt, error)
@@ -102,6 +103,37 @@ func (s *service) ReceiptsBetweenDates(startDate string, endDate string) (*[]ent
 	}
 
 	return s.receiptRepository.ReadBetweenDates(sd, ed)
+}
+
+func (s *service) ReceiptsBetweenDatesPaginated(startDate string, endDate string, params *entities.PaginationParams) (*entities.PaginatedResponse, int64, int64, error) {
+	sd, error := time.Parse(time.RFC3339, startDate)
+	if error != nil {
+		return nil, 0, 0, errors.New(fmt.Sprintf("error parsing Date %s", startDate))
+	}
+
+	ed, error := time.Parse(time.RFC3339, endDate)
+	if error != nil {
+		return nil, 0, 0, errors.New(fmt.Sprintf("error parsing Date %s", endDate))
+	}
+
+	receipts, totalReceipts, err := s.receiptRepository.ReadBetweenDatesPaginated(sd, ed, params)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	individualReceipts, totalIndividualReceipts, err := s.individualReceiptRepository.ReadBetweenDatesPaginated(sd, ed, params)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	combinedData := map[string]interface{}{
+		"receipts":           receipts,
+		"individualReceipts": individualReceipts,
+	}
+
+	totalCombined := totalReceipts + totalIndividualReceipts
+
+	return entities.NewPaginatedResponse(combinedData, totalCombined, params.Page, params.PageSize), totalReceipts, totalIndividualReceipts, nil
 }
 
 func (s *service) IndividualReceiptTodayByUser(userId uint) (*[]entities.IndividualReceipt, error) {
