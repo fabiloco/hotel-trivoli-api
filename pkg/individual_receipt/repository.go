@@ -22,7 +22,7 @@ type Repository interface {
 	ReadByShiftNotNull(limit, offset int) (*[]entities.IndividualReceipt, int64, error)
 	ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, error)
 
-	ReadByDate(targetDate time.Time) (*[]entities.IndividualReceipt, error)
+	ReadByDate(targetDate time.Time, limit, offset int) (*[]entities.IndividualReceipt, int64, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error)
 	ReadBetweenDatesPaginated(startDate time.Time, endDate time.Time, params *entities.PaginationParams) (*[]entities.IndividualReceipt, int64, error)
 }
@@ -41,7 +41,7 @@ func (r *repository) Read(limit, offset int) (*[]entities.IndividualReceipt, int
 	var receipts []entities.IndividualReceipt
 	var total int64
 
-	if err := r.db.Model(&entities.Receipt{}).
+	if err := r.db.Model(&entities.IndividualReceipt{}).
 		Where("shift_id IS NOT NULL").
 		Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -65,16 +65,24 @@ func (r *repository) ReadById(id uint) (*entities.IndividualReceipt, error) {
 	return &receipt, nil
 }
 
-func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.IndividualReceipt, error) {
+func (r *repository) ReadByDate(targetDate time.Time, limit, offset int) (*[]entities.IndividualReceipt, int64, error) {
 	var receipts []entities.IndividualReceipt
+	var total int64
 
-	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
-
-	if result.Error != nil {
-		return nil, result.Error
+	if err := r.db.Model(&entities.IndividualReceipt{}).
+		Where("shift_id IS NOT NULL AND DATE(created_at) = DATE(?)", targetDate).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
 
-	return &receipts, nil
+	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("User").Preload("User.Person").Preload("Shift").Limit(limit).
+		Offset(offset).Find(&receipts)
+
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	return &receipts, total, nil
 }
 
 func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error) {

@@ -24,7 +24,7 @@ type Repository interface {
 	ReadByShiftNotNull(limit, offset int) (*[]entities.Receipt, int64, error)
 	ReadAllByShiftId(id uint) (*[]entities.Receipt, error)
 
-	ReadByDate(targetDate time.Time) (*[]entities.Receipt, error)
+	ReadByDate(targetDate time.Time, limit, offset int) (*[]entities.Receipt, int64, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error)
 	ReadBetweenDatesPaginated(startDate time.Time, endDate time.Time, params *entities.PaginationParams) (*[]entities.Receipt, int64, error)
 }
@@ -133,16 +133,16 @@ func (r *repository) ReadAllByShiftId(id uint) (*[]entities.Receipt, error) {
 	return &receipt, nil
 }
 
-func (r *repository) ReadByDate(targetDate time.Time) (*[]entities.Receipt, error) {
+func (r *repository) ReadByDate(targetDate time.Time, limit, offset int) (*[]entities.Receipt, int64, error) {
 	var receipts []entities.Receipt
 
 	result := r.db.Where("DATE(created_at) = DATE(?)", targetDate).Preload("Products").Preload("Service").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, 0, result.Error
 	}
 
-	return &receipts, nil
+	return &receipts, 0, nil
 }
 
 func (r *repository) ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.Receipt, error) {

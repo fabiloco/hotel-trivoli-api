@@ -105,24 +105,28 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 
 		_, limit, offset := utils.GetPaginationParams(ctx)
 
-		receipts, _, error := service.FetchReceipts(limit, offset)
-		//individualReceipts, _, error := service.FetchIndividualReceipts(limit, offset)
+		receipts, total, err := service.FetchReceipts(limit, offset)
+		individualReceipts, total2, error := service.FetchIndividualReceipts(limit, offset)
 
-		if error != nil {
+		if error != nil || err != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		//totalTotal := total //+ total2
+		totalTotal := total
+
+		if total < total2 {
+			totalTotal = total2
+		}
 
 		response := fiber.Map{
-			"receipts": receipt_presenter.SuccessReceiptsResponse(receipts),
-			//	"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 
 		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-		return ctx.JSON(response)
-		//return ctx.JSON(utils.Paginate(ctx, totalTotal, receipts))
+		//return ctx.JSON(response)
+		return ctx.JSON(utils.Paginate(ctx, totalTotal, response))
 	}
 }
 
