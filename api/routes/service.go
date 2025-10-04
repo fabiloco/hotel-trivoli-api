@@ -9,6 +9,7 @@ import (
 
 func ServiceRouter(app fiber.Router, service service.Service) {
 	productGroup := app.Group("/service")
+	productGroup.Get("/paginated", handlers.GetServicesPaginated(service))
 	productGroup.Get("/", handlers.GetServices(service))
 	productGroup.Get("/:id", handlers.GetServiceById(service))
 	productGroup.Post("/", handlers.PostServices(service))

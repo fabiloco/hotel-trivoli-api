@@ -6,11 +6,12 @@ import (
 
 // Service is an interface from which our api module can access our repository of all our models
 type Service interface {
-	InsertService (productType *entities.CreateService) (*entities.Service, error)
-	FetchServices () (*[]entities.Service, error)
-  FetchServiceById (id uint) (*entities.Service, error)
-	UpdateService (id uint, product *entities.UpdateService) (*entities.Service, error)
-	RemoveService (id uint) (*entities.Service, error)
+	InsertService(productType *entities.CreateService) (*entities.Service, error)
+	FetchServices() (*[]entities.Service, error)
+	FetchServicesPaginated(params *entities.PaginationParams) (*entities.PaginatedResponse, error)
+	FetchServiceById(id uint) (*entities.Service, error)
+	UpdateService(id uint, product *entities.UpdateService) (*entities.Service, error)
+	RemoveService(id uint) (*entities.Service, error)
 }
 
 type service struct {
@@ -24,10 +25,10 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) InsertService(service *entities.CreateService) (*entities.Service, error) {
-  newService := entities.Service {
-    Name: service.Name,
-    Price: service.Price,
-  }
+	newService := entities.Service{
+		Name:  service.Name,
+		Price: service.Price,
+	}
 
 	return s.repository.Create(&newService)
 }
@@ -36,11 +37,20 @@ func (s *service) FetchServices() (*[]entities.Service, error) {
 	return s.repository.Read()
 }
 
+func (s *service) FetchServicesPaginated(params *entities.PaginationParams) (*entities.PaginatedResponse, error) {
+	services, total, err := s.repository.ReadPaginated(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return entities.NewPaginatedResponse(services, total, params.Page, params.PageSize), nil
+}
+
 func (s *service) UpdateService(id uint, service *entities.UpdateService) (*entities.Service, error) {
-  newService := entities.Service {
-    Name: service.Name,
-    Price: service.Price,
-  }
+	newService := entities.Service{
+		Name:  service.Name,
+		Price: service.Price,
+	}
 
 	return s.repository.Update(id, &newService)
 }
