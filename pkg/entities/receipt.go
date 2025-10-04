@@ -43,3 +43,8 @@ type UpdateReceipt struct {
 	User       uint    `valid:"optional,numeric" json:"user"`
 	Shift      uint    `valid:"optional,numeric" json:"shift"`
 }
+
+type GeneralReceiptItem struct {
+	Receipt      interface{} `json:"receipt"`       // Puede ser Receipt o IndividualReceipt
+	IsIndividual bool        `json:"is_individual"` // para saber de cuál tabla viene
+}

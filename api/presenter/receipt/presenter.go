@@ -5,6 +5,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/presenter"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -780,10 +781,16 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
 		// Mapear el resto de campos (igual que antes)
 		receiptResponse.User = receipt.User
 		receiptResponse.Service = receipt.Service
-		// ... (otros mapeos) ...
-		receiptResponse.Products = productsResponseList
+		receiptResponse.Room = receipt.Room
+		receiptResponse.TotalPrice = receipt.TotalPrice
+		receiptResponse.TotalTime = receipt.TotalTime
 
-		// ... (mapeo de IDs y fechas) ...
+		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
+
+		receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
+		receiptResponse.CreatedAt = receipt.CreatedAt
+		receiptResponse.UpdatedAt = receipt.UpdatedAt
 
 		receiptsResponse = append(receiptsResponse, receiptResponse)
 	}
@@ -842,4 +849,320 @@ func SuccessReceiptsResponse(receipts *[]entities.Receipt) *fiber.Map {
 	}
 
 	return presenter.SuccessResponse(receiptsResponse) */
+}
+
+func SuccessIndividualReceipts(individualReceipts *[]entities.IndividualReceipt) []IndividualReceiptResponse {
+	if individualReceipts == nil || len(*individualReceipts) == 0 {
+		return []IndividualReceiptResponse{}
+	}
+
+	// 1. RECOLECTAR TODOS LOS IDs DE PRODUCTOS ÚNICOS
+	//    (De todos los recibos para la consulta por lotes)
+	uniqueProductIDs := make(map[uint]bool)
+	for _, receipt := range *individualReceipts {
+		for _, receiptProduct := range receipt.Products {
+			uniqueProductIDs[receiptProduct.ProductID] = true
+		}
+	}
+
+	// Convertir el mapa de IDs a un slice para la cláusula IN
+	var productIDs []uint
+	for id := range uniqueProductIDs {
+		productIDs = append(productIDs, id)
+	}
+
+	// 2. HACER UNA ÚNICA CONSULTA POR LOTES (Batch Query)
+	//    (Obtiene todos los detalles de productos de una vez)
+	var products []entities.Product
+	database.DB.Preload("Type").Where("id IN (?)", productIDs).Find(&products)
+
+	// 3. CREAR UN MAPA DE ACCESO RÁPIDO PARA PRODUCTOS (O(1))
+	productDetailMap := make(map[uint]entities.Product)
+	for _, product := range products {
+		productDetailMap[product.ID] = product
+	}
+
+	// 4. MAPEO FINAL (Ahora sin consultas a la DB dentro del bucle)
+	var individualReceiptsResponse []IndividualReceiptResponse
+
+	for _, receipt := range *individualReceipts {
+		var receiptResponse IndividualReceiptResponse
+
+		// Mapa para agrupar ítems *dentro* del recibo y contar la cantidad
+		productsInReceiptMap := make(map[uint]*ProductResponse)
+
+		for _, receiptProduct := range receipt.Products {
+			productID := receiptProduct.ProductID
+
+			// Usar el mapa global de productos (O(1) look-up)
+			if product, ok := productDetailMap[productID]; ok {
+
+				if existingProduct, ok := productsInReceiptMap[productID]; ok {
+					existingProduct.Quantity++
+				} else {
+					// Inicializar el producto con los detalles obtenidos de la DB en el paso 2
+					productsInReceiptMap[productID] = &ProductResponse{
+						ID:        receiptProduct.ID,
+						Name:      product.Name,
+						Type:      product.Type,
+						Price:     product.Price,
+						Img:       product.Img,
+						Quantity:  1, // Inicializar en 1
+						CreatedAt: receiptProduct.CreatedAt,
+						UpdatedAt: receiptProduct.UpdatedAt,
+					}
+				}
+			}
+		}
+
+		// Convertir productsInReceiptMap a slice (igual que antes)
+		var productsResponseList []ProductResponse
+		for _, product := range productsInReceiptMap {
+			productsResponseList = append(productsResponseList, *product)
+		}
+
+		// Mapear el resto de campos (igual que antes)
+
+		receiptResponse.User = receipt.User
+		receiptResponse.TotalPrice = receipt.TotalPrice
+
+		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
+
+		receiptResponse.ID = fmt.Sprint("ir-", receipt.ID)
+		receiptResponse.CreatedAt = receipt.CreatedAt
+		receiptResponse.UpdatedAt = receipt.UpdatedAt
+
+		individualReceiptsResponse = append(individualReceiptsResponse, receiptResponse)
+	}
+
+	return individualReceiptsResponse
+
+}
+
+func SuccessReceipts(receipts *[]entities.Receipt) []ReceiptResponse {
+	if receipts == nil || len(*receipts) == 0 {
+		return []ReceiptResponse{}
+	}
+
+	// 1. RECOLECTAR TODOS LOS IDs DE PRODUCTOS ÚNICOS
+	//    (De todos los recibos para la consulta por lotes)
+	uniqueProductIDs := make(map[uint]bool)
+	for _, receipt := range *receipts {
+		for _, receiptProduct := range receipt.Products {
+			uniqueProductIDs[receiptProduct.ProductID] = true
+		}
+	}
+
+	// Convertir el mapa de IDs a un slice para la cláusula IN
+	var productIDs []uint
+	for id := range uniqueProductIDs {
+		productIDs = append(productIDs, id)
+	}
+
+	// 2. HACER UNA ÚNICA CONSULTA POR LOTES (Batch Query)
+	//    (Obtiene todos los detalles de productos de una vez)
+	var products []entities.Product
+	database.DB.Preload("Type").Where("id IN (?)", productIDs).Find(&products)
+
+	// 3. CREAR UN MAPA DE ACCESO RÁPIDO PARA PRODUCTOS (O(1))
+	productDetailMap := make(map[uint]entities.Product)
+	for _, product := range products {
+		productDetailMap[product.ID] = product
+	}
+
+	// 4. MAPEO FINAL (Ahora sin consultas a la DB dentro del bucle)
+	var receiptsResponse []ReceiptResponse
+
+	for _, receipt := range *receipts {
+		var receiptResponse ReceiptResponse
+
+		// Mapa para agrupar ítems *dentro* del recibo y contar la cantidad
+		productsInReceiptMap := make(map[uint]*ProductResponse)
+
+		for _, receiptProduct := range receipt.Products {
+			productID := receiptProduct.ProductID
+
+			// Usar el mapa global de productos (O(1) look-up)
+			if product, ok := productDetailMap[productID]; ok {
+
+				if existingProduct, ok := productsInReceiptMap[productID]; ok {
+					existingProduct.Quantity++
+				} else {
+					// Inicializar el producto con los detalles obtenidos de la DB en el paso 2
+					productsInReceiptMap[productID] = &ProductResponse{
+						ID:        receiptProduct.ID,
+						Name:      product.Name,
+						Type:      product.Type,
+						Price:     product.Price,
+						Img:       product.Img,
+						Quantity:  1, // Inicializar en 1
+						CreatedAt: receiptProduct.CreatedAt,
+						UpdatedAt: receiptProduct.UpdatedAt,
+					}
+				}
+			}
+		}
+
+		// Convertir productsInReceiptMap a slice (igual que antes)
+		var productsResponseList []ProductResponse
+		for _, product := range productsInReceiptMap {
+			productsResponseList = append(productsResponseList, *product)
+		}
+
+		// Mapear el resto de campos (igual que antes)
+		receiptResponse.User = receipt.User
+		receiptResponse.Service = receipt.Service
+		receiptResponse.Room = receipt.Room
+		receiptResponse.TotalPrice = receipt.TotalPrice
+		receiptResponse.TotalTime = receipt.TotalTime
+
+		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
+
+		receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
+		receiptResponse.CreatedAt = receipt.CreatedAt
+		receiptResponse.UpdatedAt = receipt.UpdatedAt
+
+		receiptsResponse = append(receiptsResponse, receiptResponse)
+	}
+
+	return receiptsResponse
+
+}
+
+func SuccessGeneralReceiptsResponse(
+	receipts *[]entities.Receipt,
+	individualReceipts *[]entities.IndividualReceipt,
+) *fiber.Map {
+
+	if (receipts == nil || len(*receipts) == 0) && (individualReceipts == nil || len(*individualReceipts) == 0) {
+		return presenter.SuccessResponse([]interface{}{})
+	}
+
+	// 1️⃣ Recolectar TODOS los IDs de productos únicos de ambos tipos
+	uniqueProductIDs := make(map[uint]bool)
+
+	for _, r := range *receipts {
+		for _, rp := range r.Products {
+			uniqueProductIDs[rp.ProductID] = true
+		}
+	}
+	for _, ir := range *individualReceipts {
+		for _, rp := range ir.Products {
+			uniqueProductIDs[rp.ProductID] = true
+		}
+	}
+
+	// 2️⃣ Consultar todos los productos en una sola query
+	var productIDs []uint
+	for id := range uniqueProductIDs {
+		productIDs = append(productIDs, id)
+	}
+
+	var products []entities.Product
+	database.DB.Preload("Type").Where("id IN (?)", productIDs).Find(&products)
+
+	// 3️⃣ Crear un mapa de productos para acceso rápido
+	productDetailMap := make(map[uint]entities.Product)
+	for _, p := range products {
+		productDetailMap[p.ID] = p
+	}
+
+	// 4️⃣ Armar respuestas de ambos tipos
+	var allResponses []interface{}
+
+	// --- Receipts normales ---
+	for _, r := range *receipts {
+		var resp ReceiptResponse
+		resp.ID = fmt.Sprintf("r-%d", r.ID)
+		resp.User = r.User
+		resp.Service = r.Service
+		resp.Room = r.Room
+		resp.TotalPrice = r.TotalPrice
+		resp.TotalTime = r.TotalTime
+		resp.Shift = r.Shift
+		resp.CreatedAt = r.CreatedAt
+		resp.UpdatedAt = r.UpdatedAt
+
+		productsMap := make(map[uint]*ProductResponse)
+		for _, rp := range r.Products {
+			p := productDetailMap[rp.ProductID]
+			if existing, ok := productsMap[rp.ProductID]; ok {
+				existing.Quantity++
+			} else {
+				productsMap[rp.ProductID] = &ProductResponse{
+					ID:        rp.ID,
+					Name:      p.Name,
+					Type:      p.Type,
+					Price:     p.Price,
+					Img:       p.Img,
+					Quantity:  1,
+					CreatedAt: rp.CreatedAt,
+					UpdatedAt: rp.UpdatedAt,
+				}
+			}
+		}
+		for _, p := range productsMap {
+			resp.Products = append(resp.Products, *p)
+		}
+
+		allResponses = append(allResponses, resp)
+	}
+
+	// --- Individual Receipts ---
+	for _, ir := range *individualReceipts {
+		var resp IndividualReceiptResponse
+		resp.ID = fmt.Sprintf("ir-%d", ir.ID)
+		resp.User = ir.User
+		resp.TotalPrice = ir.TotalPrice
+		resp.Shift = ir.Shift
+		resp.CreatedAt = ir.CreatedAt
+		resp.UpdatedAt = ir.UpdatedAt
+
+		productsMap := make(map[uint]*ProductResponse)
+		for _, rp := range ir.Products {
+			p := productDetailMap[rp.ProductID]
+			if existing, ok := productsMap[rp.ProductID]; ok {
+				existing.Quantity++
+			} else {
+				productsMap[rp.ProductID] = &ProductResponse{
+					ID:        rp.ID,
+					Name:      p.Name,
+					Type:      p.Type,
+					Price:     p.Price,
+					Img:       p.Img,
+					Quantity:  1,
+					CreatedAt: rp.CreatedAt,
+					UpdatedAt: rp.UpdatedAt,
+				}
+			}
+		}
+		for _, p := range productsMap {
+			resp.Products = append(resp.Products, *p)
+		}
+
+		allResponses = append(allResponses, resp)
+	}
+
+	// 5️⃣ Ordenar por fecha de creación (descendente)
+	sort.Slice(allResponses, func(i, j int) bool {
+		ti := getCreatedAt(allResponses[i])
+		tj := getCreatedAt(allResponses[j])
+		return ti.After(tj)
+	})
+
+	return presenter.SuccessResponse(allResponses)
+}
+
+// Helper para obtener la fecha sin type assertion fea
+func getCreatedAt(item interface{}) time.Time {
+	switch v := item.(type) {
+	case ReceiptResponse:
+		return v.CreatedAt
+	case IndividualReceiptResponse:
+		return v.CreatedAt
+	default:
+		return time.Time{}
+	}
 }

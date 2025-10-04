@@ -22,6 +22,8 @@ type Service interface {
 	GenerateReceipt(receipt *entities.CreateReceipt) (*entities.Receipt, error)
 	GenerateIndividualReceipt(receipt *entities.CreateIndividualReceipt) (*entities.IndividualReceipt, error)
 
+	FetchAllReceipts(limit, offset int) ([]entities.GeneralReceiptItem, int64, error)
+
 	//FetchReceipts() (*[]entities.Receipt, error)
 	FetchReceipts(limit, offset int) (*[]entities.Receipt, int64, error)
 	//FetchIndividualReceipts() (*[]entities.IndividualReceipt, error)
@@ -54,6 +56,84 @@ func NewService(r Repository, sr serviceModule.Repository, pr product.Repository
 		roomRepository:              rr,
 		userRepository:              ur,
 		individualReceiptRepository: irr,
+	}
+}
+
+func (s *service) FetchAllReceipts(limit, offset int) ([]entities.GeneralReceiptItem, int64, error) {
+	// Traer ambas colecciones
+	receipts, _, err := s.repository.Read(0, 0)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	individualReceipts, _, err := s.individualReceiptRepository.Read(0, 0)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Fusionar todos
+	all := make([]entities.GeneralReceiptItem, 0, len(*receipts)+len(*individualReceipts))
+
+	for _, r := range *receipts {
+		/* all = append(all, entities.GeneralReceiptItem{
+			ID:         r.ID,
+			TotalPrice: r.TotalPrice,
+			UserID:     r.UserID,
+			Type:       "receipt",
+			CreatedAt:  r.CreatedAt,
+		}) */
+		all = append(all, entities.GeneralReceiptItem{
+			Receipt:      r,
+			IsIndividual: false,
+		})
+	}
+
+	for _, ir := range *individualReceipts {
+		/* all = append(all, entities.GeneralReceiptItem{
+			ID:         ir.ID,
+			TotalPrice: ir.TotalPrice,
+			UserID:     ir.UserID,
+			Type:       "individual",
+			CreatedAt:  ir.CreatedAt,
+		}) */
+		all = append(all, entities.GeneralReceiptItem{
+			Receipt:      ir,
+			IsIndividual: true,
+		})
+	}
+
+	// Ordenar por fecha (si ambos structs tienen CreatedAt)
+	/* sort.Slice(all, func(i, j int) bool {
+		return getCreatedAt(all[i]).After(getCreatedAt(all[j]))
+	}) */
+
+	// total real
+	//total := totalReceipts + totalIndividual
+
+	total := len(all)
+
+	// Paginación en memoria
+	start := offset
+	end := offset + limit
+	if start > len(all) {
+		start = len(all)
+	}
+	if end > len(all) {
+		end = len(all)
+	}
+	paged := all[start:end]
+
+	return paged, int64(total), nil
+}
+
+func getCreatedAt(item entities.GeneralReceiptItem) time.Time {
+	switch r := item.Receipt.(type) {
+	case entities.Receipt:
+		return r.CreatedAt
+	case entities.IndividualReceipt:
+		return r.CreatedAt
+	default:
+		return time.Time{}
 	}
 }
 
