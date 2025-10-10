@@ -12,6 +12,7 @@ type Repository interface {
 	Update(id uint, data *entities.Shift) (*entities.Shift, error)
 	Delete(id uint) (*entities.Shift, error)
 	ReadById(id uint) (*entities.Shift, error)
+	ReadUniqueShifts(limit, offset int) (*[]entities.Shift, int64, error)
 }
 
 type repository struct {
@@ -90,4 +91,39 @@ func (r *repository) Delete(id uint) (*entities.Shift, error) {
 	}
 
 	return shift, nil
+}
+
+func (r *repository) ReadUniqueShifts(limit, offset int) (*[]entities.Shift, int64, error) {
+	var shifts []entities.Shift
+	var total int64
+
+	if err := r.db.Raw(`
+		SELECT COUNT(DISTINCT s.id) 
+		FROM shifts s 
+		WHERE EXISTS (
+			SELECT 1 FROM receipts r WHERE r.shift_id = s.id
+		) OR EXISTS (
+			SELECT 1 FROM individual_receipts ir WHERE ir.shift_id = s.id
+		)
+	`).Scan(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	result := r.db.Raw(`
+		SELECT DISTINCT s.* 
+		FROM shifts s 
+		WHERE EXISTS (
+			SELECT 1 FROM receipts r WHERE r.shift_id = s.id
+		) OR EXISTS (
+			SELECT 1 FROM individual_receipts ir WHERE ir.shift_id = s.id
+		)
+		ORDER BY s.id DESC
+		LIMIT ? OFFSET ?
+	`, limit, offset).Scan(&shifts)
+
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
+
+	return &shifts, total, nil
 }

@@ -1,13 +1,13 @@
 package shift
 
 import (
-	"errors"
+	"fmt"
+	"time"
+
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	individualreceipt "fabiloco/hotel-trivoli-api/pkg/individual_receipt"
 	receipt "fabiloco/hotel-trivoli-api/pkg/receipt"
-	"fmt"
 	"sort"
-	"time"
 )
 
 // Service is an interface from which our api module can access our repository of all our models
@@ -42,7 +42,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 		receiptWithId, error := s.receiptRepository.ReadById(shift.Receipts[i])
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no receipt with id %d", shift.Receipts[i]))
+			return nil, fmt.Errorf("no receipt with id %d", shift.Receipts[i])
 		}
 
 		receipts = append(receipts, *receiptWithId)
@@ -54,7 +54,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 		inidividual_receiptWithId, error := s.individualReceiptRepository.ReadById(shift.IndividualReceipts[i])
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no individual receipt with id %d", shift.IndividualReceipts[i]))
+			return nil, fmt.Errorf("no individual receipt with id %d", shift.IndividualReceipts[i])
 		}
 
 		individual_receipts = append(individual_receipts, *inidividual_receiptWithId)
@@ -74,7 +74,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 		_, error := s.receiptRepository.UpdateShift(receipt.ID, &receipt)
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("error editing receipt with id %d", receipt.ID))
+			return nil, fmt.Errorf("error editing receipt with id %d", receipt.ID)
 		}
 	}
 
@@ -84,7 +84,7 @@ func (s *service) InsertShift(shift *entities.CreateShift) (*entities.Shift, err
 		_, error := s.individualReceiptRepository.UpdateShift(individual_receipt.ID, &individual_receipt)
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("error editing individual receipt with id %d", individual_receipt.ID))
+			return nil, fmt.Errorf("error editing individual receipt with id %d", individual_receipt.ID)
 		}
 	}
 
@@ -162,9 +162,19 @@ func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]ent
 		return nil, nil, 0, err
 	}
 
-	individualReceipts, totalIndividuals, err := s.individualReceiptRepository.ReadByShiftNotNull(limit, offset)
-	if err != nil {
-		return nil, nil, 0, err
+	var allReceipts []entities.Receipt
+	var allIndividualReceipts []entities.IndividualReceipt
+
+	for _, shift := range *shifts {
+		receipts, err := s.receiptRepository.ReadAllByShiftId(shift.ID)
+		if err == nil {
+			allReceipts = append(allReceipts, *receipts...)
+		}
+
+		individualReceipts, err := s.individualReceiptRepository.ReadAllByShiftId(shift.ID)
+		if err == nil {
+			allIndividualReceipts = append(allIndividualReceipts, *individualReceipts...)
+		}
 	}
 
 	// si quieres paginar sobre los dos juntos, definamos qué total devolver
@@ -174,6 +184,7 @@ func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]ent
 	}
 
 	return receipts, individualReceipts, total, nil */
+	//return &allReceipts, &allIndividualReceipts, total, nil
 
 	/* receipts, error := s.receiptRepository.ReadByShiftNotNull()
 
@@ -193,12 +204,12 @@ func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]ent
 func (s *service) FetchShiftsBetweenDate(startDate string, endDate string) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
 	sd, error := time.Parse(time.RFC3339, startDate)
 	if error != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error parsing Date %s", startDate))
+		return nil, nil, fmt.Errorf("error parsing Date %s", startDate)
 	}
 
 	ed, error := time.Parse(time.RFC3339, endDate)
 	if error != nil {
-		return nil, nil, errors.New(fmt.Sprintf("error parsing Date %s", endDate))
+		return nil, nil, fmt.Errorf("error parsing Date %s", endDate)
 	}
 
 	receipts, error := s.receiptRepository.ReadByShiftBetweenDatesNotNull(sd, ed)
@@ -223,7 +234,7 @@ func (s *service) UpdateShift(id uint, shift *entities.UpdateShift) (*entities.S
 		receiptWithId, error := s.receiptRepository.ReadById(shift.Receipts[i])
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no receipt with id %d", shift.Receipts[i]))
+			return nil, fmt.Errorf("no receipt with id %d", shift.Receipts[i])
 		}
 
 		receipts = append(receipts, *receiptWithId)
@@ -235,7 +246,7 @@ func (s *service) UpdateShift(id uint, shift *entities.UpdateShift) (*entities.S
 		individual_receiptWithId, error := s.individualReceiptRepository.ReadById(shift.IndividualReceipts[i])
 
 		if error != nil {
-			return nil, errors.New(fmt.Sprintf("no individual receipt with id %d", shift.IndividualReceipts[i]))
+			return nil, fmt.Errorf("no individual receipt with id %d", shift.IndividualReceipts[i])
 		}
 
 		individual_receipts = append(individual_receipts, *individual_receiptWithId)

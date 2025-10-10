@@ -54,10 +54,15 @@ func (r *repository) Read(limit, offset int) (*[]entities.Receipt, int64, error)
 		return nil, 0, err
 	}
 
-	r.db.Preload("Products").Preload("Type").
-		Preload("Service").Preload("Room").Preload("User").
-		Preload("User.Person").Preload("Shift").
-		/* Limit(limit).Offset(offset). */ Find(&receipts)
+	/* 	r.db.Preload("Products").Preload("Type").
+	Preload("Service").Preload("Room").Preload("User").
+	Preload("User.Person").Preload("Shift").
+	Find(&receipts) */
+	/* Limit(limit).Offset(offset). */
+
+	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").
+		Where("shift_id IS NOT NULL").
+		Limit(limit).Offset(offset).Find(&receipts)
 
 	return &receipts, total, nil
 }

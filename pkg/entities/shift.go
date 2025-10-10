@@ -8,6 +8,8 @@ import (
 // @Description Receipt information in stock
 type Shift struct {
 	gorm.Model
+	Receipts           []Receipt           `gorm:"foreignKey:ShiftID"`
+	IndividualReceipts []IndividualReceipt `gorm:"foreignKey:ShiftID"`
 }
 
 type CreateShift struct {
