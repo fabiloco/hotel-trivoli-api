@@ -113,14 +113,10 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		totalTotal := total
-
-		if total < total2 {
-			totalTotal = total2
-		}
+		totalTotal := total + total2
 
 		response := fiber.Map{
-			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"receipts":           receipt_presenter.ReceiptsToReceiptsResponses(*receipts),
 			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 

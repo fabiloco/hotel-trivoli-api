@@ -47,8 +47,9 @@ func (r *repository) Read(limit, offset int) (*[]entities.IndividualReceipt, int
 		return nil, 0, err
 	}
 
-	r.db.Preload("Products").Preload("User").Preload("User.Person").Preload("Shift").Limit(limit).
-		Offset(offset).Find(&receipts)
+	r.db.Preload("Products").Preload("User").Preload("User.Person").Preload("Shift").
+		Where("shift_id IS NOT NULL").
+		Limit(limit).Offset(offset).Find(&receipts)
 
 	return &receipts, total, nil
 }
