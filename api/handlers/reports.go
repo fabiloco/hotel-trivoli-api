@@ -71,13 +71,11 @@ func GetReceiptsByDate(service reports.Service) fiber.Handler {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
-		totalTotal := total
-		if total < total2 {
-			totalTotal = total2
-		}
+
+		totalTotal := total + total2
 
 		response := fiber.Map{
-			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
+			"receipts":           receipt_presenter.ReceiptsToReceiptsResponses(*receipts),
 			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
 		}
 
@@ -229,6 +227,8 @@ func GetReceiptsBetweenDates(service reports.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		var body ReceiptsBetweenDates
 
+		_, limit, _ := utils.GetPaginationParams(ctx)
+
 		if err := ctx.BodyParser(&body); err != nil {
 			ctx.Status(http.StatusBadRequest)
 			return ctx.JSON(presenter.ErrorResponse(err))
@@ -240,26 +240,17 @@ func GetReceiptsBetweenDates(service reports.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(errors.New(strings.Join(validationErrors, ""))))
 		}
 
-		receipts, error := service.ReceiptsBetweenDates(body.StartDate, body.EndDate)
+		receipts, _, _, error := service.ReceiptsBetweenDatesPaginated(body.StartDate, body.EndDate, &entities.PaginationParams{
+			Page:     ctx.QueryInt("page", 1),
+			PageSize: limit,
+		})
 
 		if error != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		individualReceipts, error := service.IndividualReceiptsBetweenDates(body.StartDate, body.EndDate)
-
-		if error != nil {
-			ctx.Status(http.StatusInternalServerError)
-			return ctx.JSON(presenter.ErrorResponse(error))
-		}
-
-		response := fiber.Map{
-			"receipts":           receipt_presenter.SuccessReceiptsResponse(receipts),
-			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
-		}
-
-		return ctx.JSON(response)
+		return ctx.JSON(receipts)
 	}
 }
 
