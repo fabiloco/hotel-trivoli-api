@@ -7,6 +7,7 @@ import (
 	"fabiloco/hotel-trivoli-api/api/utils"
 	"fabiloco/hotel-trivoli-api/pkg/entities"
 	"fabiloco/hotel-trivoli-api/pkg/shift"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,7 +25,9 @@ import (
 func GetShifts(service shift.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 
-		_, limit, offset := utils.GetPaginationParams(ctx)
+		page, limit, offset := utils.GetPaginationParams(ctx)
+
+		fmt.Printf("page %d, limit %d, offset %d. ", page, limit, offset)
 
 		receipts, individualReceipts, total, err := service.FetchAllShifts(limit, offset)
 		if err != nil {
@@ -32,7 +35,7 @@ func GetShifts(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(err))
 		}
 
-		data := shift_presenter.ReceiptsToShiftsResponse(receipts, individualReceipts)
+		data := shift_presenter.ReceiptsToShiftsResponse(receipts, individualReceipts, limit, offset)
 
 		return ctx.JSON(utils.Paginate(ctx, total, data))
 
@@ -72,7 +75,7 @@ func GetShiftById(service shift.Service) fiber.Handler {
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
+		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse2(receipts, individual_receipts)))
 	}
 }
 
@@ -177,7 +180,7 @@ func GetShiftsBetweenDates(service shift.Service) fiber.Handler {
 		}
 
 		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse(receipts, individual_receipts)))
+		return ctx.JSON(presenter.SuccessResponse(shift_presenter.ReceiptsToShiftsResponse2(receipts, individual_receipts)))
 	}
 }
 

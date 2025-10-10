@@ -2,6 +2,7 @@ package user
 
 import (
 	"fabiloco/hotel-trivoli-api/pkg/entities"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -37,7 +38,7 @@ func (r *repository) Read() (*[]entities.User, error) {
 func (r *repository) ReadById(id uint) (*entities.User, error) {
 	var user entities.User
 
-	result := r.db.Preload("Person").Find(&user, id)
+	result := r.db.Preload("Person").Preload("Role").Find(&user, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -120,6 +121,8 @@ func (r *repository) Update(id uint, data *entities.UserPatch) (*entities.User, 
 		}
 	}
 
+	fmt.Printf("Rol %d.", data.RoleID)
+
 	// --- B. Actualizar la entidad User ---
 	// Usamos el mismo struct DTO para actualizar los campos del User principal.
 	// Como 'data' (UserPatchDTO) tiene un campo 'Person *PersonPatchDTO',
@@ -131,6 +134,11 @@ func (r *repository) Update(id uint, data *entities.UserPatch) (*entities.User, 
 	if data.Username != nil {
 		updateData["username"] = *data.Username
 	}
+
+	if data.RoleID != nil {
+		updateData["role_id"] = *data.RoleID
+	}
+
 	if data.Password != nil {
 		// El servicio ya hizo el Hash, solo actualiza el campo
 		updateData["password"] = *data.Password
@@ -138,7 +146,7 @@ func (r *repository) Update(id uint, data *entities.UserPatch) (*entities.User, 
 
 	// Solo actualiza si hay algo que actualizar para el usuario
 	if len(updateData) > 0 {
-		result := r.db.Model(&user).Updates(updateData)
+		result := r.db.Model(&user).Select("Username", "Password", "RoleID").Updates(updateData)
 		if result.Error != nil {
 			return nil, result.Error
 		}

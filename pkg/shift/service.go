@@ -6,6 +6,7 @@ import (
 	individualreceipt "fabiloco/hotel-trivoli-api/pkg/individual_receipt"
 	receipt "fabiloco/hotel-trivoli-api/pkg/receipt"
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -101,7 +102,62 @@ func (s *service) FetchShiftsById(id uint) (*[]entities.Receipt, *[]entities.Ind
 // func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]entities.IndividualReceipt, error) {
 func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]entities.IndividualReceipt, int64, error) {
 
-	receipts, totalReceipts, err := s.receiptRepository.ReadByShiftNotNull(limit, offset)
+	// 1️⃣ Traer todos los shiftIDs existentes en ambas tablas
+	allShiftIDs, err := s.receiptRepository.FindAllShiftIDs()
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	individualShiftIDs, err := s.individualReceiptRepository.FindAllShiftIDs()
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	// 2️⃣ Unir y eliminar duplicados
+	shiftMap := make(map[int64]bool)
+	for _, id := range allShiftIDs {
+		shiftMap[id] = true
+	}
+	for _, id := range individualShiftIDs {
+		shiftMap[id] = true
+	}
+
+	// 3️⃣ Convertir el mapa a slice y ordenar
+	shiftIDs := make([]int64, 0, len(shiftMap))
+	for id := range shiftMap {
+		shiftIDs = append(shiftIDs, id)
+	}
+	sort.Slice(shiftIDs, func(i, j int) bool {
+		return shiftIDs[i] > shiftIDs[j]
+	})
+
+	total := len(shiftIDs)
+
+	// 4️⃣ Paginar sobre los shiftIDs únicos
+	start := offset
+	end := offset + limit
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+	pagedShiftIDs := shiftIDs[start:end]
+
+	// 5️⃣ Obtener los receipts e individualReceipts solo de esos shifts
+	receipts, err := s.receiptRepository.FindByShiftIDs(pagedShiftIDs)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	individualReceipts, err := s.individualReceiptRepository.FindByShiftIDs(pagedShiftIDs)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	return &receipts, &individualReceipts, int64(total), nil
+
+	/* receipts, totalReceipts, err := s.receiptRepository.ReadByShiftNotNull(limit, offset)
 	if err != nil {
 		return nil, nil, 0, err
 	}
@@ -117,7 +173,7 @@ func (s *service) FetchAllShifts(limit, offset int) (*[]entities.Receipt, *[]ent
 		total = totalIndividuals
 	}
 
-	return receipts, individualReceipts, total, nil
+	return receipts, individualReceipts, total, nil */
 
 	/* receipts, error := s.receiptRepository.ReadByShiftNotNull()
 

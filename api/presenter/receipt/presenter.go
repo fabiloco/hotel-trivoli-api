@@ -152,53 +152,53 @@ func ReceiptToReceiptResponse(receipt *entities.Receipt) *ReceiptResponse {
 	receiptResponse.UpdatedAt = receipt.UpdatedAt
 
 	return &receiptResponse
+	/*
+		var receiptResponse ReceiptResponse
 
-	/* var receiptResponse ReceiptResponse
+		// Map to store products by their IDs
+		productsMap := make(map[uint]*ProductResponse)
 
-	// Map to store products by their IDs
-	productsMap := make(map[uint]*ProductResponse)
+		for _, receipt_product := range receipt.Products {
+			var product = entities.Product{}
 
-	for _, receipt_product := range receipt.Products {
-		var product = entities.Product{}
+			database.DB.Preload("Type").Find(&product, receipt_product.ProductID)
 
-		database.DB.Preload("Type").Find(&product, receipt_product.ProductID)
-
-		if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
-			existingProduct.Quantity++
-		} else {
-			productsMap[receipt_product.ProductID] = &ProductResponse{
-				ID:        receipt_product.ProductID,
-				Name:      product.Name,
-				Type:      product.Type,
-				Price:     product.Price,
-				Img:       product.Img,
-				Quantity:  1,
-				CreatedAt: receipt_product.CreatedAt,
-				UpdatedAt: receipt_product.UpdatedAt,
+			if existingProduct, ok := productsMap[receipt_product.ProductID]; ok {
+				existingProduct.Quantity++
+			} else {
+				productsMap[receipt_product.ProductID] = &ProductResponse{
+					ID:        receipt_product.ProductID,
+					Name:      product.Name,
+					Type:      product.Type,
+					Price:     product.Price,
+					Img:       product.Img,
+					Quantity:  1,
+					CreatedAt: receipt_product.CreatedAt,
+					UpdatedAt: receipt_product.UpdatedAt,
+				}
 			}
 		}
-	}
 
-	// Convert productsMap back to slice
-	var productsResponseList []ProductResponse
-	for _, product := range productsMap {
-		productsResponseList = append(productsResponseList, *product)
-	}
+		// Convert productsMap back to slice
+		var productsResponseList []ProductResponse
+		for _, product := range productsMap {
+			productsResponseList = append(productsResponseList, *product)
+		}
 
-	receiptResponse.User = receipt.User
-	receiptResponse.Service = receipt.Service
-	receiptResponse.Room = receipt.Room
-	receiptResponse.TotalPrice = receipt.TotalPrice
-	receiptResponse.TotalTime = receipt.TotalTime
+		receiptResponse.User = receipt.User
+		receiptResponse.Service = receipt.Service
+		receiptResponse.Room = receipt.Room
+		receiptResponse.TotalPrice = receipt.TotalPrice
+		receiptResponse.TotalTime = receipt.TotalTime
 
-	receiptResponse.Products = productsResponseList
-	receiptResponse.Shift = receipt.Shift
+		receiptResponse.Products = productsResponseList
+		receiptResponse.Shift = receipt.Shift
 
-	receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
-	receiptResponse.CreatedAt = receipt.CreatedAt
-	receiptResponse.UpdatedAt = receipt.UpdatedAt
+		receiptResponse.ID = fmt.Sprint("r-", receipt.ID)
+		receiptResponse.CreatedAt = receipt.CreatedAt
+		receiptResponse.UpdatedAt = receipt.UpdatedAt
 
-	return &receiptResponse */
+		return &receiptResponse */
 }
 
 func IndividualReceiptToIndividualReceiptResponse(receipt *entities.IndividualReceipt) *IndividualReceiptResponse {
@@ -275,7 +275,7 @@ func IndividualReceiptToIndividualReceiptResponse(receipt *entities.IndividualRe
 	receiptResponse.UpdatedAt = receipt.UpdatedAt
 	return &receiptResponse
 
-	/* 	var receiptResponse IndividualReceiptResponse
+	/* var receiptResponse IndividualReceiptResponse
 
 	// Map to store products by their IDs
 	productsMap := make(map[uint]*ProductResponse)

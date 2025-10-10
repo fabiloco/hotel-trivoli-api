@@ -33,6 +33,7 @@ type UserPatch struct {
 	Person   *PersonPatch `json:"person"`
 	Username *string      `json:"username"`
 	Password *string      `json:"password"`
+	RoleID   *uint        `json:"role_id,omitempty"`
 }
 
 type PersonPatch struct {

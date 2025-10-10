@@ -25,6 +25,8 @@ type Repository interface {
 	ReadByDate(targetDate time.Time, limit, offset int) (*[]entities.IndividualReceipt, int64, error)
 	ReadBetweenDates(startDate time.Time, endDate time.Time) (*[]entities.IndividualReceipt, error)
 	ReadBetweenDatesPaginated(startDate time.Time, endDate time.Time, params *entities.PaginationParams) (*[]entities.IndividualReceipt, int64, error)
+	FindAllShiftIDs() ([]int64, error)
+	FindByShiftIDs(shiftIDs []int64) ([]entities.IndividualReceipt, error)
 }
 
 type repository struct {
@@ -260,4 +262,44 @@ func (r *repository) ReadAllByShiftId(id uint) (*[]entities.IndividualReceipt, e
 	}
 
 	return &receipt, nil
+}
+
+// FindAllShiftIDs obtiene todos los shift_id distintos presentes en individual_receipts
+func (r *repository) FindAllShiftIDs() ([]int64, error) {
+	var shiftIDs []int64
+	err := r.db.
+		Model(&entities.IndividualReceipt{}).
+		Where("shift_id IS NOT NULL").
+		Distinct().
+		Order("shift_id DESC").
+		Pluck("shift_id", &shiftIDs).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return shiftIDs, nil
+}
+
+// FindByShiftIDs obtiene todos los individual_receipts pertenecientes a los shift_id dados
+func (r *repository) FindByShiftIDs(shiftIDs []int64) ([]entities.IndividualReceipt, error) {
+	if len(shiftIDs) == 0 {
+		return []entities.IndividualReceipt{}, nil
+	}
+
+	var receipts []entities.IndividualReceipt
+	err := r.db.
+		Preload("Shift").
+		Preload("User").
+		Preload("Products").
+		Where("shift_id IN ?", shiftIDs).
+		Find(&receipts).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return receipts, nil
 }
