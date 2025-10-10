@@ -31,8 +31,8 @@ func ConnectDB() {
 		config.Config("DB_NAME"),
 	) */
 
-	//dns := "root:root@tcp(localhost:3306)/hotel_trivoli?charset=utf8mb4&parseTime=True&loc=Local"
-	dns := "root:root@tcp(192.168.1.88:3306)/hotel_trivoli?charset=utf8mb4&parseTime=True&loc=Local"
+	dns := "root:root@tcp(localhost:3306)/hotel_trivoli?charset=utf8mb4&parseTime=True&loc=Local"
+	// dns := "root:root@tcp(192.168.1.88:3306)/hotel_trivoli?charset=utf8mb4&parseTime=True&loc=Local"
 
 	DB, err = gorm.Open(mysql.Open(dns), &gorm.Config{})
 

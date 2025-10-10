@@ -102,51 +102,23 @@ func GenerateIndividualReceipts(service receipt.Service) fiber.Handler {
 // @Router        /api/v1/receipt [get]
 func GetReceipts(service receipt.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-
 		_, limit, offset := utils.GetPaginationParams(ctx)
 
-		/* receipts, total, err := service.FetchReceipts(limit, offset)
-		individualReceipts, total2, error := service.FetchIndividualReceipts(limit, offset) */
+		receipts, total, err := service.FetchReceipts(limit, offset)
+		individualReceipts, total2, error := service.FetchIndividualReceipts(limit, offset)
 
-		allReceipts, total, error := service.FetchAllReceipts(limit, offset)
-
-		if error != nil {
+		if error != nil || err != nil {
 			ctx.Status(http.StatusInternalServerError)
 			return ctx.JSON(presenter.ErrorResponse(error))
 		}
 
-		var receipts []entities.Receipt
-		var individualReceipts []entities.IndividualReceipt
-
-		for _, item := range allReceipts {
-			if item.IsIndividual {
-				if r, ok := item.Receipt.(entities.IndividualReceipt); ok {
-					individualReceipts = append(individualReceipts, r)
-				}
-			} else {
-				if r, ok := item.Receipt.(entities.Receipt); ok {
-					receipts = append(receipts, r)
-				}
-			}
-		}
-		/* totalTotal := total
-
-		if total < total2 {
-			totalTotal = total2
-		}
 		totalTotal := total + total2
 
 		response := fiber.Map{
 			"receipts":           receipt_presenter.ReceiptsToReceiptsResponses(*receipts),
 			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
-		} */
-
-		// return ctx.JSON(receipt_presenter.SuccessReceiptsResponse(receipts))
-		//return ctx.JSON(response)
-
-		resp := receipt_presenter.SuccessGeneralReceiptsResponse(&receipts, &individualReceipts)
-
-		return ctx.JSON(utils.Paginate(ctx, total, resp))
+		}
+		return ctx.JSON(utils.Paginate(ctx, totalTotal, response))
 	}
 }
 
