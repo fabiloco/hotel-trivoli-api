@@ -7,6 +7,7 @@ import (
 	product "fabiloco/hotel-trivoli-api/pkg/product"
 	receipt "fabiloco/hotel-trivoli-api/pkg/receipt"
 	"fmt"
+	"sort"
 	"time"
 )
 
@@ -120,22 +121,89 @@ func (s *service) ReceiptsBetweenDatesPaginated(startDate string, endDate string
 		return nil, 0, 0, errors.New(fmt.Sprintf("error parsing Date %s", endDate))
 	}
 
-	receipts, totalReceipts, err := s.receiptRepository.ReadBetweenDatesPaginated(sd, ed, params)
+	allReceipts, err := s.receiptRepository.ReadBetweenDates(sd, ed)
 	if err != nil {
 		return nil, 0, 0, err
 	}
 
-	individualReceipts, totalIndividualReceipts, err := s.individualReceiptRepository.ReadBetweenDatesPaginated(sd, ed, params)
+	allIndividualReceipts, err := s.individualReceiptRepository.ReadBetweenDates(sd, ed)
 	if err != nil {
 		return nil, 0, 0, err
+	}
+
+	totalReceipts := int64(len(*allReceipts))
+	totalIndividualReceipts := int64(len(*allIndividualReceipts))
+
+	all := make([]entities.GeneralReceiptItem, 0, len(*allReceipts)+len(*allIndividualReceipts))
+
+	for _, r := range *allReceipts {
+		all = append(all, entities.GeneralReceiptItem{
+			Receipt:      r,
+			IsIndividual: false,
+		})
+	}
+
+	for _, ir := range *allIndividualReceipts {
+		all = append(all, entities.GeneralReceiptItem{
+			Receipt:      ir,
+			IsIndividual: true,
+		})
+	}
+
+	sort.Slice(all, func(i, j int) bool {
+		var timeI, timeJ time.Time
+		if all[i].IsIndividual {
+			if individualReceipt, ok := all[i].Receipt.(entities.IndividualReceipt); ok {
+				timeI = individualReceipt.CreatedAt
+			}
+		} else {
+			if receipt, ok := all[i].Receipt.(entities.Receipt); ok {
+				timeI = receipt.CreatedAt
+			}
+		}
+
+		if all[j].IsIndividual {
+			if individualReceipt, ok := all[j].Receipt.(entities.IndividualReceipt); ok {
+				timeJ = individualReceipt.CreatedAt
+			}
+		} else {
+			if receipt, ok := all[j].Receipt.(entities.Receipt); ok {
+				timeJ = receipt.CreatedAt
+			}
+		}
+
+		return timeI.After(timeJ)
+	})
+
+	totalCombined := totalReceipts + totalIndividualReceipts
+
+	start := params.GetOffset()
+	end := start + params.GetLimit()
+	if start > len(all) {
+		start = len(all)
+	}
+	if end > len(all) {
+		end = len(all)
+	}
+	paged := all[start:end]
+
+	var unifiedReceipts []interface{}
+
+	for _, item := range paged {
+		if item.IsIndividual {
+			if individualReceipt, ok := item.Receipt.(entities.IndividualReceipt); ok {
+				unifiedReceipts = append(unifiedReceipts, individualReceipt)
+			}
+		} else {
+			if receipt, ok := item.Receipt.(entities.Receipt); ok {
+				unifiedReceipts = append(unifiedReceipts, receipt)
+			}
+		}
 	}
 
 	combinedData := map[string]interface{}{
-		"receipts":           receipts,
-		"individualReceipts": individualReceipts,
+		"receipts": unifiedReceipts,
 	}
-
-	totalCombined := totalReceipts + totalIndividualReceipts
 
 	return entities.NewPaginatedResponse(combinedData, totalCombined, params.Page, params.PageSize), totalReceipts, totalIndividualReceipts, nil
 }

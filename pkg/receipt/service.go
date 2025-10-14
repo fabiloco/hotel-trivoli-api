@@ -3,6 +3,7 @@ package receipt
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"fabiloco/hotel-trivoli-api/pkg/entities"
@@ -102,10 +103,10 @@ func (s *service) FetchAllReceipts(limit, offset int) ([]entities.GeneralReceipt
 		})
 	}
 
-	// Ordenar por fecha (si ambos structs tienen CreatedAt)
-	/* sort.Slice(all, func(i, j int) bool {
+	// Ordenar por fecha (más recientes primero)
+	sort.Slice(all, func(i, j int) bool {
 		return getCreatedAt(all[i]).After(getCreatedAt(all[j]))
-	}) */
+	})
 
 	// total real
 	//total := totalReceipts + totalIndividual

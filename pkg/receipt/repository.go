@@ -49,20 +49,21 @@ func (r *repository) Read(limit, offset int) (*[]entities.Receipt, int64, error)
 	var total int64
 
 	if err := r.db.Model(&entities.Receipt{}).
-		Where("shift_id IS NOT NULL").
 		Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	/* 	r.db.Preload("Products").Preload("Type").
-	Preload("Service").Preload("Room").Preload("User").
-	Preload("User.Person").Preload("Shift").
-	Find(&receipts) */
-	/* Limit(limit).Offset(offset). */
+	var result *gorm.DB
+	if limit == 0 {
+		result = r.db.Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").Find(&receipts)
+	} else {
+		result = r.db.Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").
+			Limit(limit).Offset(offset).Find(&receipts)
+	}
 
-	r.db.Preload("Products").Preload("Type").Preload("Service").Preload("Room").Preload("User").Preload("User.Person").Preload("Shift").
-		Where("shift_id IS NOT NULL").
-		Limit(limit).Offset(offset).Find(&receipts)
+	if result.Error != nil {
+		return nil, 0, result.Error
+	}
 
 	return &receipts, total, nil
 }

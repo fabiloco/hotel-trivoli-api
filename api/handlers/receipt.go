@@ -6,6 +6,7 @@ import (
 	receipt_presenter "fabiloco/hotel-trivoli-api/api/presenter/receipt"
 	"fabiloco/hotel-trivoli-api/printer"
 	"fmt"
+	"sort"
 	"time"
 
 	"fabiloco/hotel-trivoli-api/api/utils"
@@ -104,21 +105,89 @@ func GetReceipts(service receipt.Service) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		_, limit, offset := utils.GetPaginationParams(ctx)
 
-		receipts, total, err := service.FetchReceipts(limit, offset)
-		individualReceipts, total2, error := service.FetchIndividualReceipts(limit, offset)
-
-		if error != nil || err != nil {
+		allReceipts, totalReceipts, err := service.FetchReceipts(0, 0)
+		if err != nil {
 			ctx.Status(http.StatusInternalServerError)
-			return ctx.JSON(presenter.ErrorResponse(error))
+			return ctx.JSON(presenter.ErrorResponse(err))
 		}
 
-		totalTotal := total + total2
+		allIndividualReceipts, totalIndividualReceipts, err := service.FetchIndividualReceipts(0, 0)
+		if err != nil {
+			ctx.Status(http.StatusInternalServerError)
+			return ctx.JSON(presenter.ErrorResponse(err))
+		}
+
+		all := make([]entities.GeneralReceiptItem, 0, len(*allReceipts)+len(*allIndividualReceipts))
+
+		for _, r := range *allReceipts {
+			all = append(all, entities.GeneralReceiptItem{
+				Receipt:      r,
+				IsIndividual: false,
+			})
+		}
+
+		for _, ir := range *allIndividualReceipts {
+			all = append(all, entities.GeneralReceiptItem{
+				Receipt:      ir,
+				IsIndividual: true,
+			})
+		}
+
+		sort.Slice(all, func(i, j int) bool {
+			var timeI, timeJ time.Time
+			if all[i].IsIndividual {
+				if individualReceipt, ok := all[i].Receipt.(entities.IndividualReceipt); ok {
+					timeI = individualReceipt.CreatedAt
+				}
+			} else {
+				if receipt, ok := all[i].Receipt.(entities.Receipt); ok {
+					timeI = receipt.CreatedAt
+				}
+			}
+
+			if all[j].IsIndividual {
+				if individualReceipt, ok := all[j].Receipt.(entities.IndividualReceipt); ok {
+					timeJ = individualReceipt.CreatedAt
+				}
+			} else {
+				if receipt, ok := all[j].Receipt.(entities.Receipt); ok {
+					timeJ = receipt.CreatedAt
+				}
+			}
+
+			return timeI.After(timeJ)
+		})
+
+		totalCombined := totalReceipts + totalIndividualReceipts
+
+		start := offset
+		end := start + limit
+		if start > len(all) {
+			start = len(all)
+		}
+		if end > len(all) {
+			end = len(all)
+		}
+		paged := all[start:end]
+
+		var unifiedReceipts []interface{}
+
+		for _, item := range paged {
+			if item.IsIndividual {
+				if individualReceipt, ok := item.Receipt.(entities.IndividualReceipt); ok {
+					unifiedReceipts = append(unifiedReceipts, individualReceipt)
+				}
+			} else {
+				if receipt, ok := item.Receipt.(entities.Receipt); ok {
+					unifiedReceipts = append(unifiedReceipts, receipt)
+				}
+			}
+		}
 
 		response := fiber.Map{
-			"receipts":           receipt_presenter.ReceiptsToReceiptsResponses(*receipts),
-			"individualReceipts": receipt_presenter.SuccessIndividualReceiptsResponse(individualReceipts),
+			"receipts": unifiedReceipts,
 		}
-		return ctx.JSON(utils.Paginate(ctx, totalTotal, response))
+		return ctx.JSON(utils.Paginate(ctx, totalCombined, response))
 	}
 }
 
